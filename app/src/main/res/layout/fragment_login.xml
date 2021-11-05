@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="viewModel"
+            type="com.example.youngchemist.ui.screen.auth.login.LoginFragmnetViewModel" />
+    </data>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".ui.screen.auth.login.LoginFragment">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/white">
+
+            <ImageView
+                android:layout_width="@dimen/image_register_width"
+                android:layout_height="match_parent"
+                android:layout_marginStart="@dimen/image_register_margin"
+                android:src="@drawable/flask"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+            </ImageView>
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cv_comments"
+                android:layout_width="wrap_content"
+                android:layout_height="400dp"
+                app:cardBackgroundColor="@android:color/transparent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:layout_marginStart="0dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintHorizontal_bias="0"
+                app:layout_constraintVertical_bias="0.28">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/shape_rounded_rectangle">
+
+                    <TextView
+                        android:id="@+id/tv_welcome"
+                        style="@style/TittleTextStyle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/margin_regular_one_and_half"
+                        android:layout_marginEnd="@dimen/margin_regular_one_and_half"
+                        android:text="@string/welcome"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent">
+
+                    </TextView>
+
+
+                    <androidx.cardview.widget.CardView
+                        android:id="@+id/cardView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/margin_regular_doubled"
+                        android:layout_marginEnd="@dimen/margin_regular"
+                        app:cardCornerRadius="@dimen/corner_radius_small"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/tv_welcome">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:background="@drawable/shape_rounded_rectangle_for_edittext">
+
+                            <EditText
+                                android:layout_width="@dimen/edit_text_width"
+                                android:layout_height="wrap_content"
+                                android:hint="@string/login_hint">
+
+                            </EditText>
+
+                        </LinearLayout>
+
+                    </androidx.cardview.widget.CardView>
+
+                    <androidx.cardview.widget.CardView
+                        android:id="@+id/cardView2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/margin_regular_doubled"
+                        android:layout_marginEnd="@dimen/margin_regular"
+                        app:cardCornerRadius="@dimen/corner_radius_small"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/cardView">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:background="@drawable/shape_rounded_rectangle_for_edittext">
+
+                            <EditText
+                                android:layout_width="@dimen/edit_text_width"
+                                android:layout_height="wrap_content"
+                                android:hint="@string/password_hint">
+
+                            </EditText>
+                        </LinearLayout>
+
+                    </androidx.cardview.widget.CardView>
+
+                    <androidx.appcompat.widget.AppCompatButton
+                        style="@style/DefaultButtonStyle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="@dimen/margin_regular_doubled"
+                        android:backgroundTint="#0e8bce"
+                        android:text="@string/enter"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="@+id/cardView2"
+                        app:layout_constraintStart_toStartOf="@+id/cardView2">
+
+                    </androidx.appcompat.widget.AppCompatButton>
+
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+            </androidx.cardview.widget.CardView>
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/register"
+                style="@style/DefaultButtonStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_extra_huge"
+                android:background="@drawable/shape_rounded_button"
+                android:backgroundTint="#0e8bce"
+                android:drawableEnd="@drawable/ic_baseline_arrow_right"
+                android:text="@string/register"
+                android:onClick="@{view -> viewModel.navigateToRegisterScreen()}"
+                app:layout_constraintEnd_toEndOf="@+id/cv_comments"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/cv_comments">
+
+            </androidx.appcompat.widget.AppCompatButton>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </FrameLayout>
+</layout>

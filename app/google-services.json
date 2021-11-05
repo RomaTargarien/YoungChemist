@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "610531796654",
+    "project_id": "youngchemist-c52a2",
+    "storage_bucket": "youngchemist-c52a2.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:610531796654:android:d5296df66d51b2277c2f3f",
+        "android_client_info": {
+          "package_name": "com.example.youngchemist"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "610531796654-bb75o2q3bgdvbr6jtqqa90lr22e0k40a.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDsl8t0y1CxLSfX6uDKDy4RJ0pmA4FpSPs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "610531796654-bb75o2q3bgdvbr6jtqqa90lr22e0k40a.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
