@@ -7,4 +7,6 @@
     <string name="enter">Войти</string>
     <string name="welcome">Добро пожаловать</string>
     <string name="register">Зарегестрироваться</string>
+    <string name="register_familyName">Фамилия</string>
+    <string name="repeted_password_hint">Повторите пароль</string>
 </resources>

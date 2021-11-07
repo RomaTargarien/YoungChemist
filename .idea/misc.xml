@@ -4,6 +4,15 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="../../../../layout/custom_preview.xml" value="0.25" />
+        <entry key="..\:/android-studio-2020.3.1.15-windows/AndroidApps/Apps/YoungChemist/app/src/main/res/drawable/fon.xml" value="0.22870370370370371" />
+        <entry key="..\:/android-studio-2020.3.1.15-windows/AndroidApps/Apps/YoungChemist/app/src/main/res/drawable/ic_baseline_arrow_left.xml" value="0.23333333333333334" />
+        <entry key="..\:/android-studio-2020.3.1.15-windows/AndroidApps/Apps/YoungChemist/app/src/main/res/drawable/ic_baseline_arrow_right.xml" value="0.23333333333333334" />
+        <entry key="..\:/android-studio-2020.3.1.15-windows/AndroidApps/Apps/YoungChemist/app/src/main/res/drawable/shape_rounded_button.xml" value="0.23333333333333334" />
+        <entry key="..\:/android-studio-2020.3.1.15-windows/AndroidApps/Apps/YoungChemist/app/src/main/res/drawable/shape_rounded_left_rectangle.xml" value="0.22870370370370371" />
+        <entry key="..\:/android-studio-2020.3.1.15-windows/AndroidApps/Apps/YoungChemist/app/src/main/res/drawable/shape_rounded_rectangle.xml" value="0.23333333333333334" />
+        <entry key="..\:/android-studio-2020.3.1.15-windows/AndroidApps/Apps/YoungChemist/app/src/main/res/drawable/shape_rounded_rectangle_for_edittext.xml" value="0.22870370370370371" />
+        <entry key="..\:/android-studio-2020.3.1.15-windows/AndroidApps/Apps/YoungChemist/app/src/main/res/layout/fragment_login.xml" value="0.2231833910034602" />
+        <entry key="..\:/android-studio-2020.3.1.15-windows/AndroidApps/Apps/YoungChemist/app/src/main/res/layout/fragment_register.xml" value="0.176" />
         <entry key="app/src/main/res/drawable/shape_rounded_button.xml" value="0.3212962962962963" />
         <entry key="app/src/main/res/drawable/shape_rounded_rectangle.xml" value="0.3385416666666667" />
         <entry key="app/src/main/res/drawable/shape_rounded_rectangle_for_edittext.xml" value="0.3212962962962963" />
