@@ -6,7 +6,8 @@
             <solid android:color="#eaeaf0"/>
             <corners android:radius="@dimen/corner_radius_small"/>
             <padding android:right="15dp"
-                android:top="7dp"
+                android:bottom="3dp"
+                android:top="3dp"
                 android:left="15dp"/>
         </shape>
     </item>

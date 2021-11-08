@@ -20,41 +20,170 @@
             android:background="@color/white">
 
             <ImageView
-                android:layout_width="650dp"
+                android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:layout_marginEnd="86dp"
-                android:src="@drawable/flask"
-                app:layout_constraintEnd_toEndOf="parent">
-
-            </ImageView>
-
-            <androidx.cardview.widget.CardView
-                android:id="@+id/cv_comments"
-                android:layout_width="430dp"
-                android:layout_height="400dp"
-                android:layout_marginStart="184dp"
-                android:layout_marginTop="80dp"
-                app:cardCornerRadius="@dimen/corner_radius_large"
+                android:src="@drawable/right_half_flask"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/register_box"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/shape_rounded_left_rectangle"
+                android:elevation="10dp"
+                android:paddingLeft="@dimen/padding_extra_huge"
+                android:paddingRight="@dimen/padding_extra_huge"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="1"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.3">
 
 
-            </androidx.cardview.widget.CardView>
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/cardView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:cardCornerRadius="@dimen/corner_radius_small"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    android:layout_marginTop="@dimen/margin_regular_doubled"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/shape_rounded_rectangle_for_edittext"
+                        android:backgroundTint="@color/white">
+
+                        <EditText
+                            android:layout_width="@dimen/edit_text_width"
+                            android:layout_height="wrap_content"
+                            android:hint="@string/login_hint">
+
+                        </EditText>
+
+                    </LinearLayout>
+
+                </androidx.cardview.widget.CardView>
+
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/cv_familyName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/margin_regular_doubled"
+                    app:cardCornerRadius="@dimen/corner_radius_small"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/cardView">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/shape_rounded_rectangle_for_edittext"
+                        android:backgroundTint="@color/white">
+
+                        <EditText
+                            android:layout_width="@dimen/edit_text_width"
+                            android:layout_height="wrap_content"
+                            android:hint="@string/register_familyName">
+
+                        </EditText>
+
+                    </LinearLayout>
+
+                </androidx.cardview.widget.CardView>
+
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/cardView2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/margin_regular_doubled"
+                    app:cardCornerRadius="@dimen/corner_radius_small"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/cv_familyName">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/shape_rounded_rectangle_for_edittext"
+                        android:backgroundTint="@color/white">
+
+                        <EditText
+                            android:layout_width="@dimen/edit_text_width"
+                            android:layout_height="wrap_content"
+                            android:hint="@string/password_hint">
+
+                        </EditText>
+                    </LinearLayout>
+
+                </androidx.cardview.widget.CardView>
+
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/cv_repeated_password"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/margin_regular_doubled"
+                    app:cardCornerRadius="@dimen/corner_radius_small"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/cardView2">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/shape_rounded_rectangle_for_edittext"
+                        android:backgroundTint="@color/white">
+
+                        <EditText
+                            android:layout_width="@dimen/edit_text_width"
+                            android:layout_height="wrap_content"
+                            android:hint="@string/repeted_password_hint">
+
+                        </EditText>
+                    </LinearLayout>
+
+                </androidx.cardview.widget.CardView>
+
+
+
+                <androidx.appcompat.widget.AppCompatButton
+                    style="@style/DefaultButtonStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/margin_regular_doubled"
+                    android:layout_marginBottom="@dimen/margin_regular"
+                    android:text="@string/register"
+                    android:textSize="14sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="@+id/cardView2"
+                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintStart_toStartOf="@+id/cardView2"
+                    app:layout_constraintTop_toBottomOf="@+id/cv_repeated_password">
+
+                </androidx.appcompat.widget.AppCompatButton>
+
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
             <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/login"
                 style="@style/DefaultButtonStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/margin_extra_huge"
                 android:background="@drawable/shape_rounded_button"
                 android:backgroundTint="#0e8bce"
                 android:drawableStart="@drawable/ic_baseline_arrow_left"
-                android:text="@string/enter"
                 android:onClick="@{view -> viewModel.navigateToLoginScreen()}"
-                app:layout_constraintEnd_toEndOf="@+id/cv_comments"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/cv_comments">
+                android:text="@string/enter"
+                android:layout_marginTop="@dimen/margin_huge"
+                app:layout_constraintEnd_toEndOf="@+id/register_box"
+                app:layout_constraintStart_toStartOf="@+id/register_box"
+                app:layout_constraintTop_toBottomOf="@+id/register_box">
 
             </androidx.appcompat.widget.AppCompatButton>
 
