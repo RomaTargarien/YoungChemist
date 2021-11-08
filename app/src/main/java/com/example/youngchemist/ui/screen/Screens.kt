@@ -5,6 +5,7 @@ import com.example.youngchemist.ui.screen.auth.login.LoginFragment
 import com.example.youngchemist.ui.screen.auth.register.RegisterFragment
 import com.example.youngchemist.ui.screen.main.MainFragment
 import com.example.youngchemist.ui.screen.main.subjects.SubjectsFragment
+import com.example.youngchemist.ui.screen.main.subjects.lectures.lectures_list.LecturesListFragment
 import com.github.terrakok.cicerone.androidx.FragmentScreen
 
 object Screens {
@@ -25,8 +26,8 @@ object Screens {
         MainFragment()
     }
 
-    fun subjectsScreen() = FragmentScreen {
-        SubjectsFragment()
+    fun lecturesListScreen(subjectName: String) = FragmentScreen {
+        LecturesListFragment.newInstance(subjectName)
     }
 
 }

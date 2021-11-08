@@ -5,14 +5,18 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.youngchemist.R
 import com.example.youngchemist.databinding.FragmentSubjectsBinding
 import com.example.youngchemist.model.Subject
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class SubjectsFragment : Fragment() {
 
     private lateinit var binding: FragmentSubjectsBinding
+    private val viewModel: SubjectsFragmentViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -31,5 +35,8 @@ class SubjectsFragment : Fragment() {
 
         binding.rvSubjects.layoutManager = GridLayoutManager(this.requireContext(),3)
         binding.rvSubjects.adapter = adapter
+        adapter.setOnClickListener {
+            viewModel.navigateToLecturesListScreen(it)
+        }
     }
 }
