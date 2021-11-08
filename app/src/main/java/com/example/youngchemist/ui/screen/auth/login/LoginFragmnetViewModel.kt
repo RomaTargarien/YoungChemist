@@ -4,12 +4,12 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.youngchemist.ui.screen.Screens
+import com.example.youngchemist.ui.screen.main.MainFragment
 import com.github.terrakok.cicerone.Router
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withTimeout
 import javax.inject.Inject
 
 @HiltViewModel
@@ -21,11 +21,16 @@ class LoginFragmnetViewModel @Inject constructor(
     fun navigateToRegisterScreen() {
         router.navigateTo(Screens.registerScreen())
     }
-    fun onTextChanged(s: CharSequence, start: Int ,before : Int ,count: Int ) {
+
+    fun enter(){
+        router.newRootScreen(Screens.mainScreen())
+    }
+
+    fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
         job?.cancel()
         job = viewModelScope.launch {
             delay(1000)
-            Log.d("TAG",s.toString())
+            Log.d("TAG", s.toString())
         }
     }
 }

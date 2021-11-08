@@ -116,6 +116,7 @@
                     android:layout_marginTop="@dimen/margin_huge"
                     android:layout_marginBottom="@dimen/margin_regular_doubled"
                     android:text="@string/enter"
+                    android:onClick="@{view -> viewModel.enter()}"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="@+id/cardView2"
                     app:layout_constraintHorizontal_bias="0.5"
