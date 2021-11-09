@@ -38,7 +38,7 @@
 
     <!-- Extra -->
     <dimen name="card_register_margin">200dp</dimen>
-    <dimen name="edit_text_width">200dp</dimen>
+    <dimen name="edit_text_width">180dp</dimen>
     <dimen name="image_register_width">650dp</dimen>
     <dimen name="image_register_margin">152dp</dimen>
 

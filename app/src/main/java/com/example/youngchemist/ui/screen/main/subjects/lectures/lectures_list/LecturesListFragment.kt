@@ -8,7 +8,10 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.youngchemist.R
 import com.example.youngchemist.databinding.FragmentLecturesListBinding
+import com.example.youngchemist.ui.screen.Screens
+import com.github.terrakok.cicerone.Router
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 private const val LECTURE_NAME = "param1"
 
@@ -17,6 +20,9 @@ class LecturesListFragment : Fragment() {
 
     private lateinit var binding: FragmentLecturesListBinding
     private var param1: String? = null
+
+    @Inject
+   lateinit var router: Router
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,11 +40,16 @@ class LecturesListFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val list = listOf("Лекция 1","Лекция 2","Лекция 3")
+        val adapter = LecturesListAdapter(list)
         binding.rvLecturesList.layoutManager = LinearLayoutManager(this.requireContext(),LinearLayoutManager.VERTICAL,false)
+        binding.rvLecturesList.addItemDecoration(SpacesItemVerticalDecoration(10))
         param1?.let {
             if (it.equals("Органика")) {
-                binding.rvLecturesList.adapter = LecturesListAdapter(list)
+                binding.rvLecturesList.adapter = adapter
             }
+        }
+        adapter.setOnClickListener {
+            router.navigateTo(Screens.lectureScreen())
         }
     }
 

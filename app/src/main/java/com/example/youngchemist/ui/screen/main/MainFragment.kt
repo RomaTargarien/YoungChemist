@@ -1,38 +1,45 @@
 package com.example.youngchemist.ui.screen.main
 
 import android.os.Bundle
-import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import com.example.youngchemist.R
 import com.example.youngchemist.databinding.FragmentMainBinding
-import com.example.youngchemist.ui.screen.Screens
 import com.example.youngchemist.ui.screen.main.qr.QrCodeScannerFragment
 import com.example.youngchemist.ui.screen.main.stat.StatisticsFragment
 import com.example.youngchemist.ui.screen.main.subjects.SubjectsFragment
 import com.example.youngchemist.ui.screen.main.user.UserFragment
-import com.github.terrakok.cicerone.Router
-import com.github.terrakok.cicerone.Screen
 import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
+
 
 @AndroidEntryPoint
 class MainFragment : Fragment() {
 
     private lateinit var binding: FragmentMainBinding
 
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View =
-        FragmentMainBinding.inflate(inflater,container,false).also { binding = it }.root
+        FragmentMainBinding.inflate(inflater, container, false).also { binding = it }.root
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        replaceFragment(getFragmentForTabId(R.id.subjects)!!)
-        Log.d("TAG",binding.bnvMain.isSelected.toString())
+        val qrCodeRawValue = arguments?.getString(QR_CODE_RAW_VALUE)
+        if (qrCodeRawValue != null) {
+            replaceFragment(getFragmentForTabId(R.id.qrCode, qrCodeRawValue)!!)
+            binding.bnvMain.selectedItemId = R.id.qrCode
+        } else {
+            replaceFragment(getFragmentForTabId(R.id.subjects)!!)
+        }
         binding.bnvMain.setOnItemSelectedListener { item ->
             getFragmentForTabId(item.itemId)?.run {
                 replaceFragment(this); true
@@ -40,7 +47,7 @@ class MainFragment : Fragment() {
         }
     }
 
-    private fun getFragmentForTabId(tabId: Int): Fragment? {
+    private fun getFragmentForTabId(tabId: Int, qrCodeRawValue: String? = null): Fragment? {
         return when (tabId) {
             R.id.subjects -> {
                 SubjectsFragment()
@@ -49,7 +56,7 @@ class MainFragment : Fragment() {
                 StatisticsFragment()
             }
             R.id.qrCode -> {
-                QrCodeScannerFragment()
+                QrCodeScannerFragment.newInstance(qrCodeRawValue)
             }
             R.id.person -> {
                 UserFragment()
@@ -67,4 +74,15 @@ class MainFragment : Fragment() {
         ).replace(R.id.tab_content, fragment).commit()
     }
 
+    companion object {
+        private const val QR_CODE_RAW_VALUE = "qr_raw_value"
+
+        @JvmStatic
+        fun newInstance(param1: String?) =
+            MainFragment().apply {
+                arguments = Bundle().apply {
+                    putString(QR_CODE_RAW_VALUE, param1)
+                }
+            }
+    }
 }

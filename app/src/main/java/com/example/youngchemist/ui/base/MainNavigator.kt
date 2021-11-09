@@ -27,7 +27,12 @@ class MainNavigator(activity: FragmentActivity, containerId: Int) :
                     R.anim.pop_exit_anim
                 )
             }
-            else -> {}
+            else -> fragmentTransaction.setCustomAnimations(
+                R.anim.nav_default_enter_anim,
+                R.anim.nav_default_exit_anim,
+                R.anim.nav_default_pop_enter_anim,
+                R.anim.nav_default_pop_exit_anim
+            )
 
         }
     }

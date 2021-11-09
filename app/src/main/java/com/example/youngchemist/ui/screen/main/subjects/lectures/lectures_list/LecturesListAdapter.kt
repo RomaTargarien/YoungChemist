@@ -10,9 +10,14 @@ import com.example.youngchemist.ui.screen.main.subjects.SubjectsAdapter
 
 class LecturesListAdapter(val list: List<String>): RecyclerView.Adapter<LecturesListAdapter.LectureViewHolder>() {
 
-    class LectureViewHolder(val binding: ItemLectureInListBinding): RecyclerView.ViewHolder(binding.root) {
+    inner class LectureViewHolder(val binding: ItemLectureInListBinding): RecyclerView.ViewHolder(binding.root) {
         fun bind(item: String) {
             binding.tvTitle.setText(item)
+            binding.tvTitle.setOnClickListener {
+                onClick?.let { click ->
+                    click(item)
+                }
+            }
         }
     }
 
@@ -25,4 +30,9 @@ class LecturesListAdapter(val list: List<String>): RecyclerView.Adapter<Lectures
     }
 
     override fun getItemCount() = list.size
+
+    private var onClick: ((String) -> Unit)? = null
+    fun setOnClickListener(listener: (String) -> Unit) {
+        onClick = listener
+    }
 }
