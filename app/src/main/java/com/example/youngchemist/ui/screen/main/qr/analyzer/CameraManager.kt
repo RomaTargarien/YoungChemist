@@ -9,7 +9,6 @@ import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
-import com.example.youngchemist.ui.screen.main.qr.scan.ScanFragmentViewModel.QrCodeImageAnalyzer
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 

@@ -7,17 +7,19 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.example.youngchemist.R
 import com.example.youngchemist.databinding.FragmentMainBinding
-import com.example.youngchemist.ui.screen.main.qr.QrCodeScannerFragment
+import com.example.youngchemist.ui.screen.main.qr.QrCodeFragment
 import com.example.youngchemist.ui.screen.main.stat.StatisticsFragment
 import com.example.youngchemist.ui.screen.main.subjects.SubjectsFragment
+import com.example.youngchemist.ui.screen.main.user.BottomTabScreen
 import com.example.youngchemist.ui.screen.main.user.UserFragment
 import dagger.hilt.android.AndroidEntryPoint
 
 
 @AndroidEntryPoint
-class MainFragment : Fragment() {
+class MainFragment : Fragment(),BottomTabScreen {
 
     private lateinit var binding: FragmentMainBinding
+
 
 
     override fun onCreateView(
@@ -56,7 +58,7 @@ class MainFragment : Fragment() {
                 StatisticsFragment()
             }
             R.id.qrCode -> {
-                QrCodeScannerFragment.newInstance(qrCodeRawValue)
+                QrCodeFragment.newInstance(qrCodeRawValue)
             }
             R.id.person -> {
                 UserFragment()
@@ -78,11 +80,27 @@ class MainFragment : Fragment() {
         private const val QR_CODE_RAW_VALUE = "qr_raw_value"
 
         @JvmStatic
-        fun newInstance(param1: String?) =
+        fun newInstance(qrCodeRawValue: String?) =
             MainFragment().apply {
                 arguments = Bundle().apply {
-                    putString(QR_CODE_RAW_VALUE, param1)
+                    putString(QR_CODE_RAW_VALUE, qrCodeRawValue)
                 }
             }
+    }
+
+    override fun navigateToSubjectsScreen() {
+        binding.bnvMain.selectedItemId = R.id.subjects
+    }
+
+    override fun navigateToStatisticsScreen() {
+        binding.bnvMain.selectedItemId = R.id.stat
+    }
+
+    override fun navigateToQrCodeScreen() {
+        binding.bnvMain.selectedItemId = R.id.qrCode
+    }
+
+    override fun navigateToUserScreen() {
+        binding.bnvMain.selectedItemId = R.id.person
     }
 }

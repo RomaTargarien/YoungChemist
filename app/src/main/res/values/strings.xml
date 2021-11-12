@@ -28,4 +28,7 @@
         датчики и во многих случаях метан для лабораторий и промышленных производств
         поставляется без добавления одорантов
     </string>
+    <string name="error_input_empty">Поле не должно быть пустым</string>
+    <string name="error_not_a_valid_email">Введите верную почту</string>
+    <string name="error_password_too_short">Пароль должен быть не менее %d символов</string>
 </resources>
