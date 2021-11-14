@@ -4,7 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.youngchemist.ui.base.validation.ValidationImpl.EmailValidation
+import com.example.youngchemist.ui.base.validation.ValidationImpl.LoginValidation
 import com.example.youngchemist.ui.base.validation.ValidationImpl.PasswordValidation
 import com.example.youngchemist.ui.screen.Screens
 import com.example.youngchemist.ui.util.Resource
@@ -20,7 +20,7 @@ import javax.inject.Inject
 @HiltViewModel
 class LoginFragmnetViewModel @Inject constructor(
     private val router: Router,
-    private val emailValidation: EmailValidation,
+    private val loginValidation: LoginValidation,
     private val passwordValidation: PasswordValidation
 ) : ViewModel() {
 
@@ -31,28 +31,80 @@ class LoginFragmnetViewModel @Inject constructor(
     var loginText: String = ""
     var passwordText: String = ""
 
-    private val _stateLogin = MutableStateFlow<Resource<String>>(Resource.Error(""))
-    val stateLogin = _stateLogin
+    private val stateLogin = MutableStateFlow<Resource<String>>(Resource.Error(""))
 
-    private val _statePassword = MutableStateFlow<Resource<String>>(Resource.Error(""))
-    val statePassword = _statePassword
+    private val statePassword = MutableStateFlow<Resource<String>>(Resource.Error(""))
 
     private val _enterButtonEnabled: MutableLiveData<Boolean> = MutableLiveData(false)
     val enterButtonEnabled: LiveData<Boolean> = _enterButtonEnabled
 
     private val _errorLoginMessageBehavior: MutableLiveData<Pair<String?, Boolean>> =
         MutableLiveData()
+
     val errorLoginMessageBehavior: LiveData<Pair<String?, Boolean>> = _errorLoginMessageBehavior
 
     private val _errorPasswordMessageBehavior: MutableLiveData<Pair<String?, Boolean>> =
         MutableLiveData()
+
     val errorPasswordMessageBehavior: LiveData<Pair<String?, Boolean>> =
         _errorPasswordMessageBehavior
 
+    private val _isPasswordShown: MutableLiveData<Boolean> = MutableLiveData(false)
+    val isPasswordShown: LiveData<Boolean> = _isPasswordShown
+
 
     init {
+        observe()
+    }
+
+    fun navigateToRegisterScreen() {
+        router.navigateTo(Screens.registerScreen())
+    }
+
+    fun navigateToRestorePasswordScreen(){
+        router.navigateTo(Screens.restorePasswordScreen())
+    }
+
+    fun enter() {
+        router.newRootScreen(Screens.mainScreen())
+    }
+    fun exit() {
+        router.newRootScreen(Screens.authScreen())
+    }
+
+    fun onEmailTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
+        loginJob?.cancel()
+        loginText = s.toString()
+        _errorLoginMessageBehavior.postValue(Pair(null, false))
+        _enterButtonEnabled.postValue(false)
+        loginJob = viewModelScope.launch(Dispatchers.Default) {
+            flow {
+                delay(1000)
+                emit(loginValidation.validate(s.toString()))
+            }.collect {
+                stateLogin.emit(it)
+            }
+        }
+    }
+
+    fun onPasswordTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
+        passwordJob?.cancel()
+        passwordText = s.toString()
+        _errorPasswordMessageBehavior.postValue(Pair(null, false))
+        _enterButtonEnabled.postValue(false)
+        passwordJob = viewModelScope.launch(Dispatchers.Default) {
+            flow {
+                delay(1000)
+                emit(passwordValidation.validate(s.toString()))
+            }.collect {
+                statePassword.emit(it)
+            }
+        }
+    }
+
+    fun observe() {
         viewModelScope.launch {
-            stateLogin.combine(statePassword) { login, password ->
+            combine(stateLogin,statePassword) { login, password ->
                 Pair(login, password)
             }.collect { result ->
                 val loginResult = result.first
@@ -74,46 +126,18 @@ class LoginFragmnetViewModel @Inject constructor(
                 }
             }
         }
-
     }
 
-    fun navigateToRegisterScreen() {
-        router.navigateTo(Screens.registerScreen())
+    fun togglePasswordVisibility() {
+        _isPasswordShown.value?.let {
+            _isPasswordShown.postValue(!it)
+        }
     }
 
-    fun enter() {
-        router.newRootScreen(Screens.mainScreen())
-    }
-
-    fun onEmailTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
+    override fun onCleared() {
+        super.onCleared()
         loginJob?.cancel()
-        loginText = s.toString()
-        _errorLoginMessageBehavior.postValue(Pair(null, false))
-        _enterButtonEnabled.postValue(false)
-        loginJob = viewModelScope.launch(Dispatchers.Default) {
-            flow {
-                delay(1000)
-                emit(emailValidation.validate(s.toString()))
-            }.collect {
-                _stateLogin.emit(it)
-            }
-        }
-    }
-
-    fun onPasswordTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
         passwordJob?.cancel()
-        passwordText = s.toString()
-        _errorPasswordMessageBehavior.postValue(Pair(null, false))
-        _enterButtonEnabled.postValue(false)
-        passwordJob = viewModelScope.launch(Dispatchers.Default) {
-            flow {
-                delay(1000)
-                emit(passwordValidation.validate(s.toString()))
-            }.collect {
-                _statePassword.emit(it)
-            }
-        }
     }
-
 
 }

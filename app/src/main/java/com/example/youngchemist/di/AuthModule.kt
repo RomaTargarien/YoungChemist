@@ -1,7 +1,11 @@
 package com.example.youngchemist.di
 
 import android.content.Context
+import com.example.youngchemist.repositories.AuthRepository
+import com.example.youngchemist.repositories.impl.AuthRepositoryImpl
 import com.example.youngchemist.ui.base.validation.ValidationImpl
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -16,10 +20,31 @@ object AuthModule {
     @Provides
     @Singleton
     fun provideEmailValidation(@ApplicationContext context: Context) =
-        ValidationImpl.EmailValidation(context)
+        ValidationImpl.LoginValidation(context)
 
     @Provides
     @Singleton
     fun providePasswordValidation(@ApplicationContext context: Context) =
         ValidationImpl.PasswordValidation(context)
+
+    @Provides
+    @Singleton
+    fun provideSurnameValidation(@ApplicationContext context: Context) =
+        ValidationImpl.SurnameValidation(context)
+
+    @Provides
+    @Singleton
+    fun provideAuthRepository(
+        firebaseAuth: FirebaseAuth,
+        firestore: FirebaseFirestore
+    ) = AuthRepositoryImpl(firebaseAuth, firestore) as AuthRepository
+
+    @Provides
+    @Singleton
+    fun provideFirebaseAuth() = FirebaseAuth.getInstance()
+
+    @Provides
+    @Singleton
+    fun provideFirestore() = FirebaseFirestore.getInstance()
+
 }

@@ -41,6 +41,7 @@
     <dimen name="edit_text_width">180dp</dimen>
     <dimen name="image_register_width">650dp</dimen>
     <dimen name="image_register_margin">152dp</dimen>
+    <dimen name="test">60dp</dimen>
 
 
 </resources>

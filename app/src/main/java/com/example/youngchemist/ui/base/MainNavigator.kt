@@ -19,14 +19,6 @@ class MainNavigator(activity: FragmentActivity, containerId: Int) :
         when {
             currentFragment == null && nextFragment is AuthFragment -> {
             }
-            nextFragment is LoginFragment || nextFragment is RegisterFragment -> {
-                fragmentTransaction.setCustomAnimations(
-                    R.anim.enter_anim,
-                    R.anim.exit_anim,
-                    R.anim.pop_enter_anim,
-                    R.anim.pop_exit_anim
-                )
-            }
             else -> fragmentTransaction.setCustomAnimations(
                 R.anim.nav_default_enter_anim,
                 R.anim.nav_default_exit_anim,

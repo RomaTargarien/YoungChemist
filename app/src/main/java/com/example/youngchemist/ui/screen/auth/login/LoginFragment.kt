@@ -20,7 +20,12 @@ import android.renderscript.Element
 import android.renderscript.ScriptIntrinsicBlur
 
 import android.renderscript.RenderScript
+import android.text.method.HideReturnsTransformationMethod
+import android.text.method.PasswordTransformationMethod
+import android.util.Log
 import android.view.ViewTreeObserver
+import androidx.activity.addCallback
+import com.example.youngchemist.R
 
 
 @AndroidEntryPoint
@@ -38,6 +43,9 @@ class LoginFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        requireActivity().onBackPressedDispatcher.addCallback {
+            viewModel.exit()
+        }
         binding.viewModel = viewModel
         viewModel.enterButtonEnabled.observe(viewLifecycleOwner, {
             binding.bnEnter.isEnabled = it
@@ -53,7 +61,23 @@ class LoginFragment : Fragment() {
             binding.tvPasswordErrorMessage.isVisible = it.second
             it.first.let { binding.tvPasswordErrorMessage.setText(it) }
         })
+        binding.etLogin.setText(viewModel.loginText)
+        binding.etLogin.setSelection(viewModel.loginText.length)
 
+        binding.etPassword.setText(viewModel.passwordText)
+        binding.etPassword.setSelection(viewModel.passwordText.length)
 
+        viewModel.isPasswordShown.observe(viewLifecycleOwner, {
+            if (it) {
+                binding.etPassword.transformationMethod =
+                    HideReturnsTransformationMethod.getInstance()
+                binding.etPassword.setSelection(viewModel.passwordText.length)
+                binding.ivIsPasswordShown.setImageResource(R.drawable.ic_icon_view_password)
+            } else {
+                binding.etPassword.transformationMethod = PasswordTransformationMethod.getInstance()
+                binding.etPassword.setSelection(viewModel.passwordText.length)
+                binding.ivIsPasswordShown.setImageResource(R.drawable.ic_icon_hide_password)
+            }
+        })
     }
 }

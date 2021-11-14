@@ -11,6 +11,6 @@ class MainActivityViewModel @Inject constructor(
 ) : ViewModel() {
 
     fun onActivityCreated() {
-        router.newRootScreen(Screens.loginScreen())
+        router.newRootScreen(Screens.authScreen())
     }
 }

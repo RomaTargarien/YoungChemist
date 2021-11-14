@@ -11,7 +11,14 @@ class AuthFragmentViewModel @Inject constructor(
     private val router: Router
 ) : ViewModel() {
 
-    fun onAuthFragmnetCreated() {
+    fun navigateToRegisterScreen() {
+       router.navigateTo(Screens.registerScreen())
+    }
+
+    fun navigateToLoginScreen() {
         router.navigateTo(Screens.loginScreen())
+    }
+    fun exit() {
+        router.exit()
     }
 }

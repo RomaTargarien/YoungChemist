@@ -2,6 +2,7 @@ package com.example.youngchemist.ui.screen
 
 import com.example.youngchemist.ui.screen.auth.AuthFragment
 import com.example.youngchemist.ui.screen.auth.login.LoginFragment
+import com.example.youngchemist.ui.screen.auth.password_restore.RestorePasswordFragment
 import com.example.youngchemist.ui.screen.auth.register.RegisterFragment
 import com.example.youngchemist.ui.screen.main.MainFragment
 import com.example.youngchemist.ui.screen.main.qr.scan.ScanFragment
@@ -38,6 +39,10 @@ object Screens {
 
     fun scanScreen() = FragmentScreen {
         ScanFragment()
+    }
+
+    fun restorePasswordScreen() = FragmentScreen {
+        RestorePasswordFragment()
     }
 
 }
