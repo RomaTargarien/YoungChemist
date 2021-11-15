@@ -32,7 +32,7 @@
     <string name="error_not_a_valid_email">Введите верную почту</string>
     <string name="error_password_too_short">Пароль должен быть не менее %d символов</string>
     <string name="error_surname_too_short">Фамилия должна быть не менее %d символов</string>
-    <string name="greeting">Мы скучали! Хорошо что ты вернулся</string>
+    <string name="greeting">Мы скучали! Хорошо, что ты вернулся</string>
     <string name="restore_password">Восстановить пароль</string>
     <string name="what_is_inside">Что внутри?</string>
     <string name="havent_register_yet">Еще не зарегестрировался?</string>

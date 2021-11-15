@@ -42,8 +42,5 @@ class RestorePasswordFragment : Fragment() {
             it.first.let { binding.tvLoginErrorMessage.setText(it) }
         })
 
-        binding.etLogin.setText(viewModel.loginText)
-        binding.etLogin.setSelection(viewModel.loginText.length)
-
     }
 }

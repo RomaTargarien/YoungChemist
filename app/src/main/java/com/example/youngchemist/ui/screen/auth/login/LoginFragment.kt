@@ -61,11 +61,6 @@ class LoginFragment : Fragment() {
             binding.tvPasswordErrorMessage.isVisible = it.second
             it.first.let { binding.tvPasswordErrorMessage.setText(it) }
         })
-        binding.etLogin.setText(viewModel.loginText)
-        binding.etLogin.setSelection(viewModel.loginText.length)
-
-        binding.etPassword.setText(viewModel.passwordText)
-        binding.etPassword.setSelection(viewModel.passwordText.length)
 
         viewModel.isPasswordShown.observe(viewLifecycleOwner, {
             if (it) {

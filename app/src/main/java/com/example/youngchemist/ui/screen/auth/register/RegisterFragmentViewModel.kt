@@ -1,13 +1,12 @@
 package com.example.youngchemist.ui.screen.auth.register
 
 import android.content.Context
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.youngchemist.R
-import com.example.youngchemist.model.AuthValidationResults
+import com.example.youngchemist.model.AuthResults
 import com.example.youngchemist.repositories.AuthRepository
 import com.example.youngchemist.ui.screen.Screens
 import com.example.youngchemist.ui.util.Resource
@@ -21,10 +20,7 @@ import com.example.youngchemist.ui.base.validation.ValidationImpl.PasswordValida
 import com.example.youngchemist.ui.base.validation.ValidationImpl.LoginValidation
 import com.example.youngchemist.ui.util.ResourceNetwork
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -83,8 +79,8 @@ class RegisterFragmentViewModel @Inject constructor(
     private val _registerState: MutableLiveData<ResourceNetwork<String>> = MutableLiveData()
     val registerState: LiveData<ResourceNetwork<String>> = _registerState
 
-    private val _isErrorMessageVisible: MutableLiveData<Pair<String?,Boolean>> = MutableLiveData()
-    val isErrorMessageVisible: LiveData<Pair<String?,Boolean>> = _isErrorMessageVisible
+    private val _isErrorMessageVisible: MutableLiveData<Pair<String?, Boolean>> = MutableLiveData()
+    val isErrorMessageVisible: LiveData<Pair<String?, Boolean>> = _isErrorMessageVisible
 
 
     fun navigateToLoginScreen() {
@@ -98,10 +94,7 @@ class RegisterFragmentViewModel @Inject constructor(
     fun register() {
         viewModelScope.launch(Dispatchers.IO) {
             _registerState.postValue(ResourceNetwork.Loading())
-             val registerResult = authRepository.register(loginText,surnameText,passwordText)
-            if (registerResult is ResourceNetwork.Error) {
-                showError(registerResult.message)
-            }
+            val registerResult = authRepository.register(loginText, surnameText, passwordText)
             _registerState.postValue(registerResult)
         }
     }
@@ -124,6 +117,9 @@ class RegisterFragmentViewModel @Inject constructor(
                 delay(1000)
                 emit(loginValidation.validate(s.toString()))
             }.collect {
+                if (it is Resource.Error) {
+                    _errorLoginMessageBehavior.postValue(Pair(it.message, true))
+                }
                 stateLogin.emit(it)
             }
         }
@@ -139,6 +135,9 @@ class RegisterFragmentViewModel @Inject constructor(
                 delay(1000)
                 emit(surnameValidation.validate(s.toString()))
             }.collect {
+                if (it is Resource.Error) {
+                    _errorSurnameMessageBehavior.postValue(Pair(it.message, true))
+                }
                 stateSurname.emit(it)
             }
         }
@@ -154,6 +153,9 @@ class RegisterFragmentViewModel @Inject constructor(
                 delay(1000)
                 emit(passwordValidation.validate(s.toString()))
             }.collect {
+                if (it is Resource.Error) {
+                    _errorPasswordMessageBehavior.postValue(Pair(it.message, true))
+                }
                 statePassword.emit(it)
             }
         }
@@ -169,6 +171,9 @@ class RegisterFragmentViewModel @Inject constructor(
                 delay(1000)
                 emit(passwordValidation.validate(s.toString()))
             }.collect {
+                if (it is Resource.Error) {
+                    _errorRepeatedPasswordMessageBehavior.postValue(Pair(it.message, true))
+                }
                 stateRepeatedPassword.emit(it)
             }
         }
@@ -182,13 +187,9 @@ class RegisterFragmentViewModel @Inject constructor(
                 statePassword,
                 stateRepeatedPassword
             ) { login, surname, password, repeatedPassword ->
-                AuthValidationResults(login, surname, password, repeatedPassword)
+                AuthResults(login, surname, password, repeatedPassword)
             }.collect { result ->
-                if (result.login is Resource.Success &&
-                    result.surname is Resource.Success &&
-                    result.password is Resource.Success &&
-                    result.repeatedPassword is Resource.Success
-                ) {
+                if (result.allSuccess()) {
                     if (!passwordText.equals(repeatedPasswordText)) {
                         _errorRepeatedPasswordMessageBehavior.postValue(
                             Pair(context.getString(R.string.password_must_be_equals), true)
@@ -197,26 +198,6 @@ class RegisterFragmentViewModel @Inject constructor(
                         _registerButtonEnabled.postValue(true)
                     }
                 } else {
-                    result.login?.message?.let {
-                        if (it.isNotEmpty()) {
-                            _errorLoginMessageBehavior.postValue(Pair(it, true))
-                        }
-                    }
-                    result.surname?.message?.let {
-                        if (it.isNotEmpty()) {
-                            _errorSurnameMessageBehavior.postValue(Pair(it, true))
-                        }
-                    }
-                    result.password?.message?.let {
-                        if (it.isNotEmpty()) {
-                            _errorPasswordMessageBehavior.postValue(Pair(it, true))
-                        }
-                    }
-                    result.repeatedPassword?.message?.let {
-                        if (it.isNotEmpty()) {
-                            _errorRepeatedPasswordMessageBehavior.postValue(Pair(it, true))
-                        }
-                    }
                     _registerButtonEnabled.postValue(false)
                 }
             }
@@ -237,9 +218,9 @@ class RegisterFragmentViewModel @Inject constructor(
 
     fun showError(message: String?) {
         viewModelScope.launch(Dispatchers.Default) {
-            _isErrorMessageVisible.postValue(Pair(message,true))
+            _isErrorMessageVisible.postValue(Pair(message, true))
             delay(3000)
-            _isErrorMessageVisible.postValue(Pair(message,false))
+            _isErrorMessageVisible.postValue(Pair(message, false))
         }
     }
 
