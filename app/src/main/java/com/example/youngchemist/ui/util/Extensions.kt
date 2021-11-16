@@ -5,20 +5,21 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
+import android.view.inputmethod.InputMethodManager
 import androidx.fragment.app.Fragment
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import com.example.youngchemist.R
 
 val String.Companion.EMPTY: String get() = ""
 
-fun View.showErrorMessage(context: Context, animTime: Long) {
+fun View.showMessage(context: Context, animTime: Long) {
     val enterAnim = AnimationUtils.loadAnimation(context, R.anim.result_message_anim_enter).apply {
         duration = animTime
     }
     this.startAnimation(enterAnim)
 }
 
-fun View.hideErrorMessage(context: Context,animTime: Long): Animation {
+fun View.hideMessage(context: Context,animTime: Long): Animation {
     val exitAnim = AnimationUtils.loadAnimation(context,R.anim.result_message_anim_exit).apply {
         duration = animTime
     }
@@ -47,5 +48,13 @@ fun View.slideUp(context: Context, anitTime: Long, startOffSet: Long) {
 fun Fragment.slideUpViews(vararg views: View, animTime: Long = 300L, delay: Long = 150L) {
     for (i in views.indices) {
         views[i].slideUp(this.requireContext(),animTime,delay * i)
+    }
+}
+
+fun Fragment.closeKeyBoard() {
+    val view = this.activity?.currentFocus
+    view?.let {
+        val imm = this.activity?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.hideSoftInputFromWindow(view.windowToken,0)
     }
 }

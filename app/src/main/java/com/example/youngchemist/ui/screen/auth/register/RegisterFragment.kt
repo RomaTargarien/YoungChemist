@@ -24,7 +24,7 @@ class RegisterFragment : Fragment() {
 
     private val viewModel: RegisterFragmentViewModel by viewModels()
     private lateinit var binding: FragmentRegisterBinding
-    private val animationHelper: AnimationHelper by lazy(::initializeAnimationHepler)
+    private lateinit var animationHelper: AnimationHelper
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -38,7 +38,7 @@ class RegisterFragment : Fragment() {
             viewModel.exit()
         }
         binding.viewModel = viewModel
-
+        animationHelper = initializeAnimationHepler()
         slideUpViews(
             binding.loginContainer,
             binding.familyNameContainer,
@@ -76,11 +76,15 @@ class RegisterFragment : Fragment() {
             if (it) {
                 binding.etPassword.transformationMethod =
                     HideReturnsTransformationMethod.getInstance()
-                binding.etPassword.setSelection(viewModel.passwordText.length)
+                viewModel.authResults.password?.let {
+                    binding.etPassword.setSelection(it.length)
+                }
                 binding.ivIsPasswordShown.setImageResource(R.drawable.ic_icon_view_password)
             } else {
                 binding.etPassword.transformationMethod = PasswordTransformationMethod.getInstance()
-                binding.etPassword.setSelection(viewModel.passwordText.length)
+                viewModel.authResults.password?.let {
+                    binding.etPassword.setSelection(it.length)
+                }
                 binding.ivIsPasswordShown.setImageResource(R.drawable.ic_icon_hide_password)
             }
         })
@@ -89,40 +93,52 @@ class RegisterFragment : Fragment() {
             if (it) {
                 binding.etRepeatedPassword.transformationMethod =
                     HideReturnsTransformationMethod.getInstance()
-                binding.etRepeatedPassword.setSelection(viewModel.repeatedPasswordText.length)
+                viewModel.authResults.repeatedPassword?.let {
+                    binding.etRepeatedPassword.setSelection(it.length)
+                }
                 binding.ivIsRepeatedPasswordShown.setImageResource(R.drawable.ic_icon_view_password)
             } else {
                 binding.etRepeatedPassword.transformationMethod =
                     PasswordTransformationMethod.getInstance()
-                binding.etRepeatedPassword.setSelection(viewModel.repeatedPasswordText.length)
+                viewModel.authResults.repeatedPassword?.let {
+                    binding.etRepeatedPassword.setSelection(it.length)
+                }
                 binding.ivIsRepeatedPasswordShown.setImageResource(R.drawable.ic_icon_hide_password)
             }
         })
 
         viewModel.isErrorMessageVisible.observe(viewLifecycleOwner, {
             if (it.second) {
-                it.first?.let { animationHelper.showErrorMessage(it) }
+                it.first?.let { animationHelper.showMessage(it) }
             } else {
-                animationHelper.hideErrorMessage()
+                animationHelper.hideMessage()
             }
         })
 
         viewModel.registerState.observe(viewLifecycleOwner, {
-            when {
-                it is ResourceNetwork.Loading -> {
-                    binding.mainContainer.alpha = 0.5f
-                    binding.bnRegister.isEnabled = false
-                    binding.progressFlask.isVisible = true
-                }
-                it is ResourceNetwork.Success -> {
-                    viewModel.enter()
-                }
-                it is ResourceNetwork.Error -> {
-                    binding.progressFlask.isVisible = false
-                    viewModel.showError(it.message)
+            val result = it.getContentIfNotHandled()
+            result?.let {
+                when {
+                    it is ResourceNetwork.Loading -> {
+                        binding.mainContainer.alpha = 0.5f
+                        binding.bnRegister.isEnabled = false
+                        binding.progressFlask.isVisible = true
+                    }
+                    it is ResourceNetwork.Success -> {
+                        viewModel.enter()
+                    }
+                    it is ResourceNetwork.Error -> {
+                        binding.progressFlask.isVisible = false
+                        viewModel.showError(it.message)
+                    }
                 }
             }
         })
+    }
+
+    override fun onPause() {
+        super.onPause()
+        closeKeyBoard()
     }
 
     private fun initializeAnimationHepler() =

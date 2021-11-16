@@ -67,8 +67,8 @@
                     android:background="@null"
                     android:hint="@string/login_hint"
                     android:onTextChanged="@{viewModel.onLoginlTextChanged}"
-                    android:selection="@{viewModel.loginText.length()}"
-                    android:text="@={viewModel.loginText}">
+                    android:selection="@{viewModel.authResults.login.length()}"
+                    android:text="@={viewModel.authResults.login}">
 
                 </EditText>
 
@@ -106,8 +106,8 @@
                     android:background="@null"
                     android:hint="@string/family_name_hint"
                     android:onTextChanged="@{viewModel.onSurnameTextChanged}"
-                    android:selection="@{viewModel.surnameText.length()}"
-                    android:text="@={viewModel.surnameText}">
+                    android:selection="@{viewModel.authResults.surname.length()}"
+                    android:text="@={viewModel.authResults.surname}">
 
                 </EditText>
 
@@ -144,8 +144,8 @@
                     android:background="@null"
                     android:hint="@string/password_hint"
                     android:onTextChanged="@{viewModel.onPasswordlTextChanged}"
-                    android:selection="@{viewModel.passwordText.length()}"
-                    android:text="@={viewModel.passwordText}">
+                    android:selection="@{viewModel.authResults.password.length()}"
+                    android:text="@={viewModel.authResults.password}">
 
                 </EditText>
 
@@ -195,7 +195,9 @@
                     android:layout_height="match_parent"
                     android:background="@null"
                     android:hint="@string/repeated_password_hint"
-                    android:onTextChanged="@{viewModel.onRepeatedPasswordTextChanged}">
+                    android:onTextChanged="@{viewModel.onRepeatedPasswordTextChanged}"
+                    android:text="@={viewModel.authResults.repeatedPassword}"
+                    android:selection="@{viewModel.authResults.repeatedPassword.length()}">
 
                 </EditText>
 

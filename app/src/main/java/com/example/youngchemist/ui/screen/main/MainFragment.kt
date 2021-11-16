@@ -4,7 +4,9 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.addCallback
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import com.example.youngchemist.R
 import com.example.youngchemist.databinding.FragmentMainBinding
 import com.example.youngchemist.ui.screen.main.qr.QrCodeFragment
@@ -19,6 +21,7 @@ import dagger.hilt.android.AndroidEntryPoint
 class MainFragment : Fragment(),BottomTabScreen {
 
     private lateinit var binding: FragmentMainBinding
+    private val viewModel: MainFragmentViewModel by viewModels()
 
 
 
@@ -36,6 +39,9 @@ class MainFragment : Fragment(),BottomTabScreen {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val qrCodeRawValue = arguments?.getString(QR_CODE_RAW_VALUE)
+        requireActivity().onBackPressedDispatcher.addCallback {
+            viewModel.exit()
+        }
         if (qrCodeRawValue != null) {
             replaceFragment(getFragmentForTabId(R.id.qrCode, qrCodeRawValue)!!)
             binding.bnvMain.selectedItemId = R.id.qrCode

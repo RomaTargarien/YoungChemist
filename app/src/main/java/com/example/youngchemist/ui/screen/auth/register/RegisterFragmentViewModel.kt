@@ -8,19 +8,21 @@ import androidx.lifecycle.viewModelScope
 import com.example.youngchemist.R
 import com.example.youngchemist.model.AuthResults
 import com.example.youngchemist.repositories.AuthRepository
+import com.example.youngchemist.ui.base.validation.ValidationImpl.*
 import com.example.youngchemist.ui.screen.Screens
+import com.example.youngchemist.ui.util.Event
 import com.example.youngchemist.ui.util.Resource
+import com.example.youngchemist.ui.util.ResourceNetwork
 import com.github.terrakok.cicerone.Router
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
-import com.example.youngchemist.ui.base.validation.ValidationImpl.SurnameValidation
-import com.example.youngchemist.ui.base.validation.ValidationImpl.PasswordValidation
-import com.example.youngchemist.ui.base.validation.ValidationImpl.LoginValidation
-import com.example.youngchemist.ui.util.ResourceNetwork
-import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -34,10 +36,7 @@ class RegisterFragmentViewModel @Inject constructor(
     @ApplicationContext private val context: Context
 ) : ViewModel() {
 
-    var loginText = ""
-    var surnameText = ""
-    var passwordText = ""
-    var repeatedPasswordText = ""
+    val authResults: AuthResults
 
     private var loginJob: Job? = null
     private var surnameJob: Job? = null
@@ -76,8 +75,8 @@ class RegisterFragmentViewModel @Inject constructor(
     private val _isRepeatedPasswordShown: MutableLiveData<Boolean> = MutableLiveData(false)
     val isRepeatedPasswordShown: LiveData<Boolean> = _isRepeatedPasswordShown
 
-    private val _registerState: MutableLiveData<ResourceNetwork<String>> = MutableLiveData()
-    val registerState: LiveData<ResourceNetwork<String>> = _registerState
+    private val _registerState: MutableLiveData<Event<ResourceNetwork<String>>> = MutableLiveData()
+    val registerState: LiveData<Event<ResourceNetwork<String>>> = _registerState
 
     private val _isErrorMessageVisible: MutableLiveData<Pair<String?, Boolean>> = MutableLiveData()
     val isErrorMessageVisible: LiveData<Pair<String?, Boolean>> = _isErrorMessageVisible
@@ -93,9 +92,9 @@ class RegisterFragmentViewModel @Inject constructor(
 
     fun register() {
         viewModelScope.launch(Dispatchers.IO) {
-            _registerState.postValue(ResourceNetwork.Loading())
-            val registerResult = authRepository.register(loginText, surnameText, passwordText)
-            _registerState.postValue(registerResult)
+            _registerState.postValue(Event(ResourceNetwork.Loading()))
+            val registerResult = authRepository.register(authResults)
+            _registerState.postValue(Event(registerResult))
         }
     }
 
@@ -104,12 +103,13 @@ class RegisterFragmentViewModel @Inject constructor(
     }
 
     init {
+        authResults = AuthResults()
         observe()
     }
 
     fun onLoginlTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
         loginJob?.cancel()
-        loginText = s.toString()
+        authResults.login = s.toString()
         _errorLoginMessageBehavior.postValue(Pair(null, false))
         _registerButtonEnabled.postValue(false)
         loginJob = viewModelScope.launch(Dispatchers.Default) {
@@ -127,7 +127,7 @@ class RegisterFragmentViewModel @Inject constructor(
 
     fun onSurnameTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
         surnameJob?.cancel()
-        surnameText = s.toString()
+        authResults.surname = s.toString()
         _errorSurnameMessageBehavior.postValue(Pair(null, false))
         _registerButtonEnabled.postValue(false)
         surnameJob = viewModelScope.launch(Dispatchers.Default) {
@@ -145,7 +145,7 @@ class RegisterFragmentViewModel @Inject constructor(
 
     fun onPasswordlTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
         passwordJob?.cancel()
-        passwordText = s.toString()
+        authResults.password = s.toString()
         _errorPasswordMessageBehavior.postValue(Pair(null, false))
         _registerButtonEnabled.postValue(false)
         passwordJob = viewModelScope.launch(Dispatchers.Default) {
@@ -163,7 +163,7 @@ class RegisterFragmentViewModel @Inject constructor(
 
     fun onRepeatedPasswordTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
         repeatesPasswordJob?.cancel()
-        repeatedPasswordText = s.toString()
+        authResults.repeatedPassword = s.toString()
         _errorRepeatedPasswordMessageBehavior.postValue(Pair(null, false))
         _registerButtonEnabled.postValue(false)
         repeatesPasswordJob = viewModelScope.launch(Dispatchers.Default) {
@@ -187,10 +187,15 @@ class RegisterFragmentViewModel @Inject constructor(
                 statePassword,
                 stateRepeatedPassword
             ) { login, surname, password, repeatedPassword ->
-                AuthResults(login, surname, password, repeatedPassword)
+                AuthResults(
+                    loginValidation = login,
+                    surnameValidation = surname,
+                    passwordValidation = password,
+                    repeatedPasswordValidation = repeatedPassword
+                )
             }.collect { result ->
                 if (result.allSuccess()) {
-                    if (!passwordText.equals(repeatedPasswordText)) {
+                    if (!authResults.arePasswordEquals()) {
                         _errorRepeatedPasswordMessageBehavior.postValue(
                             Pair(context.getString(R.string.password_must_be_equals), true)
                         )

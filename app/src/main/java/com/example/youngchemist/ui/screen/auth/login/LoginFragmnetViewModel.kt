@@ -1,13 +1,17 @@
 package com.example.youngchemist.ui.screen.auth.login
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.youngchemist.repositories.AuthRepository
 import com.example.youngchemist.ui.base.validation.ValidationImpl.LoginValidation
 import com.example.youngchemist.ui.base.validation.ValidationImpl.PasswordValidation
 import com.example.youngchemist.ui.screen.Screens
+import com.example.youngchemist.ui.util.Event
 import com.example.youngchemist.ui.util.Resource
+import com.example.youngchemist.ui.util.ResourceNetwork
 import com.github.terrakok.cicerone.Router
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -21,7 +25,8 @@ import javax.inject.Inject
 class LoginFragmnetViewModel @Inject constructor(
     private val router: Router,
     private val loginValidation: LoginValidation,
-    private val passwordValidation: PasswordValidation
+    private val passwordValidation: PasswordValidation,
+    private val authRepository: AuthRepository
 ) : ViewModel() {
 
 
@@ -52,6 +57,12 @@ class LoginFragmnetViewModel @Inject constructor(
     private val _isPasswordShown: MutableLiveData<Boolean> = MutableLiveData(false)
     val isPasswordShown: LiveData<Boolean> = _isPasswordShown
 
+    private val _loginState: MutableLiveData<Event<ResourceNetwork<String>>> = MutableLiveData()
+    val loginState: LiveData<Event<ResourceNetwork<String>>> = _loginState
+
+    private val _isErrorMessageVisible: MutableLiveData<Pair<String?, Boolean>> = MutableLiveData()
+    val isErrorMessageVisible: LiveData<Pair<String?, Boolean>> = _isErrorMessageVisible
+
 
     init {
         observe()
@@ -68,9 +79,19 @@ class LoginFragmnetViewModel @Inject constructor(
     fun enter() {
         router.newRootScreen(Screens.mainScreen())
     }
+
     fun exit() {
         router.newRootScreen(Screens.authScreen())
     }
+
+    fun login() {
+        viewModelScope.launch {
+            _loginState.postValue(Event(ResourceNetwork.Loading()))
+            val loginResult = authRepository.login(loginText,passwordText)
+            _loginState.postValue(Event(loginResult))
+        }
+    }
+
 
     fun onEmailTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
         loginJob?.cancel()
@@ -102,7 +123,7 @@ class LoginFragmnetViewModel @Inject constructor(
         }
     }
 
-    fun observe() {
+    private fun observe() {
         viewModelScope.launch {
             combine(stateLogin,statePassword) { login, password ->
                 Pair(login, password)
@@ -133,6 +154,16 @@ class LoginFragmnetViewModel @Inject constructor(
             _isPasswordShown.postValue(!it)
         }
     }
+
+    fun showMessage(message: String?) {
+        viewModelScope.launch(Dispatchers.Default) {
+            _isErrorMessageVisible.postValue(Pair(message,true))
+            delay(3000)
+            _isErrorMessageVisible.postValue(Pair(message,false))
+        }
+    }
+
+
 
     override fun onCleared() {
         super.onCleared()

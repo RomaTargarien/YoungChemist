@@ -50,7 +50,7 @@
                 android:id="@+id/imageView3"
                 android:layout_width="180dp"
                 android:layout_height="180dp"
-                android:src="@drawable/qr_code"
+                android:src="@drawable/ic_icon_qr_code"
                 app:layout_constraintBottom_toBottomOf="@+id/imageView2"
                 app:layout_constraintEnd_toEndOf="@+id/imageView2"
                 app:layout_constraintStart_toStartOf="@+id/imageView2"

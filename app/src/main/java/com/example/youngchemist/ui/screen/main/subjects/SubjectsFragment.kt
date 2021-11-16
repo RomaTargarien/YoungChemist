@@ -27,9 +27,9 @@ class SubjectsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val subjects = listOf(
-            Subject("Радиохимия", R.drawable.nuclear_chemistry_icon),
-            Subject("Органика",R.drawable.organic_chemistry_icon),
-            Subject("Неорганика",R.drawable.inorganic_chemistry_icon)
+            Subject("Радиохимия", R.drawable.ic_icon_nuclear_chemistry),
+            Subject("Органика",R.drawable.ic_icon_organic_chemistry),
+            Subject("Неорганика",R.drawable.ic_icon_inorganic_chemistry)
         )
         val adapter = SubjectsAdapter(subjects)
 

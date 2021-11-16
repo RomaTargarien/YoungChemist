@@ -24,8 +24,12 @@ import android.text.method.HideReturnsTransformationMethod
 import android.text.method.PasswordTransformationMethod
 import android.util.Log
 import android.view.ViewTreeObserver
+import android.view.animation.Animation
+import android.view.inputmethod.InputMethodManager
 import androidx.activity.addCallback
 import com.example.youngchemist.R
+import com.example.youngchemist.ui.base.AnimationHelper
+import com.example.youngchemist.ui.util.*
 
 
 @AndroidEntryPoint
@@ -33,6 +37,7 @@ class LoginFragment : Fragment() {
 
     private val viewModel: LoginFragmnetViewModel by viewModels()
     private lateinit var binding: FragmentLoginBinding
+    private lateinit var animationHelper: AnimationHelper
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -43,13 +48,20 @@ class LoginFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        animationHelper = initializeAnimationHepler()
         requireActivity().onBackPressedDispatcher.addCallback {
             viewModel.exit()
         }
+        slideUpViews(
+            binding.loginContainer,
+            binding.passwordContainer,
+            binding.tvRestorePassword,
+            binding.bnLogin
+        )
         binding.viewModel = viewModel
         viewModel.enterButtonEnabled.observe(viewLifecycleOwner, {
-            binding.bnEnter.isEnabled = it
-            binding.bnEnter.alpha = if (it) 1.0f else 0.7f
+            binding.bnLogin.isEnabled = it
+            binding.bnLogin.alpha = if (it) 1.0f else 0.7f
         })
         viewModel.errorLoginMessageBehavior.observe(viewLifecycleOwner, {
             TransitionManager.beginDelayedTransition(binding.mainContainer)
@@ -74,5 +86,51 @@ class LoginFragment : Fragment() {
                 binding.ivIsPasswordShown.setImageResource(R.drawable.ic_icon_hide_password)
             }
         })
+
+        viewModel.isErrorMessageVisible.observe(viewLifecycleOwner, {
+            if (it.second) {
+                it.first?.let {
+                    animationHelper.showMessage(it)
+                }
+            } else {
+                animationHelper.hideMessage()
+            }
+        })
+
+        viewModel.loginState.observe(viewLifecycleOwner, {
+            closeKeyBoard()
+            val result = it.getContentIfNotHandled()
+            result?.let {
+                Log.d("TAG",it.toString())
+                when {
+                    it is ResourceNetwork.Loading -> {
+                        binding.mainContainer.alpha = 0.5f
+                        binding.bnLogin.isEnabled = false
+                        binding.progressFlask.isVisible = true
+                    }
+                    it is ResourceNetwork.Success -> {
+                        viewModel.enter()
+                    }
+                    it is ResourceNetwork.Error -> {
+                        binding.progressFlask.isVisible = false
+                        viewModel.showMessage(it.message)
+                    }
+                }
+            }
+        })
     }
+
+    override fun onPause() {
+        super.onPause()
+        closeKeyBoard()
+    }
+
+    private fun initializeAnimationHepler() =
+        AnimationHelper(
+            this.requireContext(),
+            binding.mainContainer,
+            binding.cvLoginResult,
+            binding.tvErrorText,
+            binding.bnLogin
+        )
 }

@@ -22,8 +22,9 @@
         <com.google.android.material.bottomnavigation.BottomNavigationView
             android:id="@+id/bnv_main"
             android:layout_width="match_parent"
-            app:itemRippleColor="@color/teal_200"
+            app:itemRippleColor="#FFFFFF"
             app:menu="@menu/menu_navigation_main"
+            android:background="@color/red"
             app:labelVisibilityMode="unlabeled"
             android:layout_height="wrap_content">
 

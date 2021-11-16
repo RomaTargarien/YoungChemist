@@ -4,8 +4,11 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.youngchemist.repositories.AuthRepository
 import com.example.youngchemist.ui.base.validation.ValidationImpl.LoginValidation
+import com.example.youngchemist.ui.util.Event
 import com.example.youngchemist.ui.util.Resource
+import com.example.youngchemist.ui.util.ResourceNetwork
 import com.github.terrakok.cicerone.Router
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -20,7 +23,8 @@ import javax.inject.Inject
 @HiltViewModel
 class RestorePasswordFragmentViewModel @Inject constructor(
     private val router: Router,
-    private val loginValidation: LoginValidation
+    private val loginValidation: LoginValidation,
+    private val authRepository: AuthRepository
 ) : ViewModel() {
 
     var loginText = ""
@@ -35,6 +39,12 @@ class RestorePasswordFragmentViewModel @Inject constructor(
     private val _restorePasswordButtonEnabled: MutableLiveData<Boolean> = MutableLiveData(false)
     val restorePasswordButtonEnabled: LiveData<Boolean> = _restorePasswordButtonEnabled
 
+    private val _restorePasswordState: MutableLiveData<Event<ResourceNetwork<String>>> = MutableLiveData()
+    val restorePasswordState: LiveData<Event<ResourceNetwork<String>>> = _restorePasswordState
+
+    private val _isResultMessageVisible: MutableLiveData<Triple<String?,Boolean,Boolean>> = MutableLiveData()
+    val isResultMessageVisible: LiveData<Triple<String?, Boolean,Boolean>> = _isResultMessageVisible
+
 
     init {
         observe()
@@ -42,6 +52,14 @@ class RestorePasswordFragmentViewModel @Inject constructor(
 
     fun exit() {
         router.exit()
+    }
+
+    fun restorePassword() {
+        viewModelScope.launch {
+            _restorePasswordState.postValue(Event(ResourceNetwork.Loading()))
+            val result = authRepository.restorePassword(loginText)
+            _restorePasswordState.postValue(Event(result))
+        }
     }
 
     fun onLoginTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
@@ -69,6 +87,14 @@ class RestorePasswordFragmentViewModel @Inject constructor(
                     _errorLoginMessageBehavior.postValue(Pair(it.message,true))
                 }
             }
+        }
+    }
+
+    fun showResultMessage(message: String?,itIsErrorMessage: Boolean = true) {
+        viewModelScope.launch(Dispatchers.Default) {
+            _isResultMessageVisible.postValue(Triple(message,true,itIsErrorMessage))
+            delay(3000)
+            _isResultMessageVisible.postValue(Triple(message,false,itIsErrorMessage))
         }
     }
 
