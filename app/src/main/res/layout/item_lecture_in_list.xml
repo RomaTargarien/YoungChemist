@@ -10,6 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/shape_rounded_rectangle_for_edittext"
+        android:backgroundTint="@color/white"
         android:padding="10dp">
 
         <TextView

@@ -30,7 +30,7 @@ class SubjectsAdapter: RecyclerView.Adapter<SubjectsAdapter.SubjectViewHolder>()
         }
 
         override fun areContentsTheSame(oldItem: Subject, newItem: Subject): Boolean {
-            return oldItem.iconUrl == newItem.iconUrl
+            return oldItem.icon_url == newItem.icon_url
         }
 
     }
@@ -44,7 +44,7 @@ class SubjectsAdapter: RecyclerView.Adapter<SubjectsAdapter.SubjectViewHolder>()
     inner class SubjectViewHolder(val binding: ItemSubjectBinding): RecyclerView.ViewHolder(binding.root) {
         fun bind(item: Subject) {
             binding.title.setText(item.title)
-            binding.ivSubject.load(item.iconUrl)
+            binding.ivSubject.load(item.icon_url)
             binding.ivSubject.setOnClickListener {
                 onClick?.let { click ->
                     click(item.title)

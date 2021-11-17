@@ -33,8 +33,8 @@ object Screens {
         LecturesListFragment.newInstance(subjectName)
     }
 
-    fun lectureScreen() = FragmentScreen {
-        LectureFragment()
+    fun lectureScreen(lectureTitle: String,subjectTitle: String) = FragmentScreen {
+        LectureFragment.newInstance(lectureTitle, subjectTitle)
     }
 
     fun scanScreen() = FragmentScreen {

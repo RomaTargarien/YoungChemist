@@ -10,6 +10,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.youngchemist.model.Subject
 import com.example.youngchemist.repositories.FireStoreRepository
 import com.example.youngchemist.ui.screen.Screens
+import com.example.youngchemist.ui.util.BitmapUtils
 import com.example.youngchemist.ui.util.ResourceNetwork
 import com.example.youngchemist.ui.util.convertToByteArray
 import com.example.youngchemist.ui.util.safeCall
@@ -18,11 +19,15 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.ByteArrayOutputStream
+import java.io.IOException
 import java.io.InputStream
 import java.net.HttpURLConnection
 import java.net.URL
+import java.nio.ByteBuffer
 import javax.inject.Inject
 
+var array: ByteArray? = null
 @HiltViewModel
 class SubjectsFragmentViewModel @Inject constructor(
     private val router: Router,
@@ -45,14 +50,16 @@ class SubjectsFragmentViewModel @Inject constructor(
 
     private fun getAllSubjects() {
         viewModelScope.launch {
+            array?.let {
+                val bitmapFromArray = BitmapUtils.convertCompressedByteArrayToBitmap(it)
+                Log.d("TAG",bitmapFromArray.toString())
+                _imageBitmap.postValue(bitmapFromArray)
+            }
             val subjects = fireStoreRepository.getAllSubjects()
             if (subjects is ResourceNetwork.Success) {
-                val bitmap = getBitmapFromURL(subjects.data?.get(0)?.iconUrl)
+                val bitmap = getBitmapFromURL(subjects.data?.get(0)?.icon_url)
                if (bitmap is ResourceNetwork.Success) {
-                   val array = bitmap.data?.convertToByteArray()
-                   val bitmapFromArray = BitmapFactory.decodeByteArray(array,0,array!!.size)
-                   Log.d("TAG",bitmapFromArray.toString())
-                   _imageBitmap.postValue(bitmapFromArray)
+                   array = BitmapUtils.convertBitmapToByteArray(bitmap.data!!)
                    _subjectsState.postValue(subjects)
                }
             }

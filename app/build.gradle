@@ -118,4 +118,7 @@ dependencies {
 
     //Coil
     implementation("io.coil-kt:coil:1.4.0")
+
+    //Picasso
+    implementation 'com.squareup.picasso:picasso:2.71828'
 }
