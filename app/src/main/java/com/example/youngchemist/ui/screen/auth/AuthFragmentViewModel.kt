@@ -16,7 +16,8 @@ class AuthFragmentViewModel @Inject constructor(
     }
 
     fun navigateToLoginScreen() {
-        router.navigateTo(Screens.loginScreen())
+       // router.navigateTo(Screens.loginScreen())
+        router.newRootScreen(Screens.mainScreen())
     }
     fun exit() {
         router.exit()

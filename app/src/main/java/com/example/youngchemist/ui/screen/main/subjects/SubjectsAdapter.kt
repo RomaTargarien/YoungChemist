@@ -1,20 +1,50 @@
 package com.example.youngchemist.ui.screen.main.subjects
 
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.databinding.ViewDataBinding
+import androidx.recyclerview.widget.AsyncListDiffer
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import coil.load
 import com.example.youngchemist.databinding.ItemSubjectBinding
 import com.example.youngchemist.model.Subject
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.withContext
+import java.io.IOException
+import java.io.InputStream
+import java.net.HttpURLConnection
+import java.net.URL
+import kotlin.coroutines.CoroutineContext
 
-class SubjectsAdapter(val list: List<Subject>): RecyclerView.Adapter<SubjectsAdapter.SubjectViewHolder>() {
+class SubjectsAdapter: RecyclerView.Adapter<SubjectsAdapter.SubjectViewHolder>() {
 
-    private var onClick: ((String) -> Unit)? = null
+
+
+    private val differCallBack = object : DiffUtil.ItemCallback<Subject>() {
+        override fun areItemsTheSame(oldItem: Subject, newItem: Subject): Boolean {
+            return oldItem.hashCode() == newItem.hashCode()
+        }
+
+        override fun areContentsTheSame(oldItem: Subject, newItem: Subject): Boolean {
+            return oldItem.iconUrl == newItem.iconUrl
+        }
+
+    }
+
+    private val differ = AsyncListDiffer(this,differCallBack)
+
+    var subjects: List<Subject>
+         get() = differ.currentList
+         set(value) = differ.submitList(value)
 
     inner class SubjectViewHolder(val binding: ItemSubjectBinding): RecyclerView.ViewHolder(binding.root) {
         fun bind(item: Subject) {
             binding.title.setText(item.title)
-            binding.ivSubject.setImageResource(item.iconId)
+            binding.ivSubject.load(item.iconUrl)
             binding.ivSubject.setOnClickListener {
                 onClick?.let { click ->
                     click(item.title)
@@ -28,11 +58,16 @@ class SubjectsAdapter(val list: List<Subject>): RecyclerView.Adapter<SubjectsAda
     }
 
     override fun onBindViewHolder(holder: SubjectViewHolder, position: Int) {
-        holder.bind(list[position])
+        holder.bind(subjects[position])
     }
+
+    private var onClick: ((String) -> Unit)? = null
+
     fun setOnClickListener(listener: (String) -> Unit) {
         onClick = listener
     }
 
-    override fun getItemCount() = list.size
+
+
+    override fun getItemCount() = subjects.size
 }

@@ -4,11 +4,11 @@ import android.content.Context
 import android.util.Log
 import com.example.youngchemist.ui.screen.auth.auth_error.AuthErrorHandler
 
-inline fun safeCall(context: Context,action: () -> ResourceNetwork<String>): ResourceNetwork<String> {
+inline fun <T> safeCall(action: () -> ResourceNetwork<T>): ResourceNetwork<T> {
     return try {
         action()
     } catch (e: Exception) {
         Log.d("TAG",e.javaClass.toString())
-        AuthErrorHandler.handleException(context, e)
+        ResourceNetwork.Error(e.localizedMessage)
     }
 }

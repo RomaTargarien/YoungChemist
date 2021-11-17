@@ -26,7 +26,7 @@ class AuthRepositoryImpl @Inject constructor(
     override suspend fun register(
         authResults: AuthResults
     ) = withContext(Dispatchers.IO) {
-        safeCall(context) {
+        safeCall {
             Log.d("TAG", "here")
             val result = auth.createUserWithEmailAndPassword(authResults.login!!, authResults.password!!).await()
             Log.d("TAG", result.user.toString())
@@ -39,7 +39,7 @@ class AuthRepositoryImpl @Inject constructor(
 
     override suspend fun login(login: String, password: String) =
         withContext(Dispatchers.IO) {
-            safeCall(context) {
+            safeCall {
                 auth.signInWithEmailAndPassword(login, password).await()
                 ResourceNetwork.Success("")
             }
@@ -47,7 +47,7 @@ class AuthRepositoryImpl @Inject constructor(
 
     override suspend fun restorePassword(login: String) =
         withContext(Dispatchers.IO) {
-            safeCall(context) {
+            safeCall {
                 auth.sendPasswordResetEmail(login).await()
                 ResourceNetwork.Success("")
             }

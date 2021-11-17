@@ -7,10 +7,15 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.GridLayoutManager
-import com.example.youngchemist.R
 import com.example.youngchemist.databinding.FragmentSubjectsBinding
-import com.example.youngchemist.model.Subject
+import com.example.youngchemist.ui.util.ResourceNetwork
 import dagger.hilt.android.AndroidEntryPoint
+import android.graphics.BitmapFactory
+
+import android.graphics.Bitmap
+
+
+
 
 @AndroidEntryPoint
 class SubjectsFragment : Fragment() {
@@ -26,17 +31,36 @@ class SubjectsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val subjects = listOf(
-            Subject("Радиохимия", R.drawable.ic_icon_nuclear_chemistry),
-            Subject("Органика",R.drawable.ic_icon_organic_chemistry),
-            Subject("Неорганика",R.drawable.ic_icon_inorganic_chemistry)
-        )
-        val adapter = SubjectsAdapter(subjects)
+
+        val adapter = SubjectsAdapter()
 
         binding.rvSubjects.layoutManager = GridLayoutManager(this.requireContext(),3)
         binding.rvSubjects.adapter = adapter
         adapter.setOnClickListener {
             viewModel.navigateToLecturesListScreen(it)
         }
+
+        viewModel.imageBitmap.observe(viewLifecycleOwner,{
+            binding.bitmap.setImageBitmap(it)
+        })
+
+        viewModel.subjectsState.observe(viewLifecycleOwner,{
+            when (it) {
+                is ResourceNetwork.Loading -> {
+
+                }
+                is ResourceNetwork.Success -> {
+                    it.data?.let {
+                        adapter.subjects = it
+                    }
+                }
+                is ResourceNetwork.Error -> {
+
+                }
+            }
+        })
+
     }
+
+
 }

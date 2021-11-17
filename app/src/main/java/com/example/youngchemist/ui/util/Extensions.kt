@@ -1,6 +1,7 @@
 package com.example.youngchemist.ui.util
 
 import android.content.Context
+import android.graphics.Bitmap
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.Animation
@@ -9,6 +10,7 @@ import android.view.inputmethod.InputMethodManager
 import androidx.fragment.app.Fragment
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import com.example.youngchemist.R
+import java.nio.ByteBuffer
 
 val String.Companion.EMPTY: String get() = ""
 
@@ -58,3 +60,8 @@ fun Fragment.closeKeyBoard() {
         imm.hideSoftInputFromWindow(view.windowToken,0)
     }
 }
+
+fun Bitmap.convertToByteArray(): ByteArray = ByteBuffer.allocate(byteCount).apply {
+    copyPixelsToBuffer(this)
+    rewind()
+}.array()
