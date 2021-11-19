@@ -4,7 +4,18 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="../../../../layout/custom_preview.xml" value="0.25" />
+        <entry key="app/src/main/res/drawable-v24/ic_baseline_burger_actvie.xml" value="0.3333333333333333" />
+        <entry key="app/src/main/res/drawable/center_icon.xml" value="0.3333333333333333" />
         <entry key="app/src/main/res/drawable/fon.xml" value="0.2037037037037037" />
+        <entry key="app/src/main/res/drawable/ic_baseline_arrow_right.xml" value="0.26944444444444443" />
+        <entry key="app/src/main/res/drawable/ic_baseline_bar_chart.xml" value="0.26944444444444443" />
+        <entry key="app/src/main/res/drawable/ic_baseline_burger.xml" value="0.26944444444444443" />
+        <entry key="app/src/main/res/drawable/ic_baseline_favorite_24.xml" value="0.3333333333333333" />
+        <entry key="app/src/main/res/drawable/ic_baseline_person.xml" value="0.26944444444444443" />
+        <entry key="app/src/main/res/drawable/ic_baseline_qr_code_scanner.xml" value="0.26944444444444443" />
+        <entry key="app/src/main/res/drawable/ic_baseline_search_24.xml" value="0.3333333333333333" />
+        <entry key="app/src/main/res/drawable/ic_launcher_background.xml" value="0.3333333333333333" />
+        <entry key="app/src/main/res/drawable/ic_subject_tab_selector.xml" value="0.26944444444444443" />
         <entry key="app/src/main/res/drawable/left_gradient_line.xml" value="0.21481481481481482" />
         <entry key="app/src/main/res/drawable/main_background.xml" value="0.15555555555555556" />
         <entry key="app/src/main/res/drawable/right_gradient_line.xml" value="0.21481481481481482" />
@@ -15,9 +26,10 @@
         <entry key="app/src/main/res/drawable/shape_rounded_left_rectangle.xml" value="0.25277777777777777" />
         <entry key="app/src/main/res/drawable/shape_rounded_rect_image.xml" value="0.32407407407407407" />
         <entry key="app/src/main/res/drawable/shape_rounded_rectangle.xml" value="0.3385416666666667" />
+        <entry key="app/src/main/res/drawable/shape_rounded_rectangle_auth_screen.xml" value="0.3333333333333333" />
         <entry key="app/src/main/res/drawable/shape_rounded_rectangle_for_edittext.xml" value="0.3212962962962963" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.22554347826086957" />
-        <entry key="app/src/main/res/layout/fragment_auth.xml" value="0.33" />
+        <entry key="app/src/main/res/layout/fragment_auth.xml" value="0.25" />
         <entry key="app/src/main/res/layout/fragment_auth2.xml" value="0.22554347826086957" />
         <entry key="app/src/main/res/layout/fragment_blank.xml" value="0.22554347826086957" />
         <entry key="app/src/main/res/layout/fragment_lecture.xml" value="0.25" />

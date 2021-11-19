@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import com.example.youngchemist.databinding.ItemSubjectBinding
 import com.example.youngchemist.model.Subject
+import com.example.youngchemist.ui.util.BitmapUtils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
@@ -44,7 +45,8 @@ class SubjectsAdapter: RecyclerView.Adapter<SubjectsAdapter.SubjectViewHolder>()
     inner class SubjectViewHolder(val binding: ItemSubjectBinding): RecyclerView.ViewHolder(binding.root) {
         fun bind(item: Subject) {
             binding.title.setText(item.title)
-            binding.ivSubject.load(item.icon_url)
+            val bitmap = BitmapUtils.convertCompressedByteArrayToBitmap(item.iconByteArray)
+            binding.ivSubject.setImageBitmap(bitmap)
             binding.ivSubject.setOnClickListener {
                 onClick?.let { click ->
                     click(item.title)

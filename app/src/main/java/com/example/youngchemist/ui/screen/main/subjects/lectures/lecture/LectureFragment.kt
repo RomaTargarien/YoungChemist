@@ -2,6 +2,7 @@ package com.example.youngchemist.ui.screen.main.subjects.lectures.lecture
 
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.text.Spannable
 import android.text.method.LinkMovementMethod
@@ -11,14 +12,19 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.RequiresApi
 import androidx.core.text.HtmlCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import com.example.youngchemist.databinding.FragmentLectureBinding
+import com.example.youngchemist.ui.util.GLB
 import com.example.youngchemist.ui.util.ImageGetter
 import com.example.youngchemist.ui.util.ResourceNetwork
 import dagger.hilt.android.AndroidEntryPoint
+import java.net.URI
+import java.nio.file.Paths
+import kotlin.io.path.name
 
 @AndroidEntryPoint
 class LectureFragment : Fragment() {
@@ -45,25 +51,30 @@ class LectureFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel.getContent(subjectTitle!!,lectureTitle!!)
-        viewModel.contentState.observe(viewLifecycleOwner, Observer {
+        viewModel.pagesState.observe(viewLifecycleOwner, Observer {
+            it.let {
+                val imageGetter = ImageGetter(resources,binding.tvHtml)
+                val styledText = HtmlCompat.fromHtml(
+                    it[0].data,
+                    HtmlCompat.FROM_HTML_MODE_LEGACY,
+                    imageGetter,
+                    null
+                )
+                imageClick(styledText as Spannable)
+                binding.tvHtml.text = styledText
+                binding.tvHtml.movementMethod = LinkMovementMethod.getInstance()
+            }
+        })
+
+        viewModel.uriState.observe(viewLifecycleOwner,{
             when (it) {
                 is ResourceNetwork.Loading -> {
 
                 }
                 is ResourceNetwork.Success -> {
                     it.data?.let {
-                        val imageGetter = ImageGetter(resources,binding.tvHtml)
-                        val styledText = HtmlCompat.fromHtml(
-                            it.data[0],    //Instead of copying pasting, I kept it as a string
-                            HtmlCompat.FROM_HTML_MODE_LEGACY,
-                            imageGetter,
-                            null
-                        )
-                        imageClick(styledText as Spannable)
-                        binding.tvHtml.text = styledText
-                        binding.tvHtml.movementMethod = LinkMovementMethod.getInstance()
+                        start3DModelActivity(it)
                     }
-
 
                 }
                 is ResourceNetwork.Error -> {
@@ -71,43 +82,10 @@ class LectureFragment : Fragment() {
                 }
             }
         })
-
-//        binding.ivCh4.setOnClickListener {
-//            val intent = Intent(Intent.ACTION_VIEW)
-//            val uri = Uri.parse("https://arvr.google.com/scene-viewer/1.0").buildUpon()
-//                .appendQueryParameter(
-//                    "file",
-//                    "https://firebasestorage.googleapis.com/v0/b/youngchemist-c52a2.appspot.com/o/carbon_red-2.glb?alt=media&token=02c2a897-c722-4e04-a63c-096129c5cd2b"
-//                )
-//                .appendQueryParameter("mode", "3d_only")
-//                .build()
-//            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-//            intent.setData(uri)
-//            intent.setPackage("com.google.ar.core")
-//            startActivity(intent)
-//            try {
-//                val model = storage.getReference("carbon_red-2.glb")
-//                model.downloadUrl.addOnSuccessListener {
-//                    val intent = Intent(Intent.ACTION_VIEW)
-//                    Log.d("TAG",it.toString())
-//                    val uri = Uri.parse("https://arvr.google.com/scene-viewer/1.0").buildUpon()
-//                        .appendQueryParameter(
-//                            "file",
-//                            "https://firebasestorage.googleapis.com/v0/b/youngchemist-c52a2.appspot.com/o/carbon_red-2.glb?alt=media&token=02c2a897-c722-4e04-a63c-096129c5cd2b"
-//                        )
-//                        .appendQueryParameter("mode", "3d_only")
-//                        .build()
-//                    intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-//                    intent.setData(uri)
-//                    intent.setPackage("com.google.ar.core")
-//                    startActivity(intent)
-//                }
-//            } catch (e: Exception) {
-//                e.printStackTrace()
-//            }
         }
 
     private fun start3DModelActivity(uri: Uri) {
+        Log.d("TAG",uri.toString())
         val intent = Intent(Intent.ACTION_VIEW)
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         intent.setData(uri)
@@ -121,8 +99,12 @@ class LectureFragment : Fragment() {
             val start = html.getSpanStart(span)
             val end = html.getSpanEnd(span)
             html.setSpan(object : URLSpan(span.source) {
+                @RequiresApi(Build.VERSION_CODES.O)
                 override fun onClick(v: View) {
                     Log.d("TAG", "onClick: url is ${span.source}")
+                    val fileName = Paths.get(URI(span.source).path).fileName.toString()
+                    val fileNameWithOutExt = fileName.substring(0,fileName.lastIndexOf('.'))
+                    viewModel.get3DModelUri(fileNameWithOutExt.GLB())
                 }
             }, start, end, flags)
         }

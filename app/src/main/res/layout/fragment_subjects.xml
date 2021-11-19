@@ -87,7 +87,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
                 android:background="@drawable/shape_rounded_rectangle_for_edittext"
-                android:backgroundTint="@color/red"
+                android:backgroundTint="@color/dark_pink"
                 android:alpha="0.8"
                 android:paddingBottom="20dp"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -149,6 +149,20 @@
 
             </TextView>
 
+            <com.airbnb.lottie.LottieAnimationView
+                android:id="@+id/progress_flask"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/rv_subjects"
+                app:lottie_autoPlay="true"
+                app:lottie_fileName="progress_flask.json"
+                app:lottie_loop="true">
+
+            </com.airbnb.lottie.LottieAnimationView>
+
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rv_subjects"
                 android:layout_width="match_parent"
@@ -159,15 +173,6 @@
                 app:layout_constraintTop_toBottomOf="@+id/textView5">
 
             </androidx.recyclerview.widget.RecyclerView>
-
-            <ImageView
-                android:id="@+id/bitmap"
-                android:layout_width="70dp"
-                android:layout_height="70dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
-
-            </ImageView>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

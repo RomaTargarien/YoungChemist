@@ -7,18 +7,18 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.youngchemist.databinding.ItemLectureInListBinding
 import com.example.youngchemist.databinding.ItemSubjectBinding
-import com.example.youngchemist.model.Lection
+import com.example.youngchemist.model.Lecture
 import com.example.youngchemist.model.Subject
 import com.example.youngchemist.ui.screen.main.subjects.SubjectsAdapter
 
 class LecturesListAdapter: RecyclerView.Adapter<LecturesListAdapter.LectureViewHolder>() {
 
-    private val differCallBack = object : DiffUtil.ItemCallback<Lection>() {
-        override fun areItemsTheSame(oldItem: Lection, newItem: Lection): Boolean {
+    private val differCallBack = object : DiffUtil.ItemCallback<Lecture>() {
+        override fun areItemsTheSame(oldItem: Lecture, newItem: Lecture): Boolean {
             return oldItem.hashCode() == newItem.hashCode()
         }
 
-        override fun areContentsTheSame(oldItem: Lection, newItem: Lection): Boolean {
+        override fun areContentsTheSame(oldItem: Lecture, newItem: Lecture): Boolean {
             return oldItem.title == newItem.title
         }
 
@@ -26,12 +26,12 @@ class LecturesListAdapter: RecyclerView.Adapter<LecturesListAdapter.LectureViewH
 
     private val differ = AsyncListDiffer(this,differCallBack)
 
-    var lections: List<Lection>
+    var Lectures: List<Lecture>
         get() = differ.currentList
         set(value) = differ.submitList(value)
 
     inner class LectureViewHolder(val binding: ItemLectureInListBinding): RecyclerView.ViewHolder(binding.root) {
-        fun bind(item: Lection) {
+        fun bind(item: Lecture) {
             binding.tvTitle.setText(item.title)
             binding.tvTitle.setOnClickListener {
                 onClick?.let { click ->
@@ -46,10 +46,10 @@ class LecturesListAdapter: RecyclerView.Adapter<LecturesListAdapter.LectureViewH
     }
 
     override fun onBindViewHolder(holder: LectureViewHolder, position: Int) {
-        holder.bind(lections[position])
+        holder.bind(Lectures[position])
     }
 
-    override fun getItemCount() = lections.size
+    override fun getItemCount() = Lectures.size
 
     private var onClick: ((String) -> Unit)? = null
     fun setOnClickListener(listener: (String) -> Unit) {

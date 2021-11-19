@@ -13,8 +13,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import android.graphics.BitmapFactory
 
 import android.graphics.Bitmap
-
-
+import androidx.core.view.isVisible
 
 
 @AndroidEntryPoint
@@ -40,16 +39,13 @@ class SubjectsFragment : Fragment() {
             viewModel.navigateToLecturesListScreen(it)
         }
 
-        viewModel.imageBitmap.observe(viewLifecycleOwner,{
-            binding.bitmap.setImageBitmap(it)
-        })
-
         viewModel.subjectsState.observe(viewLifecycleOwner,{
             when (it) {
                 is ResourceNetwork.Loading -> {
-
+                    binding.progressFlask.isVisible = true
                 }
                 is ResourceNetwork.Success -> {
+                    binding.progressFlask.isVisible = false
                     it.data?.let {
                         adapter.subjects = it
                     }

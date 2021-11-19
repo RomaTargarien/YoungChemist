@@ -65,3 +65,5 @@ fun Bitmap.convertToByteArray(): ByteArray = ByteBuffer.allocate(byteCount).appl
     copyPixelsToBuffer(this)
     rewind()
 }.array()
+
+fun String.GLB() = this + ".glb"

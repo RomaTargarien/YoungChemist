@@ -8,6 +8,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.youngchemist.model.Subject
+import com.example.youngchemist.repositories.DatabaseRepository
 import com.example.youngchemist.repositories.FireStoreRepository
 import com.example.youngchemist.ui.screen.Screens
 import com.example.youngchemist.ui.util.BitmapUtils
@@ -31,7 +32,8 @@ var array: ByteArray? = null
 @HiltViewModel
 class SubjectsFragmentViewModel @Inject constructor(
     private val router: Router,
-    private val fireStoreRepository: FireStoreRepository
+    private val fireStoreRepository: FireStoreRepository,
+    private val databaseRepository: DatabaseRepository
 ): ViewModel() {
 
     private val _subjectsState: MutableLiveData<ResourceNetwork<List<Subject>>> = MutableLiveData()
@@ -50,18 +52,27 @@ class SubjectsFragmentViewModel @Inject constructor(
 
     private fun getAllSubjects() {
         viewModelScope.launch {
-            array?.let {
-                val bitmapFromArray = BitmapUtils.convertCompressedByteArrayToBitmap(it)
-                Log.d("TAG",bitmapFromArray.toString())
-                _imageBitmap.postValue(bitmapFromArray)
-            }
-            val subjects = fireStoreRepository.getAllSubjects()
-            if (subjects is ResourceNetwork.Success) {
-                val bitmap = getBitmapFromURL(subjects.data?.get(0)?.icon_url)
-               if (bitmap is ResourceNetwork.Success) {
-                   array = BitmapUtils.convertBitmapToByteArray(bitmap.data!!)
-                   _subjectsState.postValue(subjects)
-               }
+            if (databaseRepository.getAllSubjects().isEmpty()) {
+                _subjectsState.postValue(ResourceNetwork.Loading())
+                val subjects = fireStoreRepository.getAllSubjects()
+                if (subjects is ResourceNetwork.Success) {
+                    subjects.data?.let { subjectsList ->
+                        subjectsList.forEach { subject ->
+                            val bitmap = getBitmapFromURL(subject.icon_url)
+                            bitmap.data?.let {
+                                subject.iconByteArray = BitmapUtils.convertBitmapToByteArray(it)
+                            }
+                        }
+                        Log.d("TAG",subjectsList.toString())
+                        _subjectsState.postValue(ResourceNetwork.Success(subjectsList))
+                        databaseRepository.insertNewSubjects(subjectsList)
+                    }
+                } else {
+                    _subjectsState.postValue(subjects)
+                }
+            } else {
+                val subjects = databaseRepository.getAllSubjects()
+                _subjectsState.postValue(ResourceNetwork.Success(subjects))
             }
         }
     }
@@ -75,5 +86,10 @@ class SubjectsFragmentViewModel @Inject constructor(
             val input: InputStream = connection.getInputStream()
             ResourceNetwork.Success(BitmapFactory.decodeStream(input))
         }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        Log.d("TAG","onCleared")
     }
 }

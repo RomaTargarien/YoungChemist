@@ -1,3 +1,12 @@
 package com.example.youngchemist.model
 
-data class Subject(val title: String = "",val icon_url: String = "")
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+
+@Entity(tableName = "subjects")
+data class Subject(
+    @PrimaryKey
+    val title: String = "",
+    val icon_url: String = "",
+    var iconByteArray: ByteArray = byteArrayOf()
+)

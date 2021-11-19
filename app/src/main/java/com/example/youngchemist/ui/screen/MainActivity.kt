@@ -1,5 +1,6 @@
 package com.example.youngchemist.ui.screen
 
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.activity.viewModels
@@ -22,7 +23,9 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        //supportActionBar?.hide()
+        supportActionBar?.hide()
+        navigationBarColor()
+        window.statusBarColor = resources.getColor(R.color.black)
         viewModel.onActivityCreated()
     }
 
@@ -34,5 +37,11 @@ class MainActivity : AppCompatActivity() {
     override fun onPause() {
         navigatorHolder.removeNavigator()
         super.onPause()
+    }
+
+    private fun navigationBarColor() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            window.navigationBarColor = resources.getColor(R.color.black)
+        }
     }
 }

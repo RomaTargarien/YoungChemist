@@ -1,32 +1,41 @@
 package com.example.youngchemist.ui.screen.main.subjects.lectures.lecture
 
-import android.util.Log
+import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.youngchemist.model.Content
+import com.example.youngchemist.model.Page
+import com.example.youngchemist.repositories.DatabaseRepository
 import com.example.youngchemist.repositories.FireStoreRepository
 import com.example.youngchemist.ui.util.ResourceNetwork
-import com.github.terrakok.cicerone.Router
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class LectureFragmentViewModel @Inject constructor(
-    private val router: Router,
-    private val fireStoreRepository: FireStoreRepository
-): ViewModel() {
+    private val fireStoreRepository: FireStoreRepository,
+    private val databaseRepository: DatabaseRepository
+) : ViewModel() {
 
-    private val _contentState: MutableLiveData<ResourceNetwork<Content>> = MutableLiveData()
-    val contentState: LiveData<ResourceNetwork<Content>> = _contentState
+    private val _uriState: MutableLiveData<ResourceNetwork<Uri>> = MutableLiveData()
+    val uriState: LiveData<ResourceNetwork<Uri>> = _uriState
 
-    fun getContent(subjectTitle: String,lectureTitle: String) {
+    private val _pagesStae: MutableLiveData<List<Page>> = MutableLiveData()
+    val pagesState: LiveData<List<Page>> = _pagesStae
+
+    fun getContent(subjectTitle: String, lectureTitle: String) {
         viewModelScope.launch {
-            val result = fireStoreRepository.getLecture(subjectTitle, lectureTitle)
-            _contentState.postValue(result)
-            Log.d("TAG",result.data.toString())
+            val lecture = databaseRepository.getAllPages(lectureTitle, subjectTitle)[0]
+            _pagesStae.postValue(lecture.pages)
+        }
+    }
+
+    fun get3DModelUri(fileName: String) {
+        viewModelScope.launch {
+            val result = fireStoreRepository.get3DModel(fileName)
+            _uriState.postValue(result)
         }
     }
 }

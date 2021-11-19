@@ -16,17 +16,26 @@
         android:layout_height="match_parent"
         tools:context=".ui.screen.auth.AuthFragment">
 
+
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@drawable/main_background"
-            android:padding="12dp">
+            android:background="@drawable/main_background">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/constraintLayout3"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/constraintLayout2"
-                android:layout_width="match_parent"
+                android:layout_width="380dp"
                 android:layout_height="400dp"
+                app:layout_constraintVertical_bias="0.17"
                 android:background="@drawable/shape_rounded_rectangle_auth_screen"
+                app:layout_constraintBottom_toBottomOf="@+id/constraintLayout3"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
@@ -83,7 +92,7 @@
                 android:paddingRight="10dp"
                 android:text="@string/register"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintStart_toStartOf="@+id/constraintLayout2"
                 app:layout_constraintTop_toBottomOf="@+id/constraintLayout2"
                 app:layout_constraintVertical_bias="0.9">
 
@@ -96,11 +105,29 @@
                 android:onClick="@{view -> viewModel.navigateToLoginScreen()}"
                 android:text="@string/enter"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintEnd_toEndOf="@+id/constraintLayout2"
                 app:layout_constraintTop_toBottomOf="@+id/constraintLayout2"
                 app:layout_constraintVertical_bias="0.9">
 
             </androidx.appcompat.widget.AppCompatButton>
+
+            <com.google.android.material.appbar.AppBarLayout
+                android:id="@+id/appBar"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <com.google.android.material.appbar.MaterialToolbar
+                    android:layout_width="match_parent"
+                    app:title="@string/app_name"
+                    android:background="@color/violet"
+                    android:layout_height="wrap_content">
+
+                </com.google.android.material.appbar.MaterialToolbar>
+
+            </com.google.android.material.appbar.AppBarLayout>
 
 
         </androidx.constraintlayout.widget.ConstraintLayout>
