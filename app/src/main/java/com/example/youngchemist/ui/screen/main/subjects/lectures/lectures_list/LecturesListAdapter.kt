@@ -26,7 +26,7 @@ class LecturesListAdapter: RecyclerView.Adapter<LecturesListAdapter.LectureViewH
 
     private val differ = AsyncListDiffer(this,differCallBack)
 
-    var Lectures: List<Lecture>
+    var lectures: List<Lecture>
         get() = differ.currentList
         set(value) = differ.submitList(value)
 
@@ -46,10 +46,10 @@ class LecturesListAdapter: RecyclerView.Adapter<LecturesListAdapter.LectureViewH
     }
 
     override fun onBindViewHolder(holder: LectureViewHolder, position: Int) {
-        holder.bind(Lectures[position])
+        holder.bind(lectures[position])
     }
 
-    override fun getItemCount() = Lectures.size
+    override fun getItemCount() = lectures.size
 
     private var onClick: ((String) -> Unit)? = null
     fun setOnClickListener(listener: (String) -> Unit) {

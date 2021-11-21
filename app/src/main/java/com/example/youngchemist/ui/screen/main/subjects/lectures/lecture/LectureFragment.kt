@@ -51,20 +51,16 @@ class LectureFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel.getContent(subjectTitle!!,lectureTitle!!)
-        viewModel.pagesState.observe(viewLifecycleOwner, Observer {
+        val adapter = PageAdapter(resources)
+        binding.vpLecturePages.adapter = adapter
+        viewModel.pagesState.observe(viewLifecycleOwner,{
             it.let {
-                val imageGetter = ImageGetter(resources,binding.tvHtml)
-                val styledText = HtmlCompat.fromHtml(
-                    it[0].data,
-                    HtmlCompat.FROM_HTML_MODE_LEGACY,
-                    imageGetter,
-                    null
-                )
-                imageClick(styledText as Spannable)
-                binding.tvHtml.text = styledText
-                binding.tvHtml.movementMethod = LinkMovementMethod.getInstance()
+                adapter.pages = it
             }
         })
+        adapter.setOnClickListener {
+            viewModel.get3DModelUri(it)
+        }
 
         viewModel.uriState.observe(viewLifecycleOwner,{
             when (it) {
@@ -93,23 +89,6 @@ class LectureFragment : Fragment() {
         startActivity(intent)
     }
 
-    fun imageClick(html: Spannable) {
-        for (span in html.getSpans(0, html.length, ImageSpan::class.java)) {
-            val flags = html.getSpanFlags(span)
-            val start = html.getSpanStart(span)
-            val end = html.getSpanEnd(span)
-            html.setSpan(object : URLSpan(span.source) {
-                @RequiresApi(Build.VERSION_CODES.O)
-                override fun onClick(v: View) {
-                    Log.d("TAG", "onClick: url is ${span.source}")
-                    val fileName = Paths.get(URI(span.source).path).fileName.toString()
-                    val fileNameWithOutExt = fileName.substring(0,fileName.lastIndexOf('.'))
-                    viewModel.get3DModelUri(fileNameWithOutExt.GLB())
-                }
-            }, start, end, flags)
-        }
-    }
-
     companion object {
         private const val LECTURE_TITLE = "param1"
         private const val SUBJECT_TITLE = "param2"
@@ -122,5 +101,4 @@ class LectureFragment : Fragment() {
                 }
             }
     }
-
 }

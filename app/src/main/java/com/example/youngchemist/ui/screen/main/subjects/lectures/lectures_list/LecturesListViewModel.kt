@@ -27,21 +27,23 @@ class LecturesListViewModel @Inject constructor(
 
     fun getAllLectures(subjectTitle: String) {
         viewModelScope.launch {
-            val lectures = databaseRepository.getAllLectures(subjectTitle)
-            Log.d("TAG",lectures.toString())
-            if (databaseRepository.getAllLectures(subjectTitle).isEmpty()) {
-                _lecturesListState.postValue(ResourceNetwork.Loading())
-                val result = fireStoreRepository.getAllLectures(subjectTitle)
-                if (result is ResourceNetwork.Success) {
-                    result.data?.let {
-                        databaseRepository.insertNewLectures(it)
-                    }
+            //val lectures = databaseRepository.getAllLectures(subjectTitle)
+            //Log.d("TAG",lectures.toString())
+            _lecturesListState.postValue(ResourceNetwork.Loading())
+            val result = fireStoreRepository.getAllLectures(subjectTitle)
+            if (result is ResourceNetwork.Success) {
+                result.data?.let {
+                    databaseRepository.insertNewLectures(it)
                 }
-                _lecturesListState.postValue(result)
-            } else {
-                val lectures = databaseRepository.getAllLectures(subjectTitle)
-                _lecturesListState.postValue(ResourceNetwork.Success(lectures))
             }
+            _lecturesListState.postValue(result)
+//            _lecturesListState.postValue(result)
+//            if (databaseRepository.getAllLectures(subjectTitle).isEmpty()) {
+//
+//            } else {
+//                val lectures = databaseRepository.getAllLectures(subjectTitle)
+//                _lecturesListState.postValue(ResourceNetwork.Success(lectures))
+//            }
         }
     }
 

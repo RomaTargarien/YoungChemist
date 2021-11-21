@@ -60,7 +60,7 @@ class LecturesListFragment : Fragment() {
                 is ResourceNetwork.Success -> {
                     binding.progressFlask.isVisible = false
                     it.data?.let {
-                        adapter.Lectures = it
+                        adapter.lectures = it
                     }
                 }
                 is ResourceNetwork.Error -> {
