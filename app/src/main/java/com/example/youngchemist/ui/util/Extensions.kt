@@ -2,6 +2,7 @@ package com.example.youngchemist.ui.util
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.util.TypedValue
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.Animation
@@ -65,5 +66,9 @@ fun Bitmap.convertToByteArray(): ByteArray = ByteBuffer.allocate(byteCount).appl
     copyPixelsToBuffer(this)
     rewind()
 }.array()
+
+fun Int.toDp(context: Context): Int = TypedValue.applyDimension(
+    TypedValue.COMPLEX_UNIT_DIP, this.toFloat(), context.resources.displayMetrics
+).toInt()
 
 fun String.GLB() = this + ".glb"

@@ -1,6 +1,7 @@
 package com.example.youngchemist.ui.screen.main.subjects.lectures.lecture
 
 import android.net.Uri
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -25,6 +26,9 @@ class LectureFragmentViewModel @Inject constructor(
     private val _pagesStae: MutableLiveData<List<Page>> = MutableLiveData()
     val pagesState: LiveData<List<Page>> = _pagesStae
 
+    private val _isPaginationVisible: MutableLiveData<Boolean> = MutableLiveData(false)
+    val isPaginationVisible: LiveData<Boolean> = _isPaginationVisible
+
     fun getContent(subjectTitle: String, lectureTitle: String) {
         viewModelScope.launch {
             val lecture = databaseRepository.getAllPages(lectureTitle, subjectTitle)[0]
@@ -36,6 +40,13 @@ class LectureFragmentViewModel @Inject constructor(
         viewModelScope.launch {
             val result = fireStoreRepository.get3DModel(fileName)
             _uriState.postValue(result)
+        }
+    }
+
+    fun togglePagesPaginationVisibility() {
+        Log.d("TAG","Unit")
+        _isPaginationVisible.value?.let {
+            _isPaginationVisible.postValue(!it)
         }
     }
 }

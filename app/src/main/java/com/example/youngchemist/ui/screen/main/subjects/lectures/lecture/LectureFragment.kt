@@ -2,29 +2,22 @@ package com.example.youngchemist.ui.screen.main.subjects.lectures.lecture
 
 import android.content.Intent
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
-import android.text.Spannable
-import android.text.method.LinkMovementMethod
-import android.text.style.ImageSpan
-import android.text.style.URLSpan
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.annotation.RequiresApi
-import androidx.core.text.HtmlCompat
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.transition.TransitionManager
+import androidx.viewpager2.widget.ViewPager2
 import com.example.youngchemist.databinding.FragmentLectureBinding
-import com.example.youngchemist.ui.util.GLB
-import com.example.youngchemist.ui.util.ImageGetter
 import com.example.youngchemist.ui.util.ResourceNetwork
+import com.google.common.io.LineReader
 import dagger.hilt.android.AndroidEntryPoint
-import java.net.URI
-import java.nio.file.Paths
-import kotlin.io.path.name
 
 @AndroidEntryPoint
 class LectureFragment : Fragment() {
@@ -51,16 +44,47 @@ class LectureFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel.getContent(subjectTitle!!,lectureTitle!!)
-        val adapter = PageAdapter(resources)
+        val adapter = PageAdapter()
+        binding.viewModel = viewModel
+        val pagesPaginationAdapter = PagesPaginationAdapter()
+        val layoutManager = LinearLayoutManager(requireContext(),LinearLayoutManager.VERTICAL,false)
+        binding.rvPagesPagination.layoutManager = layoutManager
+        binding.rvPagesPagination.adapter = pagesPaginationAdapter
         binding.vpLecturePages.adapter = adapter
         viewModel.pagesState.observe(viewLifecycleOwner,{
             it.let {
                 adapter.pages = it
+                pagesPaginationAdapter.pages = it
+                binding.rvPagesPagination.addItemDecoration(PageNumberItemDecoration(0,true,true))
             }
         })
+        pagesPaginationAdapter.setOnClickListener {
+            binding.vpLecturePages.currentItem = it
+        }
         adapter.setOnClickListener {
             viewModel.get3DModelUri(it)
         }
+        viewModel.isPaginationVisible.observe(viewLifecycleOwner, {
+            TransitionManager.beginDelayedTransition(binding.mainContainer)
+            binding.rvPagesPagination.isVisible = it
+            if (it) {
+                binding.ivShowPagesPagination.animate().rotation(180f)
+            } else {
+                binding.ivShowPagesPagination.animate().rotation(360f)
+            }
+
+        })
+        var previuosPage: Int? = null
+        binding.vpLecturePages.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+            override fun onPageSelected(position: Int) {
+                super.onPageSelected(position)
+                previuosPage?.let {
+                    binding.rvPagesPagination.addItemDecoration(PageNumberItemDecoration(it,false))
+                }
+                previuosPage = position
+                binding.rvPagesPagination.addItemDecoration(PageNumberItemDecoration(position,true))
+            }
+        })
 
         viewModel.uriState.observe(viewLifecycleOwner,{
             when (it) {

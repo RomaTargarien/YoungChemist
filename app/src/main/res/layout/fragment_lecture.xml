@@ -5,6 +5,10 @@
 
     <data>
 
+        <variable
+            name="viewModel"
+            type="com.example.youngchemist.ui.screen.main.subjects.lectures.lecture.LectureFragmentViewModel" />
+
     </data>
 
     <FrameLayout
@@ -13,18 +17,42 @@
         tools:context=".ui.screen.main.subjects.lectures.lecture.LectureFragment">
 
         <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/main_container"
             android:layout_width="match_parent"
-            android:background="@drawable/main_background"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:background="@drawable/main_background">
 
             <androidx.viewpager2.widget.ViewPager2
                 android:id="@+id/vp_lecture_pages"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                app:layout_constraintStart_toEndOf="@+id/rv_pages_pagination">
 
             </androidx.viewpager2.widget.ViewPager2>
 
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_pages_pagination"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:paddingRight="5dp"
+                android:paddingLeft="5dp"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
 
+            </androidx.recyclerview.widget.RecyclerView>
+
+
+            <ImageView
+                android:id="@+id/iv_show_pages_pagination"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="@{view -> viewModel.togglePagesPaginationVisibility()}"
+                android:src="@drawable/ic_baseline_arrow_right_black"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/rv_pages_pagination"
+                app:layout_constraintTop_toTopOf="parent"/>
 
 
         </androidx.constraintlayout.widget.ConstraintLayout>
