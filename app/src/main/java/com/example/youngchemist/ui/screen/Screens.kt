@@ -9,6 +9,7 @@ import com.example.youngchemist.ui.screen.main.qr.scan.ScanFragment
 import com.example.youngchemist.ui.screen.main.subjects.SubjectsFragment
 import com.example.youngchemist.ui.screen.main.subjects.lectures.lecture.LectureFragment
 import com.example.youngchemist.ui.screen.main.subjects.lectures.lectures_list.LecturesListFragment
+import com.example.youngchemist.ui.screen.main.subjects.lectures.test.TestFragment
 import com.github.terrakok.cicerone.androidx.FragmentScreen
 
 object Screens {
@@ -43,6 +44,10 @@ object Screens {
 
     fun restorePasswordScreen() = FragmentScreen {
         RestorePasswordFragment()
+    }
+
+    fun testScreen() = FragmentScreen {
+        TestFragment()
     }
 
 }

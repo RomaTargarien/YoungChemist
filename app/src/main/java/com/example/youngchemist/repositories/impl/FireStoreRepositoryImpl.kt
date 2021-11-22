@@ -4,10 +4,7 @@ import android.content.Intent
 import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.LiveData
-import com.example.youngchemist.model.Content
-import com.example.youngchemist.model.Lecture
-import com.example.youngchemist.model.Page
-import com.example.youngchemist.model.Subject
+import com.example.youngchemist.model.*
 import com.example.youngchemist.repositories.FireStoreRepository
 import com.example.youngchemist.ui.util.ResourceNetwork
 import com.example.youngchemist.ui.util.safeCall
@@ -16,6 +13,7 @@ import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
+import java.lang.Exception
 import java.util.ArrayList
 import javax.inject.Inject
 
@@ -25,6 +23,7 @@ class FireStoreRepositoryImpl @Inject constructor(
 ): FireStoreRepository {
 
     private val subjects = firestore.collection("subjects")
+    private val testref = firestore.collection("tests")
 
     override suspend fun getAllSubjects() = withContext(Dispatchers.IO) {
         safeCall {
@@ -67,6 +66,25 @@ class FireStoreRepositoryImpl @Inject constructor(
                 .appendQueryParameter("mode","3d_only")
                 .build()
             ResourceNetwork.Success(intentUri)
+        }
+    }
+
+    override suspend fun saveTest(test: Test) {
+        withContext(Dispatchers.IO) {
+            try {
+                Log.d("TAG","save")
+                testref.add(test).await()
+            } catch (e: Exception) {
+                Log.d("Tag",e.localizedMessage)
+            }
+        }
+    }
+
+    override suspend fun retriveTest(uid: String) = withContext(Dispatchers.IO) {
+        safeCall {
+            val result = firestore.collection("tests").document(uid).get().await()
+            val test: Test? = result.toObject(Test::class.java)
+            ResourceNetwork.Success(test)
         }
     }
 

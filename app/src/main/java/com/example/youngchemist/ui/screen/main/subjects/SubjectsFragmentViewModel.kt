@@ -7,7 +7,10 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.youngchemist.model.Answer
 import com.example.youngchemist.model.Subject
+import com.example.youngchemist.model.Task
+import com.example.youngchemist.model.Test
 import com.example.youngchemist.repositories.DatabaseRepository
 import com.example.youngchemist.repositories.FireStoreRepository
 import com.example.youngchemist.ui.screen.Screens
@@ -46,8 +49,30 @@ class SubjectsFragmentViewModel @Inject constructor(
         router.navigateTo(Screens.lecturesListScreen(title))
     }
 
+    fun navigateToTestScreen() {
+        router.navigateTo(Screens.testScreen())
+    }
+
     init {
         getAllSubjects()
+        val answers = arrayListOf<Answer>(
+            Answer("a1",false),
+            Answer("a2",false),
+            Answer("a3",true),
+            Answer("a4",false)
+        )
+        val task = Task("q1",answers)
+        val answers2 = arrayListOf<Answer>(
+            Answer("a1",false),
+            Answer("a2",false),
+            Answer("a3",true),
+            Answer("a4",false)
+        )
+        val task2 = Task("q1",answers2)
+        val test = Test(0,0, arrayListOf(task,task2))
+        viewModelScope.launch {
+            fireStoreRepository.saveTest(test)
+        }
     }
 
     private fun getAllSubjects() {

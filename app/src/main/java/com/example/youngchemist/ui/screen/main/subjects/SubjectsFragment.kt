@@ -32,6 +32,8 @@ class SubjectsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         val adapter = SubjectsAdapter()
+        binding.viewModel = viewModel
+
 
         binding.rvSubjects.layoutManager = GridLayoutManager(this.requireContext(),3)
         binding.rvSubjects.adapter = adapter

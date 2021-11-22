@@ -4,6 +4,7 @@ import android.net.Uri
 import com.example.youngchemist.model.Content
 import com.example.youngchemist.model.Lecture
 import com.example.youngchemist.model.Subject
+import com.example.youngchemist.model.Test
 import com.example.youngchemist.ui.util.ResourceNetwork
 
 interface FireStoreRepository {
@@ -13,5 +14,9 @@ interface FireStoreRepository {
     suspend fun getAllLectures(subjectTitle: String): ResourceNetwork<List<Lecture>>
 
     suspend fun get3DModel(name: String): ResourceNetwork<Uri>
+
+    suspend fun saveTest(test: Test)
+
+    suspend fun retriveTest(uid: String): ResourceNetwork<Test>
 
 }
