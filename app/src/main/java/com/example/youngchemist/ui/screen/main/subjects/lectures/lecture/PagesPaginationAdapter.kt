@@ -1,15 +1,36 @@
 package com.example.youngchemist.ui.screen.main.subjects.lectures.lecture
 
+import android.annotation.SuppressLint
+import android.content.res.Resources
 import android.graphics.Color
+import android.graphics.PorterDuff
+import android.os.Build
+import android.util.Log
 import android.view.LayoutInflater
+import android.view.View
+import android.view.View.OnFocusChangeListener
 import android.view.ViewGroup
+import androidx.annotation.RequiresApi
+import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import com.example.youngchemist.R
 import com.example.youngchemist.databinding.ItemPageNumberBinding
 import com.example.youngchemist.model.Page
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.filterNotNull
+import androidx.core.view.ViewCompat
 
-class PagesPaginationAdapter :
+
+
+
+class PagesPaginationAdapter(
+    private val resources: Resources,
+    private val viewModel: LectureFragmentViewModel,
+    private val lifecycle: LifecycleCoroutineScope
+) :
     RecyclerView.Adapter<PagesPaginationAdapter.PagePaginationViewHolder>() {
 
     private val differCallBack = object : DiffUtil.ItemCallback<Page>() {
@@ -31,21 +52,30 @@ class PagesPaginationAdapter :
         get() = differ.currentList
         set(value) = differ.submitList(value)
 
+    init {
+        lifecycle.launch {
+            viewModel.selectedPage.filterNotNull().collect {
+                Log.d("TAG",it.toString())
+                mapBinding[previousPageNumber]?.pageNumberContainer?.background = resources.getDrawable(R.drawable.shape_outlined_rectangle)
+                mapBinding[it]?.pageNumberContainer?.background = resources.getDrawable(R.drawable.shape_rounded_button)
+                previousPageNumber = it
+            }
+        }
+    }
+
     inner class PagePaginationViewHolder(val binding: ItemPageNumberBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(position: Int) {
-            //binding.pageNumberContainer.alpha = 0.5f
-            binding.pageNumberContainer.setBackgroundColor(Color.BLUE)
-            //mapBinding[previousPageNumber]?.pageNumberContainer?.alpha = 1f
-            mapBinding[previousPageNumber]?.pageNumberContainer?.setBackgroundColor(Color.GREEN)
+            binding.pageNumberContainer.background = resources.getDrawable(R.drawable.shape_outlined_rectangle)
+            mapBinding[previousPageNumber]?.pageNumberContainer?.background = resources.getDrawable(R.drawable.shape_rounded_button)
             binding.tvPageNumber.setText((position + 1).toString())
             binding.pageNumberContainer.setOnClickListener {
                 onClick?.let { click ->
-                   // binding.pageNumberContainer.alpha = 1f
-                    binding.pageNumberContainer.setBackgroundColor(Color.GREEN)
-                    //mapBinding[previousPageNumber]?.pageNumberContainer?.alpha = 0.5f
-                    mapBinding[previousPageNumber]?.pageNumberContainer?.setBackgroundColor(Color.BLUE)
-                    previousPageNumber = position
+                    if (position != previousPageNumber) {
+                        binding.pageNumberContainer.background = resources.getDrawable(R.drawable.shape_rounded_button)
+                        mapBinding[previousPageNumber]?.pageNumberContainer?.background = resources.getDrawable(R.drawable.shape_outlined_rectangle)
+                        previousPageNumber = position
+                    }
                     click(position)
                 }
             }

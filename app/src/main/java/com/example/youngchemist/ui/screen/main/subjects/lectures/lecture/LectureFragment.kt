@@ -11,14 +11,21 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import androidx.transition.TransitionManager
 import androidx.viewpager2.widget.ViewPager2
 import com.example.youngchemist.databinding.FragmentLectureBinding
+import com.example.youngchemist.ui.util.CenterZoomLayoutManager
 import com.example.youngchemist.ui.util.ResourceNetwork
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.common.io.LineReader
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class LectureFragment : Fragment() {
@@ -47,8 +54,8 @@ class LectureFragment : Fragment() {
         viewModel.getContent(subjectTitle!!,lectureTitle!!)
         val adapter = PageAdapter()
         binding.viewModel = viewModel
-        val pagesPaginationAdapter = PagesPaginationAdapter()
-        val layoutManager = LinearLayoutManager(requireContext(),LinearLayoutManager.HORIZONTAL,false)
+        val pagesPaginationAdapter = PagesPaginationAdapter(resources,viewModel,lifecycleScope)
+        val layoutManager = CenterZoomLayoutManager(requireContext(),LinearLayoutManager.HORIZONTAL,false)
         binding.bmSheet.rvPagesPagination.layoutManager = layoutManager
         binding.bmSheet.rvPagesPagination.adapter = pagesPaginationAdapter
         binding.vpLecturePages.adapter = adapter
@@ -64,10 +71,22 @@ class LectureFragment : Fragment() {
         adapter.setOnClickListener {
             viewModel.get3DModelUri(it)
         }
+        binding.bmSheet.rvPagesPagination.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+                Log.d("TAG",dx.toString())
+            }
+
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                super.onScrollStateChanged(recyclerView, newState)
+            }
+        })
         binding.bmSheet.viewModel = viewModel
-        var previuosPage: Int? = null
         binding.vpLecturePages.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
+                lifecycleScope.launch(Dispatchers.Main) {
+                    viewModel.selectedPage.emit(position)
+                }
                 binding.bmSheet.rvPagesPagination.smoothScrollToPosition(position)
             }
         })

@@ -11,6 +11,7 @@ import com.example.youngchemist.repositories.DatabaseRepository
 import com.example.youngchemist.repositories.FireStoreRepository
 import com.example.youngchemist.ui.util.ResourceNetwork
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -28,6 +29,8 @@ class LectureFragmentViewModel @Inject constructor(
 
     private val _isPaginationVisible: MutableLiveData<Boolean> = MutableLiveData(false)
     val isPaginationVisible: LiveData<Boolean> = _isPaginationVisible
+
+    val selectedPage: MutableStateFlow<Int?> = MutableStateFlow(null)
 
     fun getContent(subjectTitle: String, lectureTitle: String) {
         viewModelScope.launch {
