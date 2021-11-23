@@ -16,6 +16,7 @@ import androidx.transition.TransitionManager
 import androidx.viewpager2.widget.ViewPager2
 import com.example.youngchemist.databinding.FragmentLectureBinding
 import com.example.youngchemist.ui.util.ResourceNetwork
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.common.io.LineReader
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -47,15 +48,14 @@ class LectureFragment : Fragment() {
         val adapter = PageAdapter()
         binding.viewModel = viewModel
         val pagesPaginationAdapter = PagesPaginationAdapter()
-        val layoutManager = LinearLayoutManager(requireContext(),LinearLayoutManager.VERTICAL,false)
-        binding.rvPagesPagination.layoutManager = layoutManager
-        binding.rvPagesPagination.adapter = pagesPaginationAdapter
+        val layoutManager = LinearLayoutManager(requireContext(),LinearLayoutManager.HORIZONTAL,false)
+        binding.bmSheet.rvPagesPagination.layoutManager = layoutManager
+        binding.bmSheet.rvPagesPagination.adapter = pagesPaginationAdapter
         binding.vpLecturePages.adapter = adapter
         viewModel.pagesState.observe(viewLifecycleOwner,{
             it.let {
                 adapter.pages = it
                 pagesPaginationAdapter.pages = it
-                binding.rvPagesPagination.addItemDecoration(PageNumberItemDecoration(0,true,true))
             }
         })
         pagesPaginationAdapter.setOnClickListener {
@@ -64,25 +64,27 @@ class LectureFragment : Fragment() {
         adapter.setOnClickListener {
             viewModel.get3DModelUri(it)
         }
-        viewModel.isPaginationVisible.observe(viewLifecycleOwner, {
-            TransitionManager.beginDelayedTransition(binding.mainContainer)
-            binding.rvPagesPagination.isVisible = it
-            if (it) {
-                binding.ivShowPagesPagination.animate().rotation(180f)
-            } else {
-                binding.ivShowPagesPagination.animate().rotation(360f)
-            }
-
-        })
+        binding.bmSheet.viewModel = viewModel
         var previuosPage: Int? = null
         binding.vpLecturePages.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
-                super.onPageSelected(position)
-                previuosPage?.let {
-                    binding.rvPagesPagination.addItemDecoration(PageNumberItemDecoration(it,false))
-                }
-                previuosPage = position
-                binding.rvPagesPagination.addItemDecoration(PageNumberItemDecoration(position,true))
+                binding.bmSheet.rvPagesPagination.smoothScrollToPosition(position)
+            }
+        })
+
+        val bottomSheet = binding.bmSheet.bottomSheetContainer
+        val bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet)
+        viewModel.isPaginationVisible.observe(viewLifecycleOwner,{
+            bottomSheetBehavior.state = if (it) BottomSheetBehavior.STATE_EXPANDED else BottomSheetBehavior.STATE_COLLAPSED
+        })
+        bottomSheetBehavior.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
+            override fun onStateChanged(bottomSheet: View, newState: Int) {
+
+            }
+
+            override fun onSlide(bottomSheet: View, slideOffset: Float) {
+                binding.bmSheet.ivLeftArrowUp.animate().rotation(slideOffset*180).setDuration(0).start()
+                binding.bmSheet.ivRightArrowUp.animate().rotation(-slideOffset*180).setDuration(0).start()
             }
         })
 

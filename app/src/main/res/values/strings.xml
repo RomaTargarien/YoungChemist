@@ -53,4 +53,5 @@
     <string name="ERROR_USER_NOT_FOUND">Такого пользователя не существует! Проверьте введенные данные. </string>
     <string name="ERROR_UNKNOWN">Произошла ошибка, попробуйте повторить это действие позже</string>
     <string name="ERROR_INVALID_CREDENTIALS">Проверьте правильность вв</string>
+    <string name="select_page">Выбрать страницу</string>
 </resources>

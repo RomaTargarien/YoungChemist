@@ -36,17 +36,16 @@ class LectureFragmentViewModel @Inject constructor(
         }
     }
 
+    fun togglePagePaginationVisibility() {
+        _isPaginationVisible.value?.let {
+            _isPaginationVisible.postValue(!it)
+        }
+    }
+
     fun get3DModelUri(fileName: String) {
         viewModelScope.launch {
             val result = fireStoreRepository.get3DModel(fileName)
             _uriState.postValue(result)
-        }
-    }
-
-    fun togglePagesPaginationVisibility() {
-        Log.d("TAG","Unit")
-        _isPaginationVisible.value?.let {
-            _isPaginationVisible.postValue(!it)
         }
     }
 }
