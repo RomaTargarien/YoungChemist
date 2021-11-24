@@ -1,29 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
 
     <data>
 
     </data>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="60dp"
-        android:id="@+id/page_number_container"
-        android:background="@drawable/shape_outlined_rectangle"
-        android:layout_height="60dp">
+    <RelativeLayout
+        android:layout_width="@dimen/item_page_number_width"
+        android:layout_height="wrap_content"
+        android:paddingTop="30dp"
+        android:paddingEnd="18dp"
+        android:paddingBottom="30dp">
+
+        <ImageView
+            android:id="@+id/list_item_page_number_background"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_centerInParent="true"
+            android:src="@drawable/shape_circle_for_page_number" />
 
         <TextView
-            android:id="@+id/tv_page_number"
-            style="@style/TittleTextStyle"
+            android:id="@+id/tv_item_page_number"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:alpha="1"
-            android:text="1"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:layout_centerInParent="true"
+            android:textColor="@color/white"
+            android:textSize="12sp" />
 
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    </RelativeLayout>
 </layout>

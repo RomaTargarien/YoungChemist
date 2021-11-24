@@ -67,13 +67,14 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
 
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:padding="15dp"
+        <com.example.youngchemist.ui.custom.HorizontalCarouselRecyclerView
             android:id="@+id/rv_pages_pagination"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
+            android:clipToPadding="false"
+            android:overScrollMode="never"
             app:layout_constraintTop_toBottomOf="@+id/constraintLayout4" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

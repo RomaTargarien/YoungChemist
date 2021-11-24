@@ -19,7 +19,7 @@ private const val ARG_PARAM2 = "param2"
 
 @AndroidEntryPoint
 class TestFragment : Fragment() {
-    // TODO: Rename and change types of parameters
+
     private var param1: String? = null
     private var param2: String? = null
 
@@ -42,11 +42,13 @@ class TestFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        val adapter = ViewPagerTestAdapter()
+        binding.vpTest.adapter = adapter
         viewModel.testState.observe(viewLifecycleOwner, {
             when (it) {
                 is ResourceNetwork.Success -> {
                     it.data?.let {
-                        Log.d("TAG",it.toString())
+                        adapter.tasks = it.tasks
                     }
                 }
                 is ResourceNetwork.Error -> {
