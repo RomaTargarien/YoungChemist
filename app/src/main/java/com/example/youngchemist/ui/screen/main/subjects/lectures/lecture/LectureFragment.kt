@@ -112,23 +112,6 @@ class LectureFragment : Fragment() {
                 binding.bmSheet.ivRightArrowUp.animate().rotation(-slideOffset*180).setDuration(0).start()
             }
         })
-
-        viewModel.uriState.observe(viewLifecycleOwner,{
-            when (it) {
-                is ResourceNetwork.Loading -> {
-
-                }
-                is ResourceNetwork.Success -> {
-                    it.data?.let {
-                        start3DModelActivity(it)
-                    }
-
-                }
-                is ResourceNetwork.Error -> {
-
-                }
-            }
-        })
         }
 
     private fun start3DModelActivity(uri: Uri) {

@@ -30,7 +30,8 @@ class TestAnswerAdapter : RecyclerView.Adapter<TestAnswerAdapter.TestAnswerViewH
         set(value) = differ.submitList(value)
 
     inner class TestAnswerViewHolder(private val binding: ItemAnswerBinding) : RecyclerView.ViewHolder(binding.root) {
-        fun bind(answer: Answer) {
+        fun bind(answer: Answer,position: Int) {
+            binding.tvAnswerNumber?.text = "${position+1})"
             binding.tvAnswer.text= answer.text
         }
     }
@@ -40,7 +41,7 @@ class TestAnswerAdapter : RecyclerView.Adapter<TestAnswerAdapter.TestAnswerViewH
     }
 
     override fun onBindViewHolder(holder: TestAnswerViewHolder, position: Int) {
-        holder.bind(answers[position])
+        holder.bind(answers[position],position)
     }
 
     override fun getItemCount() = answers.size

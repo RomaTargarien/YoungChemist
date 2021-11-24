@@ -24,16 +24,11 @@ class LectureFragmentViewModel @Inject constructor(
     private val databaseRepository: DatabaseRepository
 ) : ViewModel() {
 
-    private val _uriState: MutableLiveData<ResourceNetwork<Uri>> = MutableLiveData()
-    val uriState: LiveData<ResourceNetwork<Uri>> = _uriState
-
     private val _pagesStae: MutableLiveData<List<Page>> = MutableLiveData()
     val pagesState: LiveData<List<Page>> = _pagesStae
 
     private val _isPaginationVisible: MutableLiveData<Boolean> = MutableLiveData(false)
     val isPaginationVisible: LiveData<Boolean> = _isPaginationVisible
-
-    val selectedPage: MutableStateFlow<Int?> = MutableStateFlow(null)
 
     fun getContent(subjectTitle: String, lectureTitle: String) {
         viewModelScope.launch {
@@ -52,13 +47,6 @@ class LectureFragmentViewModel @Inject constructor(
     fun togglePagePaginationVisibility() {
         _isPaginationVisible.value?.let {
             _isPaginationVisible.postValue(!it)
-        }
-    }
-
-    fun get3DModelUri(fileName: String) {
-        viewModelScope.launch {
-            val result = fireStoreRepository.get3DModel(fileName)
-            _uriState.postValue(result)
         }
     }
 }

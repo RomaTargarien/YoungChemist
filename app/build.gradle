@@ -119,6 +119,8 @@ dependencies {
     //Coil
     implementation("io.coil-kt:coil:1.4.0")
 
+    implementation 'com.ms-square:expandableTextView:0.1.4'
+
     //Picasso
     implementation 'com.squareup.picasso:picasso:2.71828'
 
@@ -126,6 +128,8 @@ dependencies {
 
     //Room
     def room_version = "2.3.0"
+
+    implementation 'io.github.glailton.expandabletextview:expandabletextview:1.0.1'
 
     implementation "androidx.room:room-runtime:2.2.5"
     kapt "androidx.room:room-compiler:2.2.5"

@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.youngchemist.databinding.ItemTestBinding
 import com.example.youngchemist.model.Subject
 import com.example.youngchemist.model.Task
+import com.ms.square.android.expandabletextview.ExpandableTextView
 
 class ViewPagerTestAdapter: RecyclerView.Adapter<ViewPagerTestAdapter.ViewPagerTestViewHolder>()  {
 
@@ -34,6 +35,7 @@ class ViewPagerTestAdapter: RecyclerView.Adapter<ViewPagerTestAdapter.ViewPagerT
             binding.tvQuestion.text = item.question
             val testAnswerAdapter = TestAnswerAdapter()
             binding.rvAnswers.layoutManager = LinearLayoutManager(itemView.context,LinearLayoutManager.VERTICAL,false)
+            binding.rvAnswers.addItemDecoration(HorizontalItemDecoration(25))
             binding.rvAnswers.adapter = testAnswerAdapter
             testAnswerAdapter.answers = item.answers
         }

@@ -1,5 +1,7 @@
 package com.example.youngchemist.ui.screen.main.subjects.lectures.test
 
+import android.os.CountDownTimer
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -26,5 +28,15 @@ class TestFragmentViewModel @Inject constructor(
             val result = fireStoreRepository.retriveTest("jb1ZH7TOJyYeNKuhrGgr")
             _testState.postValue(result)
         }
+        val countDownTimer = object : CountDownTimer(5000,1000) {
+            override fun onTick(p0: Long) {
+                Log.d("TAG",p0.toString())
+            }
+
+            override fun onFinish() {
+                Log.d("TAG","finish")
+            }
+        }
+        countDownTimer.start()
     }
 }
