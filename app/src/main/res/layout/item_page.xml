@@ -10,10 +10,13 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+
+
         <ScrollView
+            android:id="@+id/scrollView2"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@color/white"
+            android:background="@color/white_android"
             app:layout_constraintTop_toTopOf="parent">
 
             <WebView

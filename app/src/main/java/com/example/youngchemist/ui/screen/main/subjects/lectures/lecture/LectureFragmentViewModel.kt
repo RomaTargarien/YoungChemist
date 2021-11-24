@@ -9,13 +9,16 @@ import androidx.lifecycle.viewModelScope
 import com.example.youngchemist.model.Page
 import com.example.youngchemist.repositories.DatabaseRepository
 import com.example.youngchemist.repositories.FireStoreRepository
+import com.example.youngchemist.ui.screen.Screens
 import com.example.youngchemist.ui.util.ResourceNetwork
+import com.github.terrakok.cicerone.Router
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class LectureFragmentViewModel @Inject constructor(
+    private val router: Router,
     private val fireStoreRepository: FireStoreRepository,
     private val databaseRepository: DatabaseRepository
 ) : ViewModel() {
@@ -34,6 +37,13 @@ class LectureFragmentViewModel @Inject constructor(
             val lecture = databaseRepository.getAllPages(lectureTitle, subjectTitle)[0]
             _pagesStae.postValue(lecture.pages)
         }
+    }
+    fun exit() {
+        router.exit()
+    }
+
+    fun navigateToTestScreen() {
+        router.replaceScreen(Screens.testScreen())
     }
 
     fun togglePagePaginationVisibility() {

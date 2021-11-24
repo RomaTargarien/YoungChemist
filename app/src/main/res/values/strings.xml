@@ -54,4 +54,5 @@
     <string name="ERROR_UNKNOWN">Произошла ошибка, попробуйте повторить это действие позже</string>
     <string name="ERROR_INVALID_CREDENTIALS">Проверьте правильность вв</string>
     <string name="select_page">Выбрать страницу</string>
+    <string name="start_test">Начать тест</string>
 </resources>

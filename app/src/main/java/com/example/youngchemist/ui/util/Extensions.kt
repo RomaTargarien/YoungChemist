@@ -62,11 +62,6 @@ fun Fragment.closeKeyBoard() {
     }
 }
 
-fun Bitmap.convertToByteArray(): ByteArray = ByteBuffer.allocate(byteCount).apply {
-    copyPixelsToBuffer(this)
-    rewind()
-}.array()
-
 fun Int.toDp(context: Context): Int = TypedValue.applyDimension(
     TypedValue.COMPLEX_UNIT_DIP, this.toFloat(), context.resources.displayMetrics
 ).toInt()

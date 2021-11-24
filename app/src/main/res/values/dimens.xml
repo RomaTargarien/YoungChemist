@@ -42,6 +42,7 @@
     <dimen name="image_register_width">650dp</dimen>
     <dimen name="image_register_margin">152dp</dimen>
     <dimen name="test">60dp</dimen>
+    <dimen name="item_page_number_width">84dp</dimen>
 
 
 </resources>

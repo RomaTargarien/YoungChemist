@@ -4,18 +4,20 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.youngchemist.databinding.ItemTestBinding
 import com.example.youngchemist.model.Subject
+import com.example.youngchemist.model.Task
 
 class ViewPagerTestAdapter: RecyclerView.Adapter<ViewPagerTestAdapter.ViewPagerTestViewHolder>()  {
 
-    private val differCallBack = object : DiffUtil.ItemCallback<Map<String,ArrayList<Map<String,Boolean>>>>() {
-        override fun areItemsTheSame(oldItem: Map<String,ArrayList<Map<String,Boolean>>>, newItem: Map<String,ArrayList<Map<String,Boolean>>>): Boolean {
+    private val differCallBack = object : DiffUtil.ItemCallback<Task>() {
+        override fun areItemsTheSame(oldItem: Task, newItem: Task): Boolean {
             return oldItem.hashCode() == newItem.hashCode()
         }
 
-        override fun areContentsTheSame(oldItem: Map<String,ArrayList<Map<String,Boolean>>>, newItem: Map<String,ArrayList<Map<String,Boolean>>>): Boolean {
+        override fun areContentsTheSame(oldItem: Task, newItem: Task): Boolean {
             return oldItem.hashCode() == newItem.hashCode()
         }
 
@@ -23,13 +25,17 @@ class ViewPagerTestAdapter: RecyclerView.Adapter<ViewPagerTestAdapter.ViewPagerT
 
     private val differ = AsyncListDiffer(this,differCallBack)
 
-    var questions: MutableList<Map<String, ArrayList<Map<String, Boolean>>>>
+    var tasks: List<Task>
         get() = differ.currentList
         set(value) = differ.submitList(value)
 
     inner class ViewPagerTestViewHolder(val binding: ItemTestBinding) : RecyclerView.ViewHolder(binding.root) {
-        fun bind(item: Map<String, ArrayList<Map<String, Boolean>>>) {
-           // binding.tvQuestion.text = item.
+        fun bind(item: Task) {
+            binding.tvQuestion.text = item.question
+            val testAnswerAdapter = TestAnswerAdapter()
+            binding.rvAnswers.layoutManager = LinearLayoutManager(itemView.context,LinearLayoutManager.VERTICAL,false)
+            binding.rvAnswers.adapter = testAnswerAdapter
+            testAnswerAdapter.answers = item.answers
         }
     }
 
@@ -37,8 +43,8 @@ class ViewPagerTestAdapter: RecyclerView.Adapter<ViewPagerTestAdapter.ViewPagerT
         ViewPagerTestViewHolder(ItemTestBinding.inflate(LayoutInflater.from(parent.context),parent,false))
 
     override fun onBindViewHolder(holder: ViewPagerTestViewHolder, position: Int) {
-
+        holder.bind(tasks[position])
     }
 
-    override fun getItemCount() = questions.size
+    override fun getItemCount() = tasks.size
 }

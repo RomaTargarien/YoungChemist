@@ -23,8 +23,8 @@ class TestFragmentViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-//            val result = fireStoreRepository.retriveTest("2uB7LeuEN1fmZLFI1c7n")
-//            _testState.postValue(result)
+            val result = fireStoreRepository.retriveTest("jb1ZH7TOJyYeNKuhrGgr")
+            _testState.postValue(result)
         }
     }
 }

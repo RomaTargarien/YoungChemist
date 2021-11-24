@@ -16,7 +16,6 @@ import com.example.youngchemist.repositories.FireStoreRepository
 import com.example.youngchemist.ui.screen.Screens
 import com.example.youngchemist.ui.util.BitmapUtils
 import com.example.youngchemist.ui.util.ResourceNetwork
-import com.example.youngchemist.ui.util.convertToByteArray
 import com.example.youngchemist.ui.util.safeCall
 import com.github.terrakok.cicerone.Router
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -71,7 +70,7 @@ class SubjectsFragmentViewModel @Inject constructor(
         val task2 = Task("q1",answers2)
         val test = Test(0,0, arrayListOf(task,task2))
         viewModelScope.launch {
-            fireStoreRepository.saveTest(test)
+            //fireStoreRepository.saveTest(test)
         }
     }
 

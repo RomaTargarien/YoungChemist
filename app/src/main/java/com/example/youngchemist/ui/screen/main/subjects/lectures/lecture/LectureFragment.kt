@@ -1,6 +1,8 @@
 package com.example.youngchemist.ui.screen.main.subjects.lectures.lecture
 
+import android.annotation.SuppressLint
 import android.content.Intent
+import android.graphics.Interpolator
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -14,13 +16,17 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.transition.TransitionManager
 import androidx.viewpager2.widget.ViewPager2
+import com.example.youngchemist.R
 import com.example.youngchemist.databinding.FragmentLectureBinding
+import com.example.youngchemist.ui.listeners.OnPageNumberChangedListener
+import com.example.youngchemist.ui.listeners.OnUriGetting
 import com.example.youngchemist.ui.util.ResourceNetwork
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.common.io.LineReader
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
+@SuppressLint("SetJavaScriptEnabled")
 class LectureFragment : Fragment() {
 
     private lateinit var binding: FragmentLectureBinding
@@ -46,29 +52,48 @@ class LectureFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         viewModel.getContent(subjectTitle!!,lectureTitle!!)
         val adapter = PageAdapter()
-        binding.viewModel = viewModel
+        adapter.setOnEventListener(object : OnUriGetting {
+            override fun onUriGetted(uri: String) {
+                Log.d("TAG",uri)
+                val intentUri = Uri.parse("https://arvr.google.com/scene-viewer/1.0")
+                    .buildUpon()
+                    .appendQueryParameter(
+                        "file",
+                        uri
+                    )
+                    .appendQueryParameter("mode","3d_only")
+                    .build()
+                start3DModelActivity(intentUri)
+            }
+        })
         val pagesPaginationAdapter = PagesPaginationAdapter()
-        val layoutManager = LinearLayoutManager(requireContext(),LinearLayoutManager.HORIZONTAL,false)
-        binding.bmSheet.rvPagesPagination.layoutManager = layoutManager
-        binding.bmSheet.rvPagesPagination.adapter = pagesPaginationAdapter
+        binding.bmSheet.rvPagesPagination.setOnEventListener(object : OnPageNumberChangedListener {
+            override fun onPageNumberChanged(page: Int) {
+                binding.vpLecturePages.currentItem = page
+            }
+        })
+        binding.bmSheet.rvPagesPagination.initialize(pagesPaginationAdapter)
+        binding.bmSheet.rvPagesPagination.setViewsToChangeColor(listOf(R.id.list_item_page_number_background))
+        binding.viewModel = viewModel
+
         binding.vpLecturePages.adapter = adapter
+        var size = 0
         viewModel.pagesState.observe(viewLifecycleOwner,{
             it.let {
                 adapter.pages = it
-                pagesPaginationAdapter.pages = it
+                pagesPaginationAdapter.setItems(it)
+                size = it.size
             }
         })
         pagesPaginationAdapter.setOnClickListener {
             binding.vpLecturePages.currentItem = it
         }
-        adapter.setOnClickListener {
-            viewModel.get3DModelUri(it)
-        }
         binding.bmSheet.viewModel = viewModel
-        var previuosPage: Int? = null
         binding.vpLecturePages.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
                 binding.bmSheet.rvPagesPagination.smoothScrollToPosition(position)
+                binding.tvPageNumber.text = "${position+1}/$size"
+                binding.bnBeginTest.isVisible = (position+1) == size
             }
         })
 
