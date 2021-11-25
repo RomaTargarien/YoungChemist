@@ -71,6 +71,17 @@ class TestFragment : Fragment() {
         viewModel.timeLeft.observe(viewLifecycleOwner,{
             binding.tvTimer.setText(it)
         })
+        adapter.setOnClickListener {
+            for (item in it) {
+                Log.d("TAG","Номер теста - "+ item.position.toString())
+                if (item.answersList.isEmpty()) {
+                    Log.d("TAG","Не добрался")
+                }
+                for (answers in item.answersList) {
+                    Log.d("TAG",answers.position.toString() + " "+ answers.itIsRight.toString())
+                }
+            }
+        }
         viewModel.testState.observe(viewLifecycleOwner, {
             when (it) {
                 is ResourceNetwork.Success -> {
@@ -95,7 +106,6 @@ class TestFragment : Fragment() {
     }
 
     companion object {
-
         @JvmStatic
         fun newInstance(param1: String, param2: String) =
             TestFragment().apply {

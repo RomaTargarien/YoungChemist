@@ -1,5 +1,6 @@
 package com.example.youngchemist.ui.screen.main.subjects.lectures.test
 
+import android.annotation.SuppressLint
 import android.content.res.Resources
 import android.graphics.Color
 import android.view.LayoutInflater
@@ -36,7 +37,6 @@ class TestAnswerAdapter(
     }
 
     private val differ = AsyncListDiffer(this, differCallBack)
-
     private var previousAnswerNumber: Int = -1
 
     private val mapBinding: MutableMap<Int, ItemAnswerBinding> = mutableMapOf()
@@ -90,67 +90,37 @@ class TestAnswerAdapter(
     override fun getItemCount() = answers.size
 
     private fun handleAnswer(layout: ConstraintLayout, position: Int) {
-        if (!multipleAnswersAvailable) {
-            wasAnswered[position]?.let {
-                if (!it) {
-                    answerUiList[position].itIsRight = true
-                    onClick?.let { click ->
-                        click(answerUiList)
-                    }
-                    layout.background =
-                        resourses.getDrawable(R.drawable.shape_rounded_for_selected_test)
-                    layout.children.forEach { (it as TextView).setTextColor(Color.WHITE) }
-                    wasAnswered[position] = true
-                    if (previousAnswerNumber >= 0 && previousAnswerNumber != position) {
-                        mapBinding[previousAnswerNumber]?.cvAnswer?.children?.forEach {
-                            (it as TextView).setTextColor(
-                                Color.BLACK
-                            )
-                        }
-                        mapBinding[previousAnswerNumber]?.cvAnswer?.background =
-                            resourses.getDrawable(R.drawable.shape_rounded_for_unselected_test)
-                        wasAnswered[previousAnswerNumber] = false
-                        answerUiList[previousAnswerNumber].itIsRight = false
-                        onClick?.let { click ->
-                            click(answerUiList)
-                        }
-                    } else {
-
-                    }
-                } else {
-                    layout.children.forEach { (it as TextView).setTextColor(Color.BLACK) }
-                    layout.background =
-                        resourses.getDrawable(R.drawable.shape_rounded_for_unselected_test)
-                    wasAnswered[position] = false
-                    answerUiList[position].itIsRight = false
-                    onClick?.let { click ->
-                        click(answerUiList)
-                    }
+        wasAnswered[position]?.let {
+            if (it) {
+                handleSelectedAnswer(position, layout)
+            } else {
+                handleUnselectedAnswer(position, layout)
+                if (previousAnswerNumber >= 0 && position != previousAnswerNumber && !multipleAnswersAvailable) {
+                    handleSelectedAnswer(previousAnswerNumber,mapBinding[previousAnswerNumber]?.cvAnswer)
                 }
             }
             previousAnswerNumber = position
-        } else {
-            wasAnswered[position]?.let {
-                if (!it) {
-                    layout.children.forEach { (it as TextView).setTextColor(Color.WHITE) }
-                    layout.background =
-                        resourses.getDrawable(R.drawable.shape_rounded_for_selected_test)
-                    wasAnswered[position] = true
-                    answerUiList[position].itIsRight = true
-                    onClick?.let { click ->
-                        click(answerUiList)
-                    }
-                } else {
-                    layout.children.forEach { (it as TextView).setTextColor(Color.BLACK) }
-                    layout.background =
-                        resourses.getDrawable(R.drawable.shape_rounded_for_unselected_test)
-                    wasAnswered[position] = false
-                    answerUiList[position].itIsRight = false
-                    onClick?.let { click ->
-                        click(answerUiList)
-                    }
-                }
-            }
         }
+    }
+
+    private fun handleAnswerClick(answerPosition: Int,value: Boolean) {
+        answerUiList[answerPosition].itIsRight = value
+        onClick?.let { click -> click(answerUiList) }
+    }
+
+    @SuppressLint("UseCompatLoadingForDrawables")
+    private fun handleSelectedAnswer(position: Int, layout: ConstraintLayout?) {
+        layout?.children?.forEach { (it as TextView).setTextColor(Color.BLACK) }
+        layout?.background = resourses.getDrawable(R.drawable.shape_rounded_for_unselected_test)
+        wasAnswered[position] = false
+        handleAnswerClick(position,false)
+    }
+
+    @SuppressLint("UseCompatLoadingForDrawables")
+    private fun handleUnselectedAnswer(position: Int, layout: ConstraintLayout) {
+        layout.background = resourses.getDrawable(R.drawable.shape_rounded_for_selected_test)
+        layout.children.forEach { (it as TextView).setTextColor(Color.WHITE) }
+        wasAnswered[position] = true
+        handleAnswerClick(position,true)
     }
 }
