@@ -18,23 +18,30 @@ import javax.inject.Inject
 class TestFragmentViewModel @Inject constructor(
     private val router: Router,
     private val fireStoreRepository: FireStoreRepository
-): ViewModel() {
+) : ViewModel() {
 
     private val _testState: MutableLiveData<ResourceNetwork<Test>> = MutableLiveData()
     val testState: LiveData<ResourceNetwork<Test>> = _testState
 
+    private val _timeLeft: MutableLiveData<String> = MutableLiveData()
+    val timeLeft: LiveData<String> = _timeLeft
+
     init {
         viewModelScope.launch {
-            val result = fireStoreRepository.retriveTest("jb1ZH7TOJyYeNKuhrGgr")
+            val result = fireStoreRepository.retriveTest("Zhw6FlebgEIjh7D4eEGx")
             _testState.postValue(result)
         }
-        val countDownTimer = object : CountDownTimer(5000,1000) {
+        val countDownTimer = object : CountDownTimer(900000, 1000) {
             override fun onTick(p0: Long) {
-                Log.d("TAG",p0.toString())
+                val minutes = p0 / 1000 / 60
+                val seconds = ((p0 / 1000) % 60)
+                _timeLeft.postValue("${if (minutes < 10) "0$minutes" else minutes}" + ":" +
+                            "${if (seconds < 10) "0$seconds" else seconds}"
+                )
             }
 
             override fun onFinish() {
-                Log.d("TAG","finish")
+                Log.d("TAG", "finish")
             }
         }
         countDownTimer.start()

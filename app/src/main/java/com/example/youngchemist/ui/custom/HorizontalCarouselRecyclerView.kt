@@ -30,9 +30,9 @@ class HorizontalCarouselRecyclerView(
     private var paddingDate = 0.0f
     private var firstItemWidthDate = 0.0f
     private var allPixelsDate = 0
-    private lateinit var listener: OnPageNumberChangedListener
     private var previousExpectedPosition = 0
 
+    private lateinit var listener: OnPageNumberChangedListener
     fun setOnEventListener(pageNumberChangedListner: OnPageNumberChangedListener) {
         listener = pageNumberChangedListner
     }

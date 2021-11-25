@@ -58,17 +58,19 @@ class SubjectsFragmentViewModel @Inject constructor(
             Answer("a1",false),
             Answer("a2",false),
             Answer("a3",true),
-            Answer("a4",false)
+            Answer("a4",false),
+            Answer("На нашем сайте Вы с легкостью можете найти и почитать произведение как отечественных," +
+                    " так и зарубежных поэтов-классиков. С помощью магии слов великие творцы старались передать все чувства,",false)
         )
-        val task = Task("q1",answers)
+        val task = Task("q1",answers,"https://firebasestorage.googleapis.com/v0/b/youngchemist-c52a2.appspot.com/o/metan.png?alt=media&token=b2873f55-8b1c-4a5e-856b-d996193e0935")
         val answers2 = arrayListOf<Answer>(
             Answer("a1",false),
             Answer("a2",false),
             Answer("a3",true),
             Answer("a4",false)
         )
-        val task2 = Task("q1",answers2)
-        val test = Test(0,0, arrayListOf(task,task2))
+        val task2 = Task("q1",answers2,multipleAnswersAvailable = true)
+        val test = Test(0,0,"Первый тест", arrayListOf(task,task2,task2))
         viewModelScope.launch {
             //fireStoreRepository.saveTest(test)
         }
