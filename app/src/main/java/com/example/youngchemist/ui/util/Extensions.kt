@@ -1,6 +1,8 @@
 package com.example.youngchemist.ui.util
 
 import android.content.Context
+import android.content.res.Resources
+import android.content.res.Resources.getSystem
 import android.graphics.Bitmap
 import android.util.TypedValue
 import android.view.View
@@ -66,4 +68,11 @@ fun Int.toDp(context: Context): Int = TypedValue.applyDimension(
     TypedValue.COMPLEX_UNIT_DIP, this.toFloat(), context.resources.displayMetrics
 ).toInt()
 
+fun Int.toPx(context: Context): Int = (this * context.resources.displayMetrics.density).toInt()
+
 fun String.GLB() = this + ".glb"
+
+val Number.toPx get() = TypedValue.applyDimension(
+    TypedValue.COMPLEX_UNIT_DIP,
+    this.toFloat(),
+    getSystem().displayMetrics)

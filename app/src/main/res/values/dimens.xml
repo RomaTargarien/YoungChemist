@@ -35,6 +35,7 @@
     <dimen name="pading_medium">7dp</dimen>
     <dimen name="padding_large">10dp</dimen>
     <dimen name="padding_extra_huge">15dp</dimen>
+    <dimen name="test_margin_start">30dp</dimen>
 
     <!-- Extra -->
     <dimen name="card_register_margin">200dp</dimen>
