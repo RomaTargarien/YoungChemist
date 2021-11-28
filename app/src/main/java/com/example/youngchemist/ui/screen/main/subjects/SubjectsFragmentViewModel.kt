@@ -49,30 +49,30 @@ class SubjectsFragmentViewModel @Inject constructor(
     }
 
     fun navigateToTestScreen() {
-        router.navigateTo(Screens.testScreen())
+        router.navigateTo(Screens.rootTestScreen())
     }
 
     init {
         getAllSubjects()
         val answers = arrayListOf<Answer>(
-            Answer("a1",false),
-            Answer("a2",false),
-            Answer("a3",true),
-            Answer("a4",false),
+            Answer("a1",false,0),
+            Answer("a2",false,1),
+            Answer("a3",true,2),
+            Answer("a4",false,3),
             Answer("На нашем сайте Вы с легкостью можете найти и почитать произведение как отечественных," +
                     " так и зарубежных поэтов-классиков. С помощью магии слов великие творцы старались передать все чувства,",false)
         )
         val task = Task("q1",answers,"https://firebasestorage.googleapis.com/v0/b/youngchemist-c52a2.appspot.com/o/metan.png?alt=media&token=b2873f55-8b1c-4a5e-856b-d996193e0935")
         val answers2 = arrayListOf<Answer>(
-            Answer("a1",false),
-            Answer("a2",false),
-            Answer("a3",true),
-            Answer("a4",false)
+            Answer("a1",false,0),
+            Answer("a2",false,1),
+            Answer("a3",true,2),
+            Answer("a4",false,3)
         )
         val task2 = Task("q1",answers2,multipleAnswersAvailable = true)
-        val test = Test(0,0,"Первый тест", arrayListOf(task,task2,task2))
+        val test = Test(0,0,"Первый тест", arrayListOf(task,task2,task2,task2,task,task2,task,task2,task,task2,task2,task,task))
         viewModelScope.launch {
-            //fireStoreRepository.saveTest(test)
+           // fireStoreRepository.saveTest(test)
         }
     }
 

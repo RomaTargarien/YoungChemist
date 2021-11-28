@@ -25,7 +25,6 @@ class MainFragment : Fragment(), BottomTabScreen {
     private lateinit var binding: FragmentMainBinding
     private val viewModel: MainFragmentViewModel by viewModels()
 
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
