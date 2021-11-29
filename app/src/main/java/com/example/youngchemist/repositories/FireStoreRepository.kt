@@ -1,10 +1,7 @@
 package com.example.youngchemist.repositories
 
 import android.net.Uri
-import com.example.youngchemist.model.Content
-import com.example.youngchemist.model.Lecture
-import com.example.youngchemist.model.Subject
-import com.example.youngchemist.model.Test
+import com.example.youngchemist.model.*
 import com.example.youngchemist.ui.util.ResourceNetwork
 
 interface FireStoreRepository {
@@ -18,5 +15,7 @@ interface FireStoreRepository {
     suspend fun saveTest(test: Test)
 
     suspend fun retriveTest(uid: String): ResourceNetwork<Test>
+
+    suspend fun saveTest(userUid: String,passedUserTest: PassedUserTest): ResourceNetwork<String>
 
 }

@@ -79,6 +79,7 @@ class SubjectsFragmentViewModel @Inject constructor(
     private fun getAllSubjects() {
         viewModelScope.launch {
             if (databaseRepository.getAllSubjects().isEmpty()) {
+
                 _subjectsState.postValue(ResourceNetwork.Loading())
                 val subjects = fireStoreRepository.getAllSubjects()
                 if (subjects is ResourceNetwork.Success) {

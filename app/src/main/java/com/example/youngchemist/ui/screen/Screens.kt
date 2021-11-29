@@ -6,11 +6,11 @@ import com.example.youngchemist.ui.screen.auth.password_restore.RestorePasswordF
 import com.example.youngchemist.ui.screen.auth.register.RegisterFragment
 import com.example.youngchemist.ui.screen.main.MainFragment
 import com.example.youngchemist.ui.screen.main.qr.scan.ScanFragment
-import com.example.youngchemist.ui.screen.main.subjects.SubjectsFragment
 import com.example.youngchemist.ui.screen.main.subjects.lectures.lecture.LectureFragment
 import com.example.youngchemist.ui.screen.main.subjects.lectures.lectures_list.LecturesListFragment
 import com.example.youngchemist.ui.screen.main.subjects.lectures.test.RootTestFragment
 import com.example.youngchemist.ui.screen.main.subjects.lectures.test.TestFragment
+import com.example.youngchemist.ui.screen.main.subjects.lectures.test.result.TestResultFragment
 import com.github.terrakok.cicerone.androidx.FragmentScreen
 
 object Screens {
@@ -53,6 +53,10 @@ object Screens {
 
     fun rootTestScreen() = FragmentScreen {
         RootTestFragment()
+    }
+
+    fun testResultScreen(mark: Double) = FragmentScreen {
+        TestResultFragment.newInstance(mark)
     }
 
 }

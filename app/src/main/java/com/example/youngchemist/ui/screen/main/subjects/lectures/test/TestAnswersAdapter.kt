@@ -33,25 +33,31 @@ class TestAnswerAdapter(
             return oldItem.text == newItem.text
         }
     }
-
-    private var onClick: ((MutableList<AnswerUi>) -> Unit)? = null
-    fun setOnClickListener(listener: (MutableList<AnswerUi>) -> Unit) {
-        onClick = listener
-    }
+    private var previousAnswerNumber: Int = -1
 
     private val differ = AsyncListDiffer(this, differCallBack)
-    private var previousAnswerNumber: Int = -1
+
     private val mapBinding: MutableMap<Int, ItemAnswerBinding> = mutableMapOf()
 
     var answers: List<Answer>
         get() = differ.currentList
         set(value) = differ.submitList(value)
 
+    init {
+        if (!multipleAnswersAvailable) {
+            for (item in answersUi) {
+                if (item.itIsRight) {
+                    previousAnswerNumber = item.position
+                }
+            }
+        }
+    }
+    
     inner class TestAnswerViewHolder(val binding: ItemAnswerBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(answer: Answer, position: Int) {
             if (answersUi[position].itIsRight) {
-                color(position,binding.cvAnswer)
+                handleUnselectedAnswer(position,binding.cvAnswer,false)
             }
             binding.tvAnswerNumber.text = "${position + 1})"
             binding.tvAnswer.text = answer.text
@@ -98,7 +104,6 @@ class TestAnswerAdapter(
 
     private fun handleAnswerClick(answerPosition: Int,value: Boolean) {
         answersUi[answerPosition].itIsRight = value
-        onClick?.let { click -> click(answersUi.toMutableList()) }
     }
 
     @SuppressLint("UseCompatLoadingForDrawables")
@@ -106,17 +111,15 @@ class TestAnswerAdapter(
         layout?.children?.forEach { (it as TextView).setTextColor(Color.BLACK) }
         layout?.background = resourses.getDrawable(R.drawable.shape_rounded_for_unselected_test)
         handleAnswerClick(position,false)
+
     }
 
     @SuppressLint("UseCompatLoadingForDrawables")
-    private fun handleUnselectedAnswer(position: Int, layout: ConstraintLayout) {
+    private fun handleUnselectedAnswer(position: Int, layout: ConstraintLayout,answerClick: Boolean = true) {
         layout.background = resourses.getDrawable(R.drawable.shape_rounded_for_selected_test)
         layout.children.forEach { (it as TextView).setTextColor(Color.WHITE) }
-        handleAnswerClick(position,true)
-    }
-
-    private fun color(position: Int,layout: ConstraintLayout) {
-        layout.background = resourses.getDrawable(R.drawable.shape_rounded_for_selected_test)
-        layout.children.forEach { (it as TextView).setTextColor(Color.WHITE) }
+        if (answerClick) {
+            handleAnswerClick(position,true)
+        }
     }
 }

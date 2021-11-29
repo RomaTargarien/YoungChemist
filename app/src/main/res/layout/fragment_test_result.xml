@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+    </data>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".ui.screen.main.subjects.lectures.test.result.TestResultFragment">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:background="@drawable/main_background"
+            android:paddingRight="40dp"
+            android:paddingLeft="40dp"
+            android:layout_height="match_parent">
+
+            <com.mikhaellopez.circularprogressbar.CircularProgressBar
+                android:id="@+id/pb_mark"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:cpb_background_progressbar_color="#b6bbd8"
+                app:cpb_background_progressbar_width="10dp"
+                app:cpb_progress_direction="to_right"
+                app:cpb_progressbar_color="#8BC34A"
+                app:cpb_progressbar_width="10dp"
+                app:cpb_round_border="false"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+            </com.mikhaellopez.circularprogressbar.CircularProgressBar>
+
+            <TextView
+                android:id="@+id/tv_mark"
+                style="@style/SubTitleTextStyle"
+                android:text="9.5"
+                android:layout_width="wrap_content"
+                android:textSize="130sp"
+                android:layout_height="wrap_content"
+                app:layout_constraintBottom_toBottomOf="@+id/pb_mark"
+                app:layout_constraintEnd_toEndOf="@+id/pb_mark"
+                app:layout_constraintStart_toStartOf="@+id/pb_mark"
+                app:layout_constraintTop_toTopOf="@+id/pb_mark"/>
+
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </FrameLayout>
+</layout>

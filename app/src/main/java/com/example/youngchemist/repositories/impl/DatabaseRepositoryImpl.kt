@@ -3,8 +3,10 @@ package com.example.youngchemist.repositories.impl
 import androidx.lifecycle.LiveData
 import com.example.youngchemist.db.LectureDao
 import com.example.youngchemist.db.SubjectDao
+import com.example.youngchemist.db.TestDao
 import com.example.youngchemist.model.Lecture
 import com.example.youngchemist.model.Page
+import com.example.youngchemist.model.PassedUserTest
 import com.example.youngchemist.model.Subject
 import com.example.youngchemist.repositories.DatabaseRepository
 import com.example.youngchemist.ui.util.safeCall
@@ -14,7 +16,8 @@ import javax.inject.Inject
 
 class DatabaseRepositoryImpl @Inject constructor(
     private val subjectsDao: SubjectDao,
-    private val lecturesDao: LectureDao
+    private val lecturesDao: LectureDao,
+    private val testDao: TestDao
 ): DatabaseRepository {
 
     override suspend fun getAllSubjects(): List<Subject> {
@@ -59,4 +62,9 @@ class DatabaseRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun savePassedUserTest(passedUserTest: PassedUserTest) {
+        withContext(Dispatchers.IO) {
+            testDao.savePassedUserTest(passedUserTest)
+        }
+    }
 }

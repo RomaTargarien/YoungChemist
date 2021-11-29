@@ -13,7 +13,9 @@ import android.view.inputmethod.InputMethodManager
 import androidx.fragment.app.Fragment
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import com.example.youngchemist.R
+import java.math.RoundingMode
 import java.nio.ByteBuffer
+import java.text.DecimalFormat
 
 val String.Companion.EMPTY: String get() = ""
 
@@ -76,3 +78,9 @@ val Number.toPx get() = TypedValue.applyDimension(
     TypedValue.COMPLEX_UNIT_DIP,
     this.toFloat(),
     getSystem().displayMetrics)
+
+fun Double.roundMark(tasksUiSize: Int): Double {
+    val df = DecimalFormat("#.#")
+    df.roundingMode = RoundingMode.CEILING
+    return df.format((this/tasksUiSize)*10.0).toDouble()
+}

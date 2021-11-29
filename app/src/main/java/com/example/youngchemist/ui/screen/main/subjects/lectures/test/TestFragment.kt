@@ -6,9 +6,11 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
+import coil.load
 import com.example.youngchemist.R
 import com.example.youngchemist.databinding.FragmentTestBinding
 import com.example.youngchemist.model.AnswerUi
@@ -19,7 +21,7 @@ import dagger.hilt.android.AndroidEntryPoint
 class TestFragment : Fragment() {
 
     private lateinit var binding: FragmentTestBinding
-    private lateinit var viewModel: TestFragmentViewModel
+    private val viewModel: TestFragmentViewModel by viewModels({requireParentFragment()})
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -30,18 +32,22 @@ class TestFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val pageNumber = arguments?.getInt(PAGE_NUMBER_VALUE)
-        viewModel= activity?.run {
-            ViewModelProviders.of(this).get(TestFragmentViewModel::class.java)
-        } ?: throw Exception("Invalid Activity")
+        if (viewModel.test?.tasks?.get(pageNumber!!)?.imageToQuestionUrl?.isNotEmpty()!!) {
+            binding.ivQuestion.isVisible = true
+            binding.ivQuestion.load(viewModel.test?.tasks!![pageNumber!!].imageToQuestionUrl)
+
+        }
+        val itemDecoration = HorizontalItemDecoration(20)
         binding.tvQuestion.text = pageNumber?.let { viewModel.test?.tasks?.get(it)?.question }
-        val testAnswersAdapter = TestAnswerAdapter(false,resources,viewModel.tasksUi[pageNumber!!].answersList)
+        val testAnswersAdapter = viewModel.test?.tasks?.get(pageNumber!!)
+            ?.let { TestAnswerAdapter(it.multipleAnswersAvailable,resources,viewModel.tasksUi[pageNumber].answersList) }
         binding.rvAnswers.apply {
              layoutManager = LinearLayoutManager(requireContext(),LinearLayoutManager.VERTICAL,false)
+             addItemDecoration(itemDecoration)
              adapter = testAnswersAdapter
         }
-
         viewModel.test?.let {
-            testAnswersAdapter.answers = it.tasks[pageNumber!!].answers
+            testAnswersAdapter?.answers = it.tasks[pageNumber!!].answers
         }
 
     }

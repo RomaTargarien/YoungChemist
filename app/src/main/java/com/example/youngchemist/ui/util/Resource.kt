@@ -10,3 +10,9 @@ sealed class ResourceNetwork<T>(val data: T? = null,val message: String? = null)
     class Success<T>(data: T?) : ResourceNetwork<T>(data)
     class Error<T>(message: String?): ResourceNetwork<T>(null,message)
 }
+
+sealed class FragmentAnimationBehavior {
+    class Enter : FragmentAnimationBehavior()
+    class Forward : FragmentAnimationBehavior()
+    class Back : FragmentAnimationBehavior()
+}

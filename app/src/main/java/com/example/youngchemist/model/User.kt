@@ -1,13 +1,19 @@
 package com.example.youngchemist.model
 
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+
 data class User(
     val uid: String = "",
     val surname: String = "",
     var passedUserTests: ArrayList<PassedUserTest> = arrayListOf(),
 )
 
+@Entity(tableName = "unsavedTests")
 data class PassedUserTest(
-    var testUid: String ="",
+    @PrimaryKey
+    var testUid: String = "",
+    var userUid: String = "",
     var mark: Double = 0.0,
     var answers: ArrayList<AnswerUser> = arrayListOf()
 )

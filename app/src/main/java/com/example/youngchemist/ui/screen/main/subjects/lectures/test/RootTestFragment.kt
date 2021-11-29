@@ -6,22 +6,17 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.addCallback
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProviders
-import androidx.lifecycle.lifecycleScope
-import androidx.viewpager2.widget.ViewPager2
 import com.example.youngchemist.R
 import com.example.youngchemist.databinding.FragmentRootTestBinding
-import com.example.youngchemist.databinding.FragmentTestBinding
-import com.example.youngchemist.model.TaskUi
-import com.example.youngchemist.model.TestUi
+import com.example.youngchemist.ui.util.FragmentAnimationBehavior
 import com.example.youngchemist.ui.util.ResourceNetwork
-import com.example.youngchemist.ui.util.toPx
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
 
 
 private const val ARG_PARAM1 = "param1"
@@ -34,7 +29,8 @@ class RootTestFragment : Fragment() {
     private var param2: String? = null
 
     private lateinit var binding: FragmentRootTestBinding
-    private lateinit var viewModel: TestFragmentViewModel
+    private val viewModel: TestFragmentViewModel by viewModels()
+    private var previousPosition = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,10 +48,6 @@ class RootTestFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel= activity?.run {
-            ViewModelProviders.of(this).get(TestFragmentViewModel::class.java)
-        } ?: throw Exception("Invalid Activity")
-
         binding.viewModel = viewModel
         binding.bmSheet.viewModel = viewModel
 
@@ -63,43 +55,62 @@ class RootTestFragment : Fragment() {
             val data = it.getContentIfNotHandled()
             when (data) {
                 is ResourceNetwork.Success -> {
-                    viewModel.goForward()
-                    binding.bmSheet.ivForwardTest.isVisible = true
+                    viewModel.enterTest()
+                    binding.progressFlask.isVisible = false
                 }
                 is ResourceNetwork.Error -> {
-
+                    binding.progressFlask.isVisible = false
                 }
                 is ResourceNetwork.Loading -> {
-
+                    binding.progressFlask.isVisible = true
                 }
             }
         })
-        binding.bmSheet.ivBackTest.setOnClickListener {
-            viewModel.goBack()
-        }
-        binding.bmSheet.ivForwardTest.setOnClickListener {
-            viewModel.goForward()
-        }
-        viewModel.currentPage.observe(viewLifecycleOwner,{ pageNumber ->
-            when {
-                pageNumber == 0 -> {
+
+        viewModel.timeLeft.observe(viewLifecycleOwner,{
+            binding.tvTimer.text = it
+        })
+
+        viewModel.currentPage.observe(viewLifecycleOwner, {
+            val pageNumber = it.first
+            val animationBehavior = it.second
+            if (pageNumber >= 0) {
+                val from = (((previousPosition.toFloat() + 1) / (viewModel.tasksUi.size)) * 100)
+                val to = ((pageNumber.toFloat() + 1) / (viewModel.tasksUi.size)) * 100
+                val pregressAnimator =
+                    ObjectAnimator.ofInt(binding.progressBar, "progress", from.toInt(), to.toInt())
+                pregressAnimator.duration = 1000
+                pregressAnimator.start()
+                replaceFragment(TestFragment.newInstance(pageNumber),animationBehavior)
+                binding.bmSheet.ivBackTest.isVisible = true
+                binding.bmSheet.ivForwardTest.isVisible = true
+                if (pageNumber == 0) {
                     binding.bmSheet.ivBackTest.isVisible = false
-                    replaceFragment(TestFragment.newInstance(pageNumber))
                 }
-                pageNumber == (viewModel.test?.tasks?.size?.minus(1)) -> {
+                if (pageNumber == viewModel.tasksUi.size - 1) {
                     binding.bmSheet.ivForwardTest.isVisible = false
-                    replaceFragment(TestFragment.newInstance(pageNumber))
                 }
-                pageNumber < 0 -> {
+                binding.bmSheet.tvTestPagination.text =
+                    "${pageNumber + 1} вопрос из ${viewModel.tasksUi.size}"
+                binding.bmSheet.tvTestTitle.text = viewModel.test?.testTitle
 
-                }
-                else -> {
-                    binding.bmSheet.ivBackTest.isVisible = true
-                    binding.bmSheet.ivForwardTest.isVisible = true
-                    replaceFragment(TestFragment.newInstance(pageNumber))
-                }
+                previousPosition = pageNumber
             }
         })
+        binding.ivExit.setOnClickListener {
+            val testNoSaveDialogFragment = TestNoSaveDialogFragment()
+            testNoSaveDialogFragment.show(requireActivity().supportFragmentManager,"dialog")
+        }
+        requireActivity().onBackPressedDispatcher.addCallback {
+            Log.d("TAG","exit")
+            val testNoSaveDialogFragment = TestNoSaveDialogFragment()
+            testNoSaveDialogFragment.show(requireActivity().supportFragmentManager,"dialog")
+        }
+        binding.bmSheet.bnDone.setOnClickListener {
+            val testSaveDialogFragment = TestSaveDialogFragment(viewModel)
+            testSaveDialogFragment.show(requireActivity().supportFragmentManager,"dialog")
+        }
+        Log.d("TAG",viewModel.toString())
 
         val bottomSheet = binding.bmSheet.bottomSheetContainer
         val bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet)
@@ -112,17 +123,49 @@ class RootTestFragment : Fragment() {
 
             override fun onSlide(bottomSheet: View, slideOffset: Float) {
                 val offset =
-                    ((binding.bmSheet.bottomSheetContainer.width / 2) - (binding.bmSheet.tvTestTitle.width) / 2) -resources.getDimension(R.dimen.test_margin_start)
+                    ((binding.bmSheet.bottomSheetContainer.width / 2) - (binding.bmSheet.tvTestTitle.width) / 2) - resources.getDimension(
+                        R.dimen.test_margin_start
+                    )
+                val offset2 = resources.getDimension(R.dimen.padding_small)
+
                 binding.bmSheet.tvTestTitle.animate().translationX((1 - slideOffset) * offset)
                     .setDuration(0).start()
-                binding.bmSheet.appCompatButton2.animate().alpha(slideOffset).setDuration(0).start()
+                binding.bmSheet.tvTestTitle.animate().translationY((slideOffset -1) * offset2)
+                    .setDuration(0).start()
+                binding.bmSheet.bnDone.animate().alpha(slideOffset).setDuration(0).start()
             }
         })
     }
 
-    private fun replaceFragment(fragment: Fragment) {
-        childFragmentManager.beginTransaction()
-            .replace(R.id.test_content, fragment).commit()
+    private fun replaceFragment(fragment: Fragment,animationBehavior: FragmentAnimationBehavior) {
+        val fragmentManager = childFragmentManager.beginTransaction()
+        when (animationBehavior) {
+            is FragmentAnimationBehavior.Enter -> {
+                fragmentManager.setCustomAnimations(
+                    R.anim.nav_default_enter_anim,
+                    R.anim.nav_default_exit_anim,
+                    R.anim.nav_default_pop_enter_anim,
+                    R.anim.nav_default_pop_exit_anim
+                )
+            }
+            is FragmentAnimationBehavior.Forward -> {
+                fragmentManager.setCustomAnimations(
+                    R.anim.enter_anim,
+                    R.anim.exit_anim,
+                    R.anim.pop_enter_anim,
+                    R.anim.pop_exit_anim
+                )
+            }
+            is FragmentAnimationBehavior.Back -> {
+                fragmentManager.setCustomAnimations(
+                    R.anim.pop_enter_anim,
+                    R.anim.pop_exit_anim,
+                    R.anim.enter_anim,
+                    R.anim.exit_anim
+                )
+            }
+        }
+        fragmentManager.replace(R.id.test_content, fragment).commit()
     }
 
     companion object {
