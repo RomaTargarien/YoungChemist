@@ -24,13 +24,14 @@ data class TestUi(
                 answer.itIsRight = true
             }
             userAnswersList.add(answer)
-            Log.d("TAG","${item.position} - Right $rightAnswers User $userAnswers $answer")
         }
-        Log.d("TAG","llll")
         passedUserTest.answers = userAnswersList
-        passedUserTest.mark = mark
-        Log.d("TAG","kkk")
-        //Log.d("TAG",mark.toString())
+        Log.d("TAG",mark.toString())
+        val del = mark/tasksUi.size
+        Log.d("TAG",del.toString())
+        val roundedMark: Double = Math.round(del*100.0)/10.0
+        passedUserTest.mark = roundedMark
+        Log.d("TAG","$roundedMark")
         return passedUserTest
     }
 

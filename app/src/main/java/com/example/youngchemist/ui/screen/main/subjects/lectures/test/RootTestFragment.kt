@@ -1,20 +1,26 @@
 package com.example.youngchemist.ui.screen.main.subjects.lectures.test
 
 import android.animation.ObjectAnimator
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.addCallback
+import androidx.annotation.RequiresApi
+import androidx.core.view.children
+import androidx.core.view.get
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProviders
 import com.example.youngchemist.R
 import com.example.youngchemist.databinding.FragmentRootTestBinding
+import com.example.youngchemist.ui.base.AnimationHelper
 import com.example.youngchemist.ui.util.FragmentAnimationBehavior
 import com.example.youngchemist.ui.util.ResourceNetwork
+import com.example.youngchemist.ui.util.TestExitBehavior
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -30,6 +36,7 @@ class RootTestFragment : Fragment() {
 
     private lateinit var binding: FragmentRootTestBinding
     private val viewModel: TestFragmentViewModel by viewModels()
+    private lateinit var animationHelper: AnimationHelper
     private var previousPosition = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -46,11 +53,12 @@ class RootTestFragment : Fragment() {
     ): View =
         FragmentRootTestBinding.inflate(inflater, container, false).also { binding = it }.root
 
+    @RequiresApi(Build.VERSION_CODES.M)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.viewModel = viewModel
         binding.bmSheet.viewModel = viewModel
-
+        animationHelper = initializeAnimationHepler()
         viewModel.testState.observe(viewLifecycleOwner, {
             val data = it.getContentIfNotHandled()
             when (data) {
@@ -67,6 +75,17 @@ class RootTestFragment : Fragment() {
             }
         })
 
+        viewModel.exitBehavior.observe(viewLifecycleOwner,{
+            when (it) {
+                is TestExitBehavior.ExitNoSave -> {
+                    showUnSavedDialogFragment()
+                }
+                is TestExitBehavior.Exit -> {
+                    viewModel.exit()
+                }
+            }
+        })
+
         viewModel.timeLeft.observe(viewLifecycleOwner,{
             binding.tvTimer.text = it
         })
@@ -75,6 +94,7 @@ class RootTestFragment : Fragment() {
             val pageNumber = it.first
             val animationBehavior = it.second
             if (pageNumber >= 0) {
+                binding.bmSheet.bnDone.isVisible = true
                 val from = (((previousPosition.toFloat() + 1) / (viewModel.tasksUi.size)) * 100)
                 val to = ((pageNumber.toFloat() + 1) / (viewModel.tasksUi.size)) * 100
                 val pregressAnimator =
@@ -98,22 +118,32 @@ class RootTestFragment : Fragment() {
             }
         })
         binding.ivExit.setOnClickListener {
-            val testNoSaveDialogFragment = TestNoSaveDialogFragment()
-            testNoSaveDialogFragment.show(requireActivity().supportFragmentManager,"dialog")
+            viewModel.tryExitTheTest()
         }
         requireActivity().onBackPressedDispatcher.addCallback {
-            Log.d("TAG","exit")
-            val testNoSaveDialogFragment = TestNoSaveDialogFragment()
-            testNoSaveDialogFragment.show(requireActivity().supportFragmentManager,"dialog")
+            viewModel.tryExitTheTest()
         }
         binding.bmSheet.bnDone.setOnClickListener {
             val testSaveDialogFragment = TestSaveDialogFragment(viewModel)
             testSaveDialogFragment.show(requireActivity().supportFragmentManager,"dialog")
         }
-        Log.d("TAG",viewModel.toString())
-
         val bottomSheet = binding.bmSheet.bottomSheetContainer
         val bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet)
+
+        viewModel.timeIsUp.observe(viewLifecycleOwner,{
+            if (it) {
+                binding.testContent.isVisible = false
+                binding.bmSheet.bnDone.isEnabled = false
+                binding.bmSheet.ivForwardTest.isEnabled = false
+                binding.bmSheet.ivBackTest.isEnabled = false
+                animationHelper.showMessage("Время истекло!")
+            } else {
+                viewModel.saveTest()
+            }
+
+        })
+
+
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
         bottomSheetBehavior.addBottomSheetCallback(object :
             BottomSheetBehavior.BottomSheetCallback() {
@@ -135,6 +165,11 @@ class RootTestFragment : Fragment() {
                 binding.bmSheet.bnDone.animate().alpha(slideOffset).setDuration(0).start()
             }
         })
+    }
+
+    private fun showUnSavedDialogFragment() {
+        val testUnSaveDialogFragment = TestNoSaveDialogFragment(viewModel)
+        testUnSaveDialogFragment.show(requireActivity().supportFragmentManager,"dialog")
     }
 
     private fun replaceFragment(fragment: Fragment,animationBehavior: FragmentAnimationBehavior) {
@@ -178,4 +213,13 @@ class RootTestFragment : Fragment() {
                 }
             }
     }
+
+    private fun initializeAnimationHepler() =
+        AnimationHelper(
+            this.requireContext(),
+            binding.testContent,
+            binding.cvTestEnd,
+            binding.tvErrorText,
+            binding.bmSheet.bnDone
+        )
 }

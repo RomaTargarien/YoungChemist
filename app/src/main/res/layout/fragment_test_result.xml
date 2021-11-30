@@ -4,6 +4,9 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
+        <variable
+            name="viewModel"
+            type="com.example.youngchemist.ui.screen.main.subjects.lectures.test.result.TestResultFragmentViewModel" />
 
     </data>
 
@@ -31,6 +34,7 @@
                 app:cpb_round_border="false"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintVertical_bias="0.3"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
 
@@ -47,6 +51,87 @@
                 app:layout_constraintEnd_toEndOf="@+id/pb_mark"
                 app:layout_constraintStart_toStartOf="@+id/pb_mark"
                 app:layout_constraintTop_toTopOf="@+id/pb_mark"/>
+
+
+            <TextView
+                style="@style/SubTitleTextStyle"
+                android:id="@+id/tv_test_result"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintVertical_bias="0.1"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/pb_mark"/>
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/bn_back_to_lectures"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/shape_outlined_rectangle"
+                android:paddingLeft="15dp"
+                android:paddingRight="15dp"
+                android:text="@string/back_to_lectures"
+                android:textColor="@color/black"
+                android:onClick="@{view -> viewModel.exit()}"
+                android:drawableEnd="@drawable/ic_baseline_arrow_right"
+                android:drawableTint="@color/black"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tv_test_result"
+                app:layout_constraintVertical_bias="0.219"
+                tools:targetApi="m">
+
+            </androidx.appcompat.widget.AppCompatButton>
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/bn_back_to_main_screen"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/shape_outlined_rectangle"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:text="@string/return_to_main_page"
+                android:onClick="@{view -> viewModel.goToMainScreen()}"
+                android:textColor="@color/black"
+                android:drawableStart="@drawable/ic_baseline_arrow_left"
+                android:drawableTint="@color/black"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.497"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tv_test_result"
+                app:layout_constraintVertical_bias="0.571"
+                tools:targetApi="m">
+
+            </androidx.appcompat.widget.AppCompatButton>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/appBar"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:background="@color/violet"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+
+            <ImageView
+                android:id="@+id/iv_exit"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:onClick="@{view -> viewModel.exit()}"
+                android:layout_marginStart="30dp"
+                android:src="@drawable/ic_baseline_arrow_left"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+            </ImageView>
+
+
 
 
 

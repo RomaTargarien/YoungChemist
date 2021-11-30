@@ -15,13 +15,13 @@ import com.example.youngchemist.model.*
 import com.example.youngchemist.repositories.DatabaseRepository
 import com.example.youngchemist.repositories.FireStoreRepository
 import com.example.youngchemist.ui.screen.Screens
-import com.example.youngchemist.ui.util.Event
-import com.example.youngchemist.ui.util.FragmentAnimationBehavior
-import com.example.youngchemist.ui.util.ResourceNetwork
+import com.example.youngchemist.ui.util.*
+import com.example.youngchemist.ui.util.TestExitBehavior.*
 import com.github.terrakok.cicerone.Router
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -39,6 +39,10 @@ class TestFragmentViewModel @Inject constructor(
     var tasksUi: MutableList<TaskUi> = mutableListOf()
     private lateinit var countDownTimer: CountDownTimer
 
+    private var exitState: TestExitBehavior
+    private val _exitBehavior: MutableLiveData<TestExitBehavior> = MutableLiveData()
+    val exitBehavior: LiveData<TestExitBehavior> = _exitBehavior
+
     private val _currentPage: MutableLiveData<Pair<Int,FragmentAnimationBehavior>> = MutableLiveData(
         Pair(-1,FragmentAnimationBehavior.Enter())
     )
@@ -50,45 +54,46 @@ class TestFragmentViewModel @Inject constructor(
     private val _timeLeft: MutableLiveData<String> = MutableLiveData()
     val timeLeft: LiveData<String> = _timeLeft
 
+    private val _timeIsUp: MutableLiveData<Boolean> = MutableLiveData()
+    val timeIsUp: LiveData<Boolean> = _timeIsUp
+
+
     init {
+        exitState = Exit()
         viewModelScope.launch {
             _testState.postValue(Event(ResourceNetwork.Loading()))
             val result = fireStoreRepository.retriveTest("Ub8gvb0ZbjWjK3o2Z3ke")
             if (result is ResourceNetwork.Success) {
+                exitState = ExitNoSave()
                 initializeCountDownTimer()
                 result.data?.let {
                     test = it
-                    initializeEmptyTaskUiList(it.tasks)
+                    tasksUi = initializeEmptyTaskUiList(it.tasks)
                     countDownTimer.start()
                 }
             }
             _testState.postValue(Event(result))
         }
-        Log.d("TAG",isOnline(context).toString())
     }
 
-    fun saveTest() {
+    fun saveTest(showMark: Boolean = true) {
         viewModelScope.launch(Dispatchers.Default) {
-            Log.d("TAG","save")
             val testUi = TestUi("","", ArrayList(tasksUi))
             test?.let {
-                Log.d("TAG","1")
                 val passedUserTest = testUi.formatUserPassedTest(it)
-                Log.d("TAG","2")
-                Log.d("TAG",isOnline(context).toString())
-                val result = fireStoreRepository.saveTest("dJuRGOc06xhllmscaAEqQoHC9Ir2",passedUserTest)
                 if (isOnline(context)) {
-
+                    Log.d("TAG","online")
+                    val result = fireStoreRepository.saveTest("dJuRGOc06xhllmscaAEqQoHC9Ir2",passedUserTest)
                     if (result is ResourceNetwork.Error) {
 
                     }
                 } else {
-                    Log.d("TAG","saving")
                     databaseRepository.savePassedUserTest(passedUserTest)
                 }
-
-                launch(Dispatchers.Main) {
-                    router.replaceScreen(Screens.testResultScreen(passedUserTest.mark))
+                if (showMark) {
+                    launch(Dispatchers.Main) {
+                        router.replaceScreen(Screens.testResultScreen(passedUserTest.mark))
+                    }
                 }
             }
 
@@ -109,12 +114,20 @@ class TestFragmentViewModel @Inject constructor(
         }
     }
 
+    fun tryExitTheTest() {
+        _exitBehavior.postValue(exitState)
+    }
+
     fun exit() {
+        test?.let {
+            tasksUi = initializeEmptyTaskUiList(it.tasks)
+            saveTest(false)
+        }
         router.exit()
     }
 
     fun initializeCountDownTimer() {
-        countDownTimer = object : CountDownTimer(900000, 1000) {
+        countDownTimer = object : CountDownTimer(30000, 1000) {
             override fun onTick(p0: Long) {
                 val minutes = p0 / 1000 / 60
                 val seconds = ((p0 / 1000) % 60)
@@ -124,7 +137,7 @@ class TestFragmentViewModel @Inject constructor(
                 )
             }
             override fun onFinish() {
-                Log.d("TAG", "finish")
+               timeIsUp()
             }
         }
     }
@@ -136,7 +149,16 @@ class TestFragmentViewModel @Inject constructor(
         }
     }
 
-    private fun initializeEmptyTaskUiList(tasks: ArrayList<Task>) {
+    private fun timeIsUp() {
+        viewModelScope.launch(Dispatchers.Default) {
+            _timeIsUp.postValue(true)
+            delay(3000)
+            _timeIsUp.postValue(false)
+        }
+    }
+
+    private fun initializeEmptyTaskUiList(tasks: ArrayList<Task>): ArrayList<TaskUi> {
+        val emptyTaskUiList = arrayListOf<TaskUi>()
         for (i in 0 until tasks.size) {
             val taskUi = TaskUi(i)
             val answersList = arrayListOf<AnswerUi>()
@@ -145,14 +167,14 @@ class TestFragmentViewModel @Inject constructor(
                 answersList.add(answerUi)
             }
             taskUi.answersList = answersList
-            tasksUi.add(taskUi)
+            emptyTaskUiList.add(taskUi)
         }
+        return emptyTaskUiList
     }
 
 
     @RequiresApi(Build.VERSION_CODES.M)
     fun isOnline(context: Context): Boolean {
-        Log.d("TAG","checking")
         val connectivityManager =
             context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val capabilities =
@@ -169,7 +191,6 @@ class TestFragmentViewModel @Inject constructor(
                 return true
             }
         }
-        Log.d("TAG",capabilities.toString())
         return false
     }
 }

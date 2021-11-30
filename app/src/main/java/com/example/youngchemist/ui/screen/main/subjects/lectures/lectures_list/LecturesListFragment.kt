@@ -43,7 +43,7 @@ class LecturesListFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         val adapter = LecturesListAdapter()
         binding.rvLecturesList.layoutManager = LinearLayoutManager(this.requireContext(),LinearLayoutManager.VERTICAL,false)
-        binding.rvLecturesList.addItemDecoration(SpacesItemVerticalDecoration(10))
+        binding.rvLecturesList.addItemDecoration(SpacesItemVerticalDecoration(20))
         binding.rvLecturesList.adapter = adapter
         param1?.let {
             Log.d("TAG",it)

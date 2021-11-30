@@ -16,3 +16,8 @@ sealed class FragmentAnimationBehavior {
     class Forward : FragmentAnimationBehavior()
     class Back : FragmentAnimationBehavior()
 }
+
+sealed class TestExitBehavior {
+    class Exit : TestExitBehavior()
+    class ExitNoSave: TestExitBehavior()
+}

@@ -9,9 +9,7 @@ import androidx.fragment.app.viewModels
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class TestNoSaveDialogFragment : DialogFragment() {
-
-    private val viewModel: TestFragmentViewModel by viewModels()
+class TestNoSaveDialogFragment(private val viewModel: TestFragmentViewModel) : DialogFragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -19,7 +17,6 @@ class TestNoSaveDialogFragment : DialogFragment() {
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         return activity?.let {
-            Log.d("TAG",viewModel.toString())
             val builder = AlertDialog.Builder(it)
             builder.setTitle("Внимание!")
                 .setMessage("Нажимая эту кнопку результат теста не сохранится и вы не сможете пройти его вновь")
