@@ -58,77 +58,39 @@ class RootTestFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         binding.viewModel = viewModel
         binding.bmSheet.viewModel = viewModel
-        animationHelper = initializeAnimationHepler()
-        viewModel.testState.observe(viewLifecycleOwner, {
-            val data = it.getContentIfNotHandled()
-            when (data) {
-                is ResourceNetwork.Success -> {
-                    viewModel.enterTest()
-                    binding.progressFlask.isVisible = false
-                }
-                is ResourceNetwork.Error -> {
-                    binding.progressFlask.isVisible = false
-                }
-                is ResourceNetwork.Loading -> {
-                    binding.progressFlask.isVisible = true
-                }
-            }
-        })
+        initializeAnimationHepler()
+        initializeBottomSheet()
+        observeTestState()
+        observeExitBehavior()
+        observeTimeLeft()
 
-        viewModel.exitBehavior.observe(viewLifecycleOwner,{
-            when (it) {
-                is TestExitBehavior.ExitNoSave -> {
-                    showUnSavedDialogFragment()
-                }
-                is TestExitBehavior.Exit -> {
-                    viewModel.exit()
-                }
-            }
-        })
+        requireActivity().onBackPressedDispatcher.addCallback {
+            viewModel.tryExitTheTest()
+        }
 
-        viewModel.timeLeft.observe(viewLifecycleOwner,{
-            binding.tvTimer.text = it
-        })
 
         viewModel.currentPage.observe(viewLifecycleOwner, {
             val pageNumber = it.first
             val animationBehavior = it.second
             if (pageNumber >= 0) {
-                binding.bmSheet.bnDone.isVisible = true
-                val from = (((previousPosition.toFloat() + 1) / (viewModel.tasksUi.size)) * 100)
-                val to = ((pageNumber.toFloat() + 1) / (viewModel.tasksUi.size)) * 100
-                val pregressAnimator =
-                    ObjectAnimator.ofInt(binding.progressBar, "progress", from.toInt(), to.toInt())
-                pregressAnimator.duration = 1000
-                pregressAnimator.start()
+                animateProgressBar(pageNumber)
                 replaceFragment(TestFragment.newInstance(pageNumber),animationBehavior)
-                binding.bmSheet.ivBackTest.isVisible = true
-                binding.bmSheet.ivForwardTest.isVisible = true
-                if (pageNumber == 0) {
-                    binding.bmSheet.ivBackTest.isVisible = false
-                }
-                if (pageNumber == viewModel.tasksUi.size - 1) {
-                    binding.bmSheet.ivForwardTest.isVisible = false
-                }
+                toggleArrowsVisibility(pageNumber)
                 binding.bmSheet.tvTestPagination.text =
                     "${pageNumber + 1} вопрос из ${viewModel.tasksUi.size}"
                 binding.bmSheet.tvTestTitle.text = viewModel.test?.testTitle
-
                 previousPosition = pageNumber
             }
         })
         binding.ivExit.setOnClickListener {
             viewModel.tryExitTheTest()
         }
-        requireActivity().onBackPressedDispatcher.addCallback {
-            viewModel.tryExitTheTest()
-        }
+
         binding.bmSheet.bnDone.setOnClickListener {
             val testSaveDialogFragment = TestSaveDialogFragment(viewModel)
             testSaveDialogFragment.show(requireActivity().supportFragmentManager,"dialog")
         }
-        val bottomSheet = binding.bmSheet.bottomSheetContainer
-        val bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet)
+
 
         viewModel.timeIsUp.observe(viewLifecycleOwner,{
             if (it) {
@@ -142,29 +104,70 @@ class RootTestFragment : Fragment() {
             }
 
         })
+    }
 
-
-        bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
-        bottomSheetBehavior.addBottomSheetCallback(object :
-            BottomSheetBehavior.BottomSheetCallback() {
-            override fun onStateChanged(bottomSheet: View, newState: Int) {
-
-            }
-
-            override fun onSlide(bottomSheet: View, slideOffset: Float) {
-                val offset =
-                    ((binding.bmSheet.bottomSheetContainer.width / 2) - (binding.bmSheet.tvTestTitle.width) / 2) - resources.getDimension(
-                        R.dimen.test_margin_start
-                    )
-                val offset2 = resources.getDimension(R.dimen.padding_small)
-
-                binding.bmSheet.tvTestTitle.animate().translationX((1 - slideOffset) * offset)
-                    .setDuration(0).start()
-                binding.bmSheet.tvTestTitle.animate().translationY((slideOffset -1) * offset2)
-                    .setDuration(0).start()
-                binding.bmSheet.bnDone.animate().alpha(slideOffset).setDuration(0).start()
+    private fun observeTestState() {
+        viewModel.testState.observe(viewLifecycleOwner, {
+            val data = it.getContentIfNotHandled()
+            when (data) {
+                is ResourceNetwork.Success -> {
+                    viewModel.enterTest()
+                    binding.progressFlask.isVisible = false
+                    binding.bmSheet.bnDone.isVisible = true
+                }
+                is ResourceNetwork.Error -> {
+                    binding.progressFlask.isVisible = false
+                }
+                is ResourceNetwork.Loading -> {
+                    binding.progressFlask.isVisible = true
+                }
             }
         })
+    }
+
+    private fun observeExitBehavior() {
+        viewModel.exitBehavior.observe(viewLifecycleOwner,{
+            when (it) {
+                is TestExitBehavior.ExitNoSave -> {
+                    showUnSavedDialogFragment()
+                }
+                is TestExitBehavior.Exit -> {
+                    viewModel.exit()
+                }
+            }
+        })
+    }
+
+    fun observeTimeLeft() {
+        viewModel.timeLeft.observe(viewLifecycleOwner,{
+            binding.tvTimer.text = it
+        })
+    }
+
+    private fun initializeBottomSheet() {
+        val bottomSheet = binding.bmSheet.bottomSheetContainer
+        val bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet)
+        bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+        bottomSheetBehavior.addBottomSheetCallback(bottomSheetCallback)
+    }
+
+    private val bottomSheetCallback = object : BottomSheetBehavior.BottomSheetCallback() {
+
+        val halfContainerWidth = binding.bmSheet.bottomSheetContainer.width / 2
+        val halfTextWidth = (binding.bmSheet.tvTestTitle.width) / 2
+        val offsetX = halfContainerWidth - halfTextWidth - resources.getDimension(R.dimen.test_margin_start)
+        val offsetY = resources.getDimension(R.dimen.padding_small)
+
+        override fun onStateChanged(bottomSheet: View, newState: Int) {}
+
+        override fun onSlide(bottomSheet: View, slideOffset: Float) {
+            binding.bmSheet.tvTestTitle.animate().translationX((1 - slideOffset) * offsetX)
+                .setDuration(0).start()
+            binding.bmSheet.tvTestTitle.animate().translationY((slideOffset -1) * offsetY)
+                .setDuration(0).start()
+            binding.bmSheet.bnDone.animate().alpha(slideOffset).setDuration(0).start()
+        }
+
     }
 
     private fun showUnSavedDialogFragment() {
@@ -203,6 +206,33 @@ class RootTestFragment : Fragment() {
         fragmentManager.replace(R.id.test_content, fragment).commit()
     }
 
+    private fun initializeAnimationHepler() {
+        animationHelper = AnimationHelper(
+            this.requireContext(),
+            binding.testContent,
+            binding.cvTestEnd,
+            binding.tvErrorText,
+            binding.bmSheet.bnDone
+        )
+    }
+
+    private fun animateProgressBar(pageNumber: Int) {
+        val from = (((previousPosition.toFloat() + 1) / (viewModel.tasksUi.size)) * 100)
+        val to = ((pageNumber.toFloat() + 1) / (viewModel.tasksUi.size)) * 100
+        animationHelper.animateProgressBar(binding.progressBar,from,to)
+    }
+
+    private fun toggleArrowsVisibility(pageNumber: Int) {
+        binding.bmSheet.ivBackTest.isVisible = true
+        binding.bmSheet.ivForwardTest.isVisible = true
+        if (pageNumber == 0) {
+            binding.bmSheet.ivBackTest.isVisible = false
+        }
+        if (pageNumber == viewModel.tasksUi.size - 1) {
+            binding.bmSheet.ivForwardTest.isVisible = false
+        }
+    }
+
     companion object {
         @JvmStatic
         fun newInstance(param1: String, param2: String) =
@@ -214,12 +244,5 @@ class RootTestFragment : Fragment() {
             }
     }
 
-    private fun initializeAnimationHepler() =
-        AnimationHelper(
-            this.requireContext(),
-            binding.testContent,
-            binding.cvTestEnd,
-            binding.tvErrorText,
-            binding.bmSheet.bnDone
-        )
+
 }
