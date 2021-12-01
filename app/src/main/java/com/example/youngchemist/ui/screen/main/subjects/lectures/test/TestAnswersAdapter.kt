@@ -3,7 +3,6 @@ package com.example.youngchemist.ui.screen.main.subjects.lectures.test
 import android.annotation.SuppressLint
 import android.content.res.Resources
 import android.graphics.Color
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.TextView
@@ -16,7 +15,6 @@ import com.example.youngchemist.R
 import com.example.youngchemist.databinding.ItemAnswerBinding
 import com.example.youngchemist.model.Answer
 import com.example.youngchemist.model.AnswerUi
-import com.example.youngchemist.model.TaskUi
 
 class TestAnswerAdapter(
     private val multipleAnswersAvailable: Boolean,
@@ -52,12 +50,12 @@ class TestAnswerAdapter(
             }
         }
     }
-    
+
     inner class TestAnswerViewHolder(val binding: ItemAnswerBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(answer: Answer, position: Int) {
             if (answersUi[position].itIsRight) {
-                handleUnselectedAnswer(position,binding.cvAnswer,false)
+                handleUnselectedAnswer(position, binding.cvAnswer, false)
             }
             binding.tvAnswerNumber.text = "${position + 1})"
             binding.tvAnswer.text = answer.text
@@ -92,34 +90,48 @@ class TestAnswerAdapter(
 
     private fun handleAnswer(layout: ConstraintLayout, position: Int) {
         if (answersUi[position].itIsRight) {
-            handleSelectedAnswer(position,layout)
+            handleSelectedAnswer(position, layout)
         } else {
             handleUnselectedAnswer(position, layout)
             if (previousAnswerNumber >= 0 && position != previousAnswerNumber && !multipleAnswersAvailable) {
-                handleSelectedAnswer(previousAnswerNumber,mapBinding[previousAnswerNumber]?.cvAnswer)
+                handleSelectedAnswer(
+                    previousAnswerNumber,
+                    mapBinding[previousAnswerNumber]?.cvAnswer
+                )
             }
         }
         previousAnswerNumber = position
     }
 
-    private fun handleAnswerClick(answerPosition: Int,value: Boolean) {
+    private var onClick: ((List<AnswerUi>) -> Unit)? = null
+    fun setOnClickListener(listener: (List<AnswerUi>) -> Unit) {
+        onClick = listener
+    }
+
+    private fun handleAnswerClick(answerPosition: Int, value: Boolean) {
         answersUi[answerPosition].itIsRight = value
+        onClick?.let { click ->
+            click(answersUi)
+        }
     }
 
     @SuppressLint("UseCompatLoadingForDrawables")
     private fun handleSelectedAnswer(position: Int, layout: ConstraintLayout?) {
         layout?.children?.forEach { (it as TextView).setTextColor(Color.BLACK) }
         layout?.background = resourses.getDrawable(R.drawable.shape_rounded_for_unselected_test)
-        handleAnswerClick(position,false)
-
+        handleAnswerClick(position, false)
     }
 
     @SuppressLint("UseCompatLoadingForDrawables")
-    private fun handleUnselectedAnswer(position: Int, layout: ConstraintLayout,answerClick: Boolean = true) {
+    private fun handleUnselectedAnswer(
+        position: Int,
+        layout: ConstraintLayout,
+        answerClick: Boolean = true
+    ) {
         layout.background = resourses.getDrawable(R.drawable.shape_rounded_for_selected_test)
         layout.children.forEach { (it as TextView).setTextColor(Color.WHITE) }
         if (answerClick) {
-            handleAnswerClick(position,true)
+            handleAnswerClick(position, true)
         }
     }
 }

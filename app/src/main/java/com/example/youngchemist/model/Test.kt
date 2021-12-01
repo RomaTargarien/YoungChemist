@@ -5,19 +5,10 @@ data class Test(
     var lectionId: Int = 0,
     var testId: Int = 0,
     var testTitle: String = "",
-    val tasks: ArrayList<Task> = arrayListOf()
+    val tasks: ArrayList<Task> = arrayListOf(),
+    val timeInMillis: Long = 0
 ) {
-    fun amountOfRightAnswers(): Double {
-        var amountOfRightAnswers = 0
-        for (task in tasks) {
-            for (answer in task.answers) {
-                if (answer.itIsRight) {
-                    amountOfRightAnswers++
-                }
-            }
-        }
-        return amountOfRightAnswers.toDouble()
-    }
+
     fun rightAnswersPositions(questionNumber: Int): List<Int> {
         val rightAnswers = mutableListOf<Int>()
         for (answer in tasks[questionNumber].answers) {

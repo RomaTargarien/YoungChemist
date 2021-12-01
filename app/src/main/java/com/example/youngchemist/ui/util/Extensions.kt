@@ -70,6 +70,14 @@ fun Int.toDp(context: Context): Int = TypedValue.applyDimension(
     TypedValue.COMPLEX_UNIT_DIP, this.toFloat(), context.resources.displayMetrics
 ).toInt()
 
+fun Long.evaluateTime(): String {
+    val minutes = this / 1000 / 60
+    val seconds = ((this / 1000) % 60)
+    return "${if (minutes < 10) "0$minutes" else minutes}" + ":" +
+                "${if (seconds < 10) "0$seconds" else seconds}"
+
+}
+
 fun Int.toPx(context: Context): Int = (this * context.resources.displayMetrics.density).toInt()
 
 fun String.GLB() = this + ".glb"

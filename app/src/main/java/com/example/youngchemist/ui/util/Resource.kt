@@ -20,4 +20,5 @@ sealed class FragmentAnimationBehavior {
 sealed class TestExitBehavior {
     class Exit : TestExitBehavior()
     class ExitNoSave: TestExitBehavior()
+    class ExitSave: TestExitBehavior()
 }

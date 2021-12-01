@@ -7,7 +7,7 @@
 
         <variable
             name="viewModel"
-            type="com.example.youngchemist.ui.screen.main.subjects.lectures.test.TestFragmentViewModel" />
+            type="com.example.youngchemist.ui.screen.main.subjects.lectures.test.tests.TestFragmentViewModel" />
 
     </data>
 
@@ -62,6 +62,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="30dp"
+                android:onClick="@{view -> viewModel.tryExitTheTest()}"
                 android:src="@drawable/ic_baseline_close"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"

@@ -8,8 +8,8 @@ import com.example.youngchemist.ui.screen.main.MainFragment
 import com.example.youngchemist.ui.screen.main.qr.scan.ScanFragment
 import com.example.youngchemist.ui.screen.main.subjects.lectures.lecture.LectureFragment
 import com.example.youngchemist.ui.screen.main.subjects.lectures.lectures_list.LecturesListFragment
-import com.example.youngchemist.ui.screen.main.subjects.lectures.test.RootTestFragment
-import com.example.youngchemist.ui.screen.main.subjects.lectures.test.TestFragment
+import com.example.youngchemist.ui.screen.main.subjects.lectures.test.tests.RootTestFragment
+import com.example.youngchemist.ui.screen.main.subjects.lectures.test.tests.TestFragment
 import com.example.youngchemist.ui.screen.main.subjects.lectures.test.result.TestResultFragment
 import com.github.terrakok.cicerone.androidx.FragmentScreen
 

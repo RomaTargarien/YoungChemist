@@ -2,7 +2,6 @@ package com.example.youngchemist.ui.screen.main.subjects.lectures.test.result
 
 import android.graphics.Color
 import android.os.Bundle
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -11,7 +10,6 @@ import androidx.activity.addCallback
 import androidx.fragment.app.viewModels
 import com.example.youngchemist.R
 import com.example.youngchemist.databinding.FragmentTestResultBinding
-import com.example.youngchemist.ui.screen.main.subjects.lectures.test.TestNoSaveDialogFragment
 import com.example.youngchemist.ui.util.slideUpViews
 import dagger.hilt.android.AndroidEntryPoint
 

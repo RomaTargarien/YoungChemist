@@ -28,6 +28,7 @@
     <string name="description">Читайте лекции, проходите тесты и совершенствуйте свои знания</string>
     <string name="password_must_be_equals">Пароли должны совпадать</string>
     <string name="go_to_your_email_for_password_changing">Перейдите на свою почту для смены пароля</string>
+    <string name="page_number_from_all_pages">%1s вопрос из %1s</string>
 
     <!-- Firebase Auth Exceptions localized -->
     <string name="ERROR_EMAIL_ALREADY_IN_USE">К сожалению, этот логин уже занят. Попробуйте зарегестрироваться с другим логином</string>
@@ -46,4 +47,5 @@
     <string name="not_so_bad">Неплохо!</string>
     <string name="good">Почти превосходно!</string>
     <string name="very_good">Вау! Идеальный результат!</string>
+    <string name="time_is_up">Время истекло</string>
 </resources>

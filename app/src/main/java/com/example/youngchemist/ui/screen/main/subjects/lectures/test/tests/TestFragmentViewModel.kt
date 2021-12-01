@@ -1,4 +1,4 @@
-package com.example.youngchemist.ui.screen.main.subjects.lectures.test
+package com.example.youngchemist.ui.screen.main.subjects.lectures.test.tests
 
 import android.content.Context
 import android.net.ConnectivityManager
@@ -6,7 +6,6 @@ import android.net.NetworkCapabilities
 import android.os.Build
 import android.os.CountDownTimer
 import android.util.Log
-import androidx.annotation.RequiresApi
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -22,11 +21,10 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-@RequiresApi(Build.VERSION_CODES.M)
 @HiltViewModel
 class TestFragmentViewModel @Inject constructor(
     private val router: Router,
@@ -35,11 +33,14 @@ class TestFragmentViewModel @Inject constructor(
     private val databaseRepository: DatabaseRepository
 ) : ViewModel() {
 
-    var test: Test? = null
-    var tasksUi: MutableList<TaskUi> = mutableListOf()
-    private lateinit var countDownTimer: CountDownTimer
+    private val _tasksUi: MutableStateFlow<MutableList<TaskUi>> = MutableStateFlow(mutableListOf())
+    val tasksUi: StateFlow<MutableList<TaskUi>> = _tasksUi
 
-    private var exitState: TestExitBehavior
+    private val _test: MutableStateFlow<Test?> = MutableStateFlow(null)
+    val test: StateFlow<Test?> = _test
+
+    private val saveAndShowMark: MutableStateFlow<Pair<Boolean,Boolean>> = MutableStateFlow(Pair(false,false))
+
     private val _exitBehavior: MutableLiveData<TestExitBehavior> = MutableLiveData()
     val exitBehavior: LiveData<TestExitBehavior> = _exitBehavior
 
@@ -57,46 +58,74 @@ class TestFragmentViewModel @Inject constructor(
     private val _timeIsUp: MutableLiveData<Boolean> = MutableLiveData()
     val timeIsUp: LiveData<Boolean> = _timeIsUp
 
+    private var exitState: TestExitBehavior
+    private lateinit var countDownTimer: CountDownTimer
+
 
     init {
         exitState = Exit()
         viewModelScope.launch {
             _testState.postValue(Event(ResourceNetwork.Loading()))
-            val result = fireStoreRepository.retriveTest("Ub8gvb0ZbjWjK3o2Z3ke")
+            val result = fireStoreRepository.retriveTest("ZfWMCTjAc94n2aYGRAHm")
             if (result is ResourceNetwork.Success) {
                 exitState = ExitNoSave()
-                initializeCountDownTimer()
                 result.data?.let {
-                    test = it
-                    tasksUi = initializeEmptyTaskUiList(it.tasks)
+                    initializeCountDownTimer(it.timeInMillis)
+                    _tasksUi.emit(initializeEmptyTaskUiList(it.tasks))
+                    _test.emit(it)
                     countDownTimer.start()
                 }
             }
             _testState.postValue(Event(result))
         }
+        observeSavingState()
     }
 
-    fun saveTest(showMark: Boolean = true) {
-        viewModelScope.launch(Dispatchers.Default) {
-            val testUi = TestUi("","", ArrayList(tasksUi))
-            test?.let {
-                val passedUserTest = testUi.formatUserPassedTest(it)
-                if (isOnline(context)) {
-                    Log.d("TAG","online")
-                    val result = fireStoreRepository.saveTest("dJuRGOc06xhllmscaAEqQoHC9Ir2",passedUserTest)
-                    if (result is ResourceNetwork.Error) {
+    fun udpateTasksUi(pageNumber: Int,answersUi: List<AnswerUi>) {
+        _tasksUi.value[pageNumber].answersList = answersUi
+    }
 
-                    }
-                } else {
-                    databaseRepository.savePassedUserTest(passedUserTest)
-                }
-                if (showMark) {
+    private fun observeSavingState() {
+        viewModelScope.launch(Dispatchers.Default) {
+            combine(test, tasksUi, saveAndShowMark) { test, tasks, save ->
+                Triple(test, tasks, save)
+            }.collect {
+                val save = it.third.first
+                val saveWithNoProgress = it.third.second
+                if (save) {
+                    val test = it.first!!
+                    val tasks = it.second
+                    val testUi = TestUi(
+                        "",
+                        "",
+                        if (saveWithNoProgress) ArrayList(initializeEmptyTaskUiList(test.tasks)) else ArrayList(tasks)
+                    )
+                    val passedUserTest = testUi.formatUserPassedTest(test)
+                    uploadTest(passedUserTest)
                     launch(Dispatchers.Main) {
-                        router.replaceScreen(Screens.testResultScreen(passedUserTest.mark))
+                        if (saveWithNoProgress) {
+                            router.exit()
+                        } else {
+                            router.replaceScreen(Screens.testResultScreen(passedUserTest.mark))
+                        }
                     }
                 }
             }
+        }
+    }
 
+    fun saveTest(save: Boolean,saveWithNoProgress: Boolean) {
+        viewModelScope.launch {
+            saveAndShowMark.emit(Pair(save,saveWithNoProgress))
+        }
+    }
+
+    private fun uploadTest(passedUserTest: PassedUserTest) {
+        viewModelScope.launch {
+            if (isOnline(context)) {
+                fireStoreRepository.saveTest("dJuRGOc06xhllmscaAEqQoHC9Ir2",passedUserTest)
+            }
+            databaseRepository.savePassedUserTest(passedUserTest)
         }
     }
 
@@ -114,38 +143,33 @@ class TestFragmentViewModel @Inject constructor(
         }
     }
 
+    fun goBack() {
+        currentPage.value?.let {
+            var page = it.first
+            _currentPage.postValue(Pair(--page,FragmentAnimationBehavior.Back()))
+        }
+    }
+
     fun tryExitTheTest() {
         _exitBehavior.postValue(exitState)
     }
 
     fun exit() {
-        test?.let {
-            tasksUi = initializeEmptyTaskUiList(it.tasks)
-            saveTest(false)
-        }
         router.exit()
     }
 
-    fun initializeCountDownTimer() {
-        countDownTimer = object : CountDownTimer(30000, 1000) {
+    fun done() {
+        _exitBehavior.postValue(ExitSave())
+    }
+
+    private fun initializeCountDownTimer(timeInMillis: Long) {
+        countDownTimer = object : CountDownTimer(timeInMillis, 1000) {
             override fun onTick(p0: Long) {
-                val minutes = p0 / 1000 / 60
-                val seconds = ((p0 / 1000) % 60)
-                _timeLeft.postValue(
-                    "${if (minutes < 10) "0$minutes" else minutes}" + ":" +
-                            "${if (seconds < 10) "0$seconds" else seconds}"
-                )
+                _timeLeft.postValue(p0.evaluateTime())
             }
             override fun onFinish() {
                timeIsUp()
             }
-        }
-    }
-
-    fun goBack() {
-        currentPage.value?.let {
-            var page = it.first
-            _currentPage.postValue(Pair(--page,FragmentAnimationBehavior.Back()))
         }
     }
 
@@ -172,13 +196,15 @@ class TestFragmentViewModel @Inject constructor(
         return emptyTaskUiList
     }
 
-
-    @RequiresApi(Build.VERSION_CODES.M)
-    fun isOnline(context: Context): Boolean {
+    private fun isOnline(context: Context): Boolean {
         val connectivityManager =
             context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val capabilities =
-            connectivityManager.getNetworkCapabilities(connectivityManager.activeNetwork)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                connectivityManager.getNetworkCapabilities(connectivityManager.activeNetwork)
+            } else {
+                null
+            }
         if (capabilities != null) {
             if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)) {
                 Log.d("TAG", "NetworkCapabilities.TRANSPORT_CELLULAR")

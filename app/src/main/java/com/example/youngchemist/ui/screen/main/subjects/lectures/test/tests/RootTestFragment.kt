@@ -1,28 +1,33 @@
-package com.example.youngchemist.ui.screen.main.subjects.lectures.test
+package com.example.youngchemist.ui.screen.main.subjects.lectures.test.tests
 
-import android.animation.ObjectAnimator
+import android.app.AlertDialog
+import android.app.Dialog
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.addCallback
 import androidx.annotation.RequiresApi
-import androidx.core.view.children
-import androidx.core.view.get
 import androidx.core.view.isVisible
+import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.lifecycleScope
 import com.example.youngchemist.R
 import com.example.youngchemist.databinding.FragmentRootTestBinding
 import com.example.youngchemist.ui.base.AnimationHelper
+import com.example.youngchemist.ui.screen.main.subjects.lectures.test.tests.dialogs.TestNoSaveDialogFragment
+import com.example.youngchemist.ui.screen.main.subjects.lectures.test.tests.dialogs.TestSaveDialogFragment
 import com.example.youngchemist.ui.util.FragmentAnimationBehavior
 import com.example.youngchemist.ui.util.ResourceNetwork
 import com.example.youngchemist.ui.util.TestExitBehavior
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 
 
 private const val ARG_PARAM1 = "param1"
@@ -63,46 +68,46 @@ class RootTestFragment : Fragment() {
         observeTestState()
         observeExitBehavior()
         observeTimeLeft()
-
+        observeCurrentPageNumber()
+        observeTimeIsUp()
         requireActivity().onBackPressedDispatcher.addCallback {
             viewModel.tryExitTheTest()
         }
-
-
-        viewModel.currentPage.observe(viewLifecycleOwner, {
-            val pageNumber = it.first
-            val animationBehavior = it.second
-            if (pageNumber >= 0) {
-                animateProgressBar(pageNumber)
-                replaceFragment(TestFragment.newInstance(pageNumber),animationBehavior)
-                toggleArrowsVisibility(pageNumber)
-                binding.bmSheet.tvTestPagination.text =
-                    "${pageNumber + 1} вопрос из ${viewModel.tasksUi.size}"
-                binding.bmSheet.tvTestTitle.text = viewModel.test?.testTitle
-                previousPosition = pageNumber
+        lifecycleScope.launch {
+            viewModel.test.filterNotNull().map { it.testTitle }.collect {
+                binding.bmSheet.tvTestTitle.text = it
             }
-        })
-        binding.ivExit.setOnClickListener {
-            viewModel.tryExitTheTest()
         }
+    }
 
-        binding.bmSheet.bnDone.setOnClickListener {
-            val testSaveDialogFragment = TestSaveDialogFragment(viewModel)
-            testSaveDialogFragment.show(requireActivity().supportFragmentManager,"dialog")
-        }
-
-
-        viewModel.timeIsUp.observe(viewLifecycleOwner,{
+    private fun observeTimeIsUp() {
+        viewModel.timeIsUp.observe(viewLifecycleOwner, {
             if (it) {
                 binding.testContent.isVisible = false
                 binding.bmSheet.bnDone.isEnabled = false
                 binding.bmSheet.ivForwardTest.isEnabled = false
                 binding.bmSheet.ivBackTest.isEnabled = false
-                animationHelper.showMessage("Время истекло!")
+                animationHelper.showMessage(resources.getString(R.string.time_is_up))
             } else {
-                viewModel.saveTest()
+                viewModel.saveTest(true, false)
             }
+        })
+    }
 
+    private fun observeCurrentPageNumber() {
+        viewModel.currentPage.observe(viewLifecycleOwner, {
+            val pageNumber = it.first
+            val animationBehavior = it.second
+            if (pageNumber >= 0) {
+                animateProgressBar(pageNumber)
+                replaceFragment(TestFragment.newInstance(pageNumber), animationBehavior)
+                toggleArrowsVisibility(pageNumber)
+                val page = (pageNumber + 1).toString()
+                val allPages = viewModel.tasksUi.value.size.toString()
+                binding.bmSheet.tvTestPagination.text =
+                    resources.getString(R.string.page_number_from_all_pages, page, allPages)
+                previousPosition = pageNumber
+            }
         })
     }
 
@@ -126,7 +131,7 @@ class RootTestFragment : Fragment() {
     }
 
     private fun observeExitBehavior() {
-        viewModel.exitBehavior.observe(viewLifecycleOwner,{
+        viewModel.exitBehavior.observe(viewLifecycleOwner, {
             when (it) {
                 is TestExitBehavior.ExitNoSave -> {
                     showUnSavedDialogFragment()
@@ -134,12 +139,15 @@ class RootTestFragment : Fragment() {
                 is TestExitBehavior.Exit -> {
                     viewModel.exit()
                 }
+                is TestExitBehavior.ExitSave -> {
+                    showSavedDialogFragment()
+                }
             }
         })
     }
 
-    fun observeTimeLeft() {
-        viewModel.timeLeft.observe(viewLifecycleOwner,{
+    private fun observeTimeLeft() {
+        viewModel.timeLeft.observe(viewLifecycleOwner, {
             binding.tvTimer.text = it
         })
     }
@@ -153,17 +161,17 @@ class RootTestFragment : Fragment() {
 
     private val bottomSheetCallback = object : BottomSheetBehavior.BottomSheetCallback() {
 
-        val halfContainerWidth = binding.bmSheet.bottomSheetContainer.width / 2
-        val halfTextWidth = (binding.bmSheet.tvTestTitle.width) / 2
-        val offsetX = halfContainerWidth - halfTextWidth - resources.getDimension(R.dimen.test_margin_start)
-        val offsetY = resources.getDimension(R.dimen.padding_small)
-
         override fun onStateChanged(bottomSheet: View, newState: Int) {}
 
         override fun onSlide(bottomSheet: View, slideOffset: Float) {
+            val halfContainerWidth = binding.bmSheet.bottomSheetContainer.width / 2
+            val halfTextWidth = (binding.bmSheet.tvTestTitle.width) / 2
+            val offsetX =
+                halfContainerWidth - halfTextWidth - resources.getDimension(R.dimen.test_margin_start)
+            val offsetY = resources.getDimension(R.dimen.padding_small)
             binding.bmSheet.tvTestTitle.animate().translationX((1 - slideOffset) * offsetX)
                 .setDuration(0).start()
-            binding.bmSheet.tvTestTitle.animate().translationY((slideOffset -1) * offsetY)
+            binding.bmSheet.tvTestTitle.animate().translationY((slideOffset - 1) * offsetY)
                 .setDuration(0).start()
             binding.bmSheet.bnDone.animate().alpha(slideOffset).setDuration(0).start()
         }
@@ -172,10 +180,15 @@ class RootTestFragment : Fragment() {
 
     private fun showUnSavedDialogFragment() {
         val testUnSaveDialogFragment = TestNoSaveDialogFragment(viewModel)
-        testUnSaveDialogFragment.show(requireActivity().supportFragmentManager,"dialog")
+        testUnSaveDialogFragment.show(requireActivity().supportFragmentManager, "dialog")
     }
 
-    private fun replaceFragment(fragment: Fragment,animationBehavior: FragmentAnimationBehavior) {
+    private fun showSavedDialogFragment() {
+        val testSaveDialogFragment = TestSaveDialogFragment(viewModel)
+        testSaveDialogFragment.show(requireActivity().supportFragmentManager, "dialog")
+    }
+
+    private fun replaceFragment(fragment: Fragment, animationBehavior: FragmentAnimationBehavior) {
         val fragmentManager = childFragmentManager.beginTransaction()
         when (animationBehavior) {
             is FragmentAnimationBehavior.Enter -> {
@@ -217,9 +230,9 @@ class RootTestFragment : Fragment() {
     }
 
     private fun animateProgressBar(pageNumber: Int) {
-        val from = (((previousPosition.toFloat() + 1) / (viewModel.tasksUi.size)) * 100)
-        val to = ((pageNumber.toFloat() + 1) / (viewModel.tasksUi.size)) * 100
-        animationHelper.animateProgressBar(binding.progressBar,from,to)
+        val from = (((previousPosition.toFloat() + 1) / (viewModel.tasksUi.value.size)) * 100)
+        val to = ((pageNumber.toFloat() + 1) / (viewModel.tasksUi.value.size)) * 100
+        animationHelper.animateProgressBar(binding.progressBar, from, to)
     }
 
     private fun toggleArrowsVisibility(pageNumber: Int) {
@@ -228,7 +241,7 @@ class RootTestFragment : Fragment() {
         if (pageNumber == 0) {
             binding.bmSheet.ivBackTest.isVisible = false
         }
-        if (pageNumber == viewModel.tasksUi.size - 1) {
+        if (pageNumber == viewModel.tasksUi.value.size - 1) {
             binding.bmSheet.ivForwardTest.isVisible = false
         }
     }
@@ -243,6 +256,4 @@ class RootTestFragment : Fragment() {
                 }
             }
     }
-
-
 }
