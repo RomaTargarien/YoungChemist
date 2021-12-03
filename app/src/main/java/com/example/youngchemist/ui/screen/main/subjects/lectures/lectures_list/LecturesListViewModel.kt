@@ -1,6 +1,5 @@
 package com.example.youngchemist.ui.screen.main.subjects.lectures.lectures_list
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -20,35 +19,40 @@ class LecturesListViewModel @Inject constructor(
     private val router: Router,
     private val fireStoreRepository: FireStoreRepository,
     private val databaseRepository: DatabaseRepository
-): ViewModel() {
+) : ViewModel() {
 
-    private val _lecturesListState: MutableLiveData<ResourceNetwork<List<Lecture>>> = MutableLiveData()
+    private val _lecturesListState: MutableLiveData<ResourceNetwork<List<Lecture>>> =
+        MutableLiveData()
     val lecturesListState: LiveData<ResourceNetwork<List<Lecture>>> = _lecturesListState
 
-    fun getAllLectures(subjectTitle: String) {
+    fun getAllLectures(collectionId: String) {
         viewModelScope.launch {
-            //val lectures = databaseRepository.getAllLectures(subjectTitle)
-            //Log.d("TAG",lectures.toString())
             _lecturesListState.postValue(ResourceNetwork.Loading())
-            val result = fireStoreRepository.getAllLectures(subjectTitle)
-            if (result is ResourceNetwork.Success) {
-                result.data?.let {
-                    databaseRepository.insertNewLectures(it)
+            val lectures = databaseRepository.getAllLectures(collectionId)
+            if (lectures.isEmpty()) {
+                val result = fireStoreRepository.getAllLectures(collectionId)
+                if (result is ResourceNetwork.Success) {
+                    result.data?.let {
+                        databaseRepository.insertNewLectures(it)
+                    }
+                    _lecturesListState.postValue(result)
                 }
+            } else {
+                _lecturesListState.postValue(ResourceNetwork.Success(lectures))
             }
-            _lecturesListState.postValue(result)
-//            _lecturesListState.postValue(result)
-//            if (databaseRepository.getAllLectures(subjectTitle).isEmpty()) {
-//
-//            } else {
-//                val lectures = databaseRepository.getAllLectures(subjectTitle)
-//                _lecturesListState.postValue(ResourceNetwork.Success(lectures))
-//            }
+
         }
     }
 
-    fun navigateToLectureScreen(subjectTitle: String,lectureTitle: String) {
-        router.navigateTo(Screens.lectureScreen(lectureTitle, subjectTitle))
+    fun exit() {
+        router.exit()
     }
 
+    fun navigateToLectureScreen(lecture: Lecture) {
+        router.navigateTo(Screens.lectureScreen(lecture))
+    }
+
+    fun navigateToTestScreen(testId: String) {
+        router.navigateTo(Screens.rootTestScreen(testId))
+    }
 }

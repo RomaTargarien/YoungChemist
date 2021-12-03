@@ -42,17 +42,16 @@ class FireStoreRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getAllLectures(subjectTitle: String) = withContext(Dispatchers.IO) {
+    override suspend fun getAllLectures(collectionId: String) = withContext(Dispatchers.IO) {
         safeCall {
-            val Lectures = firestore.collection(subjectTitle).get().await()
-            val LecturesList = mutableListOf<Lecture>()
-            Lectures.onEach {
-                val pagesList = (it["data"] as ArrayList<String>).map {
-                    Page(it)
+            val lectures = firestore.collection(collectionId).get().await()
+            val lecturesList = mutableListOf<Lecture>()
+            lectures.onEach { document ->
+                document.toObject(Lecture::class.java).let {
+                    lecturesList.add(it)
                 }
-                LecturesList.add(Lecture(it.id,subjectTitle,pagesList))
             }
-            ResourceNetwork.Success(LecturesList.toList())
+            ResourceNetwork.Success(lecturesList.toList())
         }
     }
 

@@ -44,12 +44,12 @@ class SubjectsFragmentViewModel @Inject constructor(
     private val _imageBitmap: MutableLiveData<Bitmap> = MutableLiveData()
     val imageBitmap: LiveData<Bitmap> = _imageBitmap
 
-    fun navigateToLecturesListScreen(title: String) {
-        router.navigateTo(Screens.lecturesListScreen(title))
+    fun navigateToLecturesListScreen(subject: Subject) {
+        router.navigateTo(Screens.lecturesListScreen(subject))
     }
 
     fun navigateToTestScreen() {
-        router.navigateTo(Screens.rootTestScreen())
+        router.navigateTo(Screens.rootTestScreen(""))
     }
 
     init {
@@ -79,7 +79,6 @@ class SubjectsFragmentViewModel @Inject constructor(
     private fun getAllSubjects() {
         viewModelScope.launch {
             if (databaseRepository.getAllSubjects().isEmpty()) {
-
                 _subjectsState.postValue(ResourceNetwork.Loading())
                 val subjects = fireStoreRepository.getAllSubjects()
                 if (subjects is ResourceNetwork.Success) {

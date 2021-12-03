@@ -64,9 +64,16 @@ class TestFragmentViewModel @Inject constructor(
 
     init {
         exitState = Exit()
+        observeSavingState()
+
+    }
+
+    fun retrieveTest(testId: String) {
         viewModelScope.launch {
+            Log.d("TAG",testId)
             _testState.postValue(Event(ResourceNetwork.Loading()))
-            val result = fireStoreRepository.retriveTest("ZfWMCTjAc94n2aYGRAHm")
+            val result = fireStoreRepository.retriveTest(testId)
+            Log.d("TAG",result.data.toString())
             if (result is ResourceNetwork.Success) {
                 exitState = ExitNoSave()
                 result.data?.let {
@@ -78,7 +85,6 @@ class TestFragmentViewModel @Inject constructor(
             }
             _testState.postValue(Event(result))
         }
-        observeSavingState()
     }
 
     fun udpateTasksUi(pageNumber: Int,answersUi: List<AnswerUi>) {
@@ -101,14 +107,7 @@ class TestFragmentViewModel @Inject constructor(
                         if (saveWithNoProgress) ArrayList(initializeEmptyTaskUiList(test.tasks)) else ArrayList(tasks)
                     )
                     val passedUserTest = testUi.formatUserPassedTest(test)
-                    uploadTest(passedUserTest)
-                    launch(Dispatchers.Main) {
-                        if (saveWithNoProgress) {
-                            router.exit()
-                        } else {
-                            router.replaceScreen(Screens.testResultScreen(passedUserTest.mark))
-                        }
-                    }
+                    uploadTest(passedUserTest,saveWithNoProgress)
                 }
             }
         }
@@ -120,12 +119,23 @@ class TestFragmentViewModel @Inject constructor(
         }
     }
 
-    private fun uploadTest(passedUserTest: PassedUserTest) {
-        viewModelScope.launch {
+    private fun uploadTest(passedUserTest: PassedUserTest,saveWithNoProgress: Boolean) {
+        viewModelScope.launch(Dispatchers.Default) {
             if (isOnline(context)) {
                 fireStoreRepository.saveTest("dJuRGOc06xhllmscaAEqQoHC9Ir2",passedUserTest)
             }
             databaseRepository.savePassedUserTest(passedUserTest)
+            navigate(saveWithNoProgress, passedUserTest)
+        }
+    }
+
+    private fun navigate(saveWithNoProgress: Boolean,passedUserTest: PassedUserTest) {
+        viewModelScope.launch(Dispatchers.Main) {
+            if (saveWithNoProgress) {
+                router.exit()
+            } else {
+                router.replaceScreen(Screens.testResultScreen(passedUserTest.mark))
+            }
         }
     }
 

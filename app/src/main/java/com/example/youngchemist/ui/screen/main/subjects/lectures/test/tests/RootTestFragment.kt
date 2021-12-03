@@ -1,16 +1,14 @@
 package com.example.youngchemist.ui.screen.main.subjects.lectures.test.tests
 
-import android.app.AlertDialog
-import android.app.Dialog
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.addCallback
 import androidx.annotation.RequiresApi
 import androidx.core.view.isVisible
-import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -30,14 +28,10 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
 @AndroidEntryPoint
 class RootTestFragment : Fragment() {
 
-    private var param1: String? = null
-    private var param2: String? = null
+    private lateinit var testId: String
 
     private lateinit var binding: FragmentRootTestBinding
     private val viewModel: TestFragmentViewModel by viewModels()
@@ -47,8 +41,7 @@ class RootTestFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
+            testId = it.getString(TEST_ID) as String
         }
     }
 
@@ -63,6 +56,7 @@ class RootTestFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         binding.viewModel = viewModel
         binding.bmSheet.viewModel = viewModel
+        viewModel.retrieveTest(testId)
         initializeAnimationHepler()
         initializeBottomSheet()
         observeTestState()
@@ -113,8 +107,7 @@ class RootTestFragment : Fragment() {
 
     private fun observeTestState() {
         viewModel.testState.observe(viewLifecycleOwner, {
-            val data = it.getContentIfNotHandled()
-            when (data) {
+            when (it.getContentIfNotHandled()) {
                 is ResourceNetwork.Success -> {
                     viewModel.enterTest()
                     binding.progressFlask.isVisible = false
@@ -247,12 +240,12 @@ class RootTestFragment : Fragment() {
     }
 
     companion object {
+        private const val TEST_ID = "test.tests"
         @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            TestFragment().apply {
+        fun newInstance(testId: String) =
+            RootTestFragment().apply {
                 arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
+                    putString(TEST_ID, testId)
                 }
             }
     }

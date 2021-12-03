@@ -1,20 +1,16 @@
 package com.example.youngchemist.ui.screen.main.subjects.lectures.lecture
 
-import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.recyclerview.widget.AsyncListDiffer
-import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.youngchemist.databinding.ItemPageNumberBinding
-import com.example.youngchemist.model.Page
 
 class PagesPaginationAdapter :
     RecyclerView.Adapter<PagesPaginationAdapter.PagePaginationViewHolder>() {
 
-    private var items: List<Page> = listOf()
+    private var items: List<String> = listOf()
 
-    fun setItems(newItems: List<Page>) {
+    fun setItems(newItems: List<String>) {
         items = newItems
         notifyDataSetChanged()
     }
@@ -22,7 +18,7 @@ class PagesPaginationAdapter :
     inner class PagePaginationViewHolder(val binding: ItemPageNumberBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(position: Int) {
-            binding.tvItemPageNumber.text = (position+1).toString()
+            binding.tvItemPageNumber.text = (position + 1).toString()
             binding.listItemPageNumberBackground.setOnClickListener {
                 onClick?.let { click ->
                     click(position)

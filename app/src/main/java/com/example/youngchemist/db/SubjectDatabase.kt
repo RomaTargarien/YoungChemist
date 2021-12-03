@@ -7,7 +7,7 @@ import com.example.youngchemist.model.Lecture
 import com.example.youngchemist.model.PassedUserTest
 import com.example.youngchemist.model.Subject
 
-@Database(entities = [Subject::class, Lecture::class, PassedUserTest::class], version = 6)
+@Database(entities = [Subject::class, Lecture::class, PassedUserTest::class], version = 7)
 @TypeConverters(Converters::class)
 abstract class SubjectDatabase : RoomDatabase() {
     abstract fun getSubjectdao(): SubjectDao

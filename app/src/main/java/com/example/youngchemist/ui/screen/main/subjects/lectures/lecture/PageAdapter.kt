@@ -1,8 +1,6 @@
 package com.example.youngchemist.ui.screen.main.subjects.lectures.lecture
 
 import android.annotation.SuppressLint
-import android.net.Uri
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.webkit.JavascriptInterface
@@ -11,20 +9,18 @@ import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.youngchemist.databinding.ItemPageBinding
-import com.example.youngchemist.model.Page
-import com.example.youngchemist.ui.listeners.OnPageNumberChangedListener
 import com.example.youngchemist.ui.listeners.OnUriGetting
 
 @SuppressLint("SetJavaScriptEnabled")
 class PageAdapter : RecyclerView.Adapter<PageAdapter.PageViewHolder>() {
 
-    private val differCallBack = object : DiffUtil.ItemCallback<Page>() {
-        override fun areItemsTheSame(oldItem: Page, newItem: Page): Boolean {
+    private val differCallBack = object : DiffUtil.ItemCallback<String>() {
+        override fun areItemsTheSame(oldItem: String, newItem: String): Boolean {
             return oldItem.hashCode() == newItem.hashCode()
         }
 
-        override fun areContentsTheSame(oldItem: Page, newItem: Page): Boolean {
-            return oldItem.data == newItem.data
+        override fun areContentsTheSame(oldItem: String, newItem: String): Boolean {
+            return oldItem.toInt() == newItem.toInt()
         }
     }
     private lateinit var listener: OnUriGetting
@@ -34,18 +30,18 @@ class PageAdapter : RecyclerView.Adapter<PageAdapter.PageViewHolder>() {
 
     private val differ = AsyncListDiffer(this, differCallBack)
 
-    var pages: List<Page>
+    var pages: List<String>
         get() = differ.currentList
         set(value) = differ.submitList(value)
 
     @SuppressLint("SetJavaScriptEnabled")
     inner class PageViewHolder(val binding: ItemPageBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        fun bind(page: Page,position: Int) {
+        fun bind(page: String) {
             binding.wvHtml.settings.javaScriptEnabled = true
             binding.wvHtml.webChromeClient = WebChromeClient()
-            binding.wvHtml.addJavascriptInterface(JavaScriptInterface(),"androidImage")
-            binding.wvHtml.loadData(page.data,"text/html", "UTF-8")
+            binding.wvHtml.addJavascriptInterface(JavaScriptInterface(), "androidImage")
+            binding.wvHtml.loadData(page, "text/html", "UTF-8")
         }
     }
 
@@ -54,7 +50,7 @@ class PageAdapter : RecyclerView.Adapter<PageAdapter.PageViewHolder>() {
 
 
     override fun onBindViewHolder(holder: PageViewHolder, position: Int) {
-        holder.bind(pages[position],position)
+        holder.bind(pages[position])
     }
 
     override fun getItemCount() = pages.size

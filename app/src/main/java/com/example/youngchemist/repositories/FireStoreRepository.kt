@@ -8,7 +8,7 @@ interface FireStoreRepository {
 
     suspend fun getAllSubjects(): ResourceNetwork<List<Subject>>
 
-    suspend fun getAllLectures(subjectTitle: String): ResourceNetwork<List<Lecture>>
+    suspend fun getAllLectures(collectionId: String): ResourceNetwork<List<Lecture>>
 
     suspend fun get3DModel(name: String): ResourceNetwork<Uri>
 

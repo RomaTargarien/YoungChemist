@@ -18,6 +18,7 @@ import androidx.transition.TransitionManager
 import androidx.viewpager2.widget.ViewPager2
 import com.example.youngchemist.R
 import com.example.youngchemist.databinding.FragmentLectureBinding
+import com.example.youngchemist.model.Lecture
 import com.example.youngchemist.ui.listeners.OnPageNumberChangedListener
 import com.example.youngchemist.ui.listeners.OnUriGetting
 import com.example.youngchemist.ui.util.ResourceNetwork
@@ -31,14 +32,16 @@ class LectureFragment : Fragment() {
 
     private lateinit var binding: FragmentLectureBinding
     private val viewModel: LectureFragmentViewModel by viewModels()
-    private var lectureTitle: String? = null
-    private var subjectTitle: String? = null
+    private lateinit var lecture: Lecture
+
+    private var lastPage = 1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
-            lectureTitle = it.getString(LECTURE_TITLE)
-            subjectTitle = it.getString(SUBJECT_TITLE)
+            (it.getParcelable(LECTURE_PARAM) as Lecture?)?.let {
+                lecture = it
+            }
         }
     }
 
@@ -50,8 +53,11 @@ class LectureFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel.getContent(subjectTitle!!,lectureTitle!!)
+        binding.viewModel = viewModel
         val adapter = PageAdapter()
+        adapter.pages = lecture.data
+        binding.vpLecturePages.adapter = adapter
+        val size = lecture.data.size
         adapter.setOnEventListener(object : OnUriGetting {
             override fun onUriGetted(uri: String) {
                 Log.d("TAG",uri)
@@ -67,30 +73,27 @@ class LectureFragment : Fragment() {
             }
         })
         val pagesPaginationAdapter = PagesPaginationAdapter()
+
         binding.bmSheet.rvPagesPagination.setOnEventListener(object : OnPageNumberChangedListener {
             override fun onPageNumberChanged(page: Int) {
                 binding.vpLecturePages.currentItem = page
             }
         })
         binding.bmSheet.rvPagesPagination.initialize(pagesPaginationAdapter)
-        binding.bmSheet.rvPagesPagination.setViewsToChangeColor(listOf(R.id.list_item_page_number_background))
-        binding.viewModel = viewModel
 
-        binding.vpLecturePages.adapter = adapter
-        var size = 0
-        viewModel.pagesState.observe(viewLifecycleOwner,{
-            it.let {
-                adapter.pages = it
-                pagesPaginationAdapter.setItems(it)
-                size = it.size
-            }
-        })
+        binding.bmSheet.rvPagesPagination.setViewsToChangeColor(listOf(R.id.list_item_page_number_background))
+        pagesPaginationAdapter.setItems(lecture.data)
+
+
         pagesPaginationAdapter.setOnClickListener {
             binding.vpLecturePages.currentItem = it
         }
         binding.bmSheet.viewModel = viewModel
         binding.vpLecturePages.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
+                if (lastPage < position+1) {
+                    lastPage = position+1
+                }
                 binding.bmSheet.rvPagesPagination.smoothScrollToPosition(position)
                 binding.tvPageNumber.text = "${position+1}/$size"
                 binding.bnBeginTest.isVisible = (position+1) == size
@@ -123,15 +126,18 @@ class LectureFragment : Fragment() {
         startActivity(intent)
     }
 
-    companion object {
-        private const val LECTURE_TITLE = "param1"
-        private const val SUBJECT_TITLE = "param2"
+    override fun onDestroy() {
+        super.onDestroy()
+        Log.d("TAG",lastPage.toString())
+    }
 
-        fun newInstance(lectureTitle: String, subjectTitle: String) =
+    companion object {
+        private const val LECTURE_PARAM = "lectures.lecture"
+
+        fun newInstance(lecture: Lecture) =
             LectureFragment().apply {
                 arguments = Bundle().apply {
-                    putString(LECTURE_TITLE, lectureTitle)
-                    putString(SUBJECT_TITLE, subjectTitle)
+                    putParcelable(LECTURE_PARAM, lecture)
                 }
             }
     }

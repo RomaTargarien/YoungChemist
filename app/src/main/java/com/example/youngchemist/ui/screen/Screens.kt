@@ -1,5 +1,7 @@
 package com.example.youngchemist.ui.screen
 
+import com.example.youngchemist.model.Lecture
+import com.example.youngchemist.model.Subject
 import com.example.youngchemist.ui.screen.auth.AuthFragment
 import com.example.youngchemist.ui.screen.auth.login.LoginFragment
 import com.example.youngchemist.ui.screen.auth.password_restore.RestorePasswordFragment
@@ -31,12 +33,12 @@ object Screens {
         MainFragment.newInstance(qrCodeRawValue)
     }
 
-    fun lecturesListScreen(subjectName: String) = FragmentScreen {
-        LecturesListFragment.newInstance(subjectName)
+    fun lecturesListScreen(subject: Subject) = FragmentScreen {
+        LecturesListFragment.newInstance(subject)
     }
 
-    fun lectureScreen(lectureTitle: String,subjectTitle: String) = FragmentScreen {
-        LectureFragment.newInstance(lectureTitle, subjectTitle)
+    fun lectureScreen(lecture: Lecture) = FragmentScreen {
+        LectureFragment.newInstance(lecture)
     }
 
     fun scanScreen() = FragmentScreen {
@@ -47,12 +49,8 @@ object Screens {
         RestorePasswordFragment()
     }
 
-    fun testScreen(pageNumber: Int) = FragmentScreen {
-        TestFragment.newInstance(pageNumber)
-    }
-
-    fun rootTestScreen() = FragmentScreen {
-        RootTestFragment()
+    fun rootTestScreen(testId: String) = FragmentScreen {
+        RootTestFragment.newInstance(testId)
     }
 
     fun testResultScreen(mark: Double) = FragmentScreen {

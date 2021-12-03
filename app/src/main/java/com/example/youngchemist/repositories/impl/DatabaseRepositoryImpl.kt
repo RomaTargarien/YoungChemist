@@ -1,16 +1,15 @@
 package com.example.youngchemist.repositories.impl
 
-import androidx.lifecycle.LiveData
+import android.util.Log
 import com.example.youngchemist.db.LectureDao
 import com.example.youngchemist.db.SubjectDao
 import com.example.youngchemist.db.TestDao
 import com.example.youngchemist.model.Lecture
-import com.example.youngchemist.model.Page
 import com.example.youngchemist.model.PassedUserTest
 import com.example.youngchemist.model.Subject
 import com.example.youngchemist.repositories.DatabaseRepository
-import com.example.youngchemist.ui.util.safeCall
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
@@ -18,7 +17,7 @@ class DatabaseRepositoryImpl @Inject constructor(
     private val subjectsDao: SubjectDao,
     private val lecturesDao: LectureDao,
     private val testDao: TestDao
-): DatabaseRepository {
+) : DatabaseRepository {
 
     override suspend fun getAllSubjects(): List<Subject> {
         return withContext(Dispatchers.IO) {
@@ -38,9 +37,9 @@ class DatabaseRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getAllLectures(subjectTitle: String): List<Lecture> {
+    override suspend fun getAllLectures(collectionId: String): List<Lecture> {
         return withContext(Dispatchers.IO) {
-            lecturesDao.getAllLectures(subjectTitle)
+            lecturesDao.getAllLectures(collectionId)
         }
     }
 
@@ -51,14 +50,8 @@ class DatabaseRepositoryImpl @Inject constructor(
     }
 
     override suspend fun deleteAlllectures() {
-       withContext(Dispatchers.IO) {
+        withContext(Dispatchers.IO) {
 
-       }
-    }
-
-    override suspend fun getAllPages(lectureTitle: String, subjectTitle: String): List<Lecture> {
-        return withContext(Dispatchers.IO) {
-            lecturesDao.getAllPages(lectureTitle, subjectTitle)
         }
     }
 
