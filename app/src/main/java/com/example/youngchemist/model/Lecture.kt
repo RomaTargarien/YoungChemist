@@ -13,6 +13,31 @@ data class Lecture(
     var lectureId: String = "",
     var collectionId: String = "",
     var lectureTitle: String = "",
+    var lectureDescription: String ="",
     var data: ArrayList<String> = arrayListOf(),
     var testId: String = "",
+): Parcelable {
+
+    fun convertToLectureUi() = LectureUi(
+            lectureId,
+            collectionId,
+            lectureTitle,
+            lectureDescription,
+            data,
+            testId,
+            false
+        )
+
+}
+@Parcelize
+data class LectureUi(
+    var lectureId: String = "",
+    var collectionId: String = "",
+    var lectureTitle: String = "",
+    var lectureDescription: String ="",
+    var data: ArrayList<String> = arrayListOf(),
+    var testId: String = "",
+    var isTestEnabled: Boolean = false,
+    var mark: Double = 0.0,
+    var lectureWasReaden: Boolean = false
 ): Parcelable

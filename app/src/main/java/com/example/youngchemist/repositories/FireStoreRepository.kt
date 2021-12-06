@@ -3,6 +3,7 @@ package com.example.youngchemist.repositories
 import android.net.Uri
 import com.example.youngchemist.model.*
 import com.example.youngchemist.ui.util.ResourceNetwork
+import kotlinx.coroutines.Deferred
 
 interface FireStoreRepository {
 
@@ -18,4 +19,7 @@ interface FireStoreRepository {
 
     suspend fun saveTest(userUid: String,passedUserTest: PassedUserTest): ResourceNetwork<String>
 
+    suspend fun getUser(userUid: String): Deferred<ResourceNetwork<User>>
+
+    suspend fun updateReadenLectures(lectureId: String): ResourceNetwork<String>
 }

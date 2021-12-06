@@ -2,8 +2,7 @@ package com.example.youngchemist.model
 
 
 data class Test(
-    var lectionId: Int = 0,
-    var testId: Int = 0,
+    var testId: String = "",
     var testTitle: String = "",
     val tasks: ArrayList<Task> = arrayListOf(),
     val timeInMillis: Long = 0

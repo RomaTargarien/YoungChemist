@@ -12,6 +12,7 @@ data class TestUi(
 ) {
     fun formatUserPassedTest(test: Test): PassedUserTest {
         val passedUserTest = PassedUserTest()
+        passedUserTest.testUid = test.testId
         var mark = 0.0
         val userAnswersList = arrayListOf<AnswerUser>()
         for (item in tasksUi) {
@@ -26,12 +27,9 @@ data class TestUi(
             userAnswersList.add(answer)
         }
         passedUserTest.answers = userAnswersList
-        Log.d("TAG",mark.toString())
         val del = mark/tasksUi.size
-        Log.d("TAG",del.toString())
         val roundedMark: Double = Math.round(del*100.0)/10.0
         passedUserTest.mark = roundedMark
-        Log.d("TAG","$roundedMark")
         return passedUserTest
     }
 

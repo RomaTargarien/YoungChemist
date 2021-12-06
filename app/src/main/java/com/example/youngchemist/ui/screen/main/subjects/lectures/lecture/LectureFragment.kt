@@ -19,6 +19,7 @@ import androidx.viewpager2.widget.ViewPager2
 import com.example.youngchemist.R
 import com.example.youngchemist.databinding.FragmentLectureBinding
 import com.example.youngchemist.model.Lecture
+import com.example.youngchemist.model.LectureUi
 import com.example.youngchemist.ui.listeners.OnPageNumberChangedListener
 import com.example.youngchemist.ui.listeners.OnUriGetting
 import com.example.youngchemist.ui.util.ResourceNetwork
@@ -32,14 +33,14 @@ class LectureFragment : Fragment() {
 
     private lateinit var binding: FragmentLectureBinding
     private val viewModel: LectureFragmentViewModel by viewModels()
-    private lateinit var lecture: Lecture
+    private lateinit var lecture: LectureUi
 
     private var lastPage = 1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
-            (it.getParcelable(LECTURE_PARAM) as Lecture?)?.let {
+            (it.getParcelable(LECTURE_PARAM) as LectureUi?)?.let {
                 lecture = it
             }
         }
@@ -94,6 +95,9 @@ class LectureFragment : Fragment() {
                 if (lastPage < position+1) {
                     lastPage = position+1
                 }
+                if (position+1 == size) {
+                    viewModel.lectureHasBeenReaden(lecture.lectureId)
+                }
                 binding.bmSheet.rvPagesPagination.smoothScrollToPosition(position)
                 binding.tvPageNumber.text = "${position+1}/$size"
                 binding.bnBeginTest.isVisible = (position+1) == size
@@ -134,7 +138,7 @@ class LectureFragment : Fragment() {
     companion object {
         private const val LECTURE_PARAM = "lectures.lecture"
 
-        fun newInstance(lecture: Lecture) =
+        fun newInstance(lecture: LectureUi) =
             LectureFragment().apply {
                 arguments = Bundle().apply {
                     putParcelable(LECTURE_PARAM, lecture)

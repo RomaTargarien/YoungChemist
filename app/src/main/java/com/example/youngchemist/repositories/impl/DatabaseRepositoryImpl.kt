@@ -8,9 +8,7 @@ import com.example.youngchemist.model.Lecture
 import com.example.youngchemist.model.PassedUserTest
 import com.example.youngchemist.model.Subject
 import com.example.youngchemist.repositories.DatabaseRepository
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import javax.inject.Inject
 
 class DatabaseRepositoryImpl @Inject constructor(
@@ -37,11 +35,10 @@ class DatabaseRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getAllLectures(collectionId: String): List<Lecture> {
-        return withContext(Dispatchers.IO) {
-            lecturesDao.getAllLectures(collectionId)
-        }
+    override fun getAllLectures(collectionId: String) = CoroutineScope(Dispatchers.IO).async {
+        lecturesDao.getAllLectures(collectionId)
     }
+
 
     override suspend fun insertNewLectures(lectures: List<Lecture>) {
         withContext(Dispatchers.IO) {

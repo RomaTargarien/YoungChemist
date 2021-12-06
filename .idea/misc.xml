@@ -55,9 +55,10 @@
         <entry key="app/src/main/res/layout/fragment_scan.xml" value="0.19157608695652173" />
         <entry key="app/src/main/res/layout/fragment_statistics.xml" value="0.19882246376811594" />
         <entry key="app/src/main/res/layout/fragment_subjects.xml" value="0.25" />
+        <entry key="app/src/main/res/layout/fragment_test.xml" value="0.18478260869565216" />
         <entry key="app/src/main/res/layout/fragment_user.xml" value="0.19882246376811594" />
         <entry key="app/src/main/res/layout/item.xml" value="0.33" />
-        <entry key="app/src/main/res/layout/item_lecture_in_list.xml" value="0.25" />
+        <entry key="app/src/main/res/layout/item_lecture_in_list.xml" value="0.22" />
         <entry key="app/src/main/res/layout/item_page.xml" value="0.15678824721377912" />
         <entry key="app/src/main/res/layout/item_page_number.xml" value="0.5" />
         <entry key="app/src/main/res/layout/item_subject.xml" value="0.5" />

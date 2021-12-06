@@ -103,7 +103,7 @@ class TestFragmentViewModel @Inject constructor(
                     val tasks = it.second
                     val testUi = TestUi(
                         "",
-                        "",
+                        test.testId,
                         if (saveWithNoProgress) ArrayList(initializeEmptyTaskUiList(test.tasks)) else ArrayList(tasks)
                     )
                     val passedUserTest = testUi.formatUserPassedTest(test)

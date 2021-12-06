@@ -70,7 +70,7 @@ class SubjectsFragmentViewModel @Inject constructor(
             Answer("a4",false,3)
         )
         val task2 = Task("q1",answers2,multipleAnswersAvailable = true)
-        val test = Test(0,0,"Первый тест", arrayListOf(task,task2,task2,task2,task,task2,task,task2,task,task2,task2,task,task),30000)
+        //val test = Test(0,0,"Первый тест", arrayListOf(task,task2,task2,task2,task,task2,task,task2,task,task2,task2,task,task),30000)
         viewModelScope.launch {
             //fireStoreRepository.saveTest(test)
         }

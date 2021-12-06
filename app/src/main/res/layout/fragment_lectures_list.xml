@@ -15,11 +15,110 @@
         android:layout_height="match_parent"
         tools:context=".ui.screen.main.subjects.lectures.lectures_list.LecturesListFragment">
 
-
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@drawable/main_background">
+            android:background="@drawable/main_background"
+            android:layout_height="match_parent">
+
+
+
+
+
+        <androidx.core.widget.NestedScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <ImageView
+                    android:id="@+id/iv_subject"
+                    android:layout_width="140dp"
+                    android:layout_height="140dp"
+                    android:layout_marginTop="70dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rv_lectures"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:nestedScrollingEnabled="false"
+                    app:layout_constraintTop_toBottomOf="@+id/iv_subject">
+
+                </androidx.recyclerview.widget.RecyclerView>
+
+                <com.mikhaellopez.circularprogressbar.CircularProgressBar
+                    android:id="@+id/pb_read_lectures"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginEnd="20dp"
+                    app:layout_constraintBottom_toBottomOf="@+id/iv_subject"
+                    app:layout_constraintEnd_toStartOf="@+id/iv_subject"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/iv_subject"/>
+
+                <TextView
+                    android:id="@+id/tv_read_lectures"
+                    style="@style/SubTitleTextStyle"
+                    android:layout_width="wrap_content"
+                    tools:text="4"
+                    android:textSize="30sp"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintBottom_toBottomOf="@+id/pb_read_lectures"
+                    app:layout_constraintEnd_toEndOf="@+id/pb_read_lectures"
+                    app:layout_constraintStart_toStartOf="@+id/pb_read_lectures"
+                    app:layout_constraintTop_toTopOf="@+id/pb_read_lectures">
+
+                </TextView>
+
+                <TextView
+                    android:id="@+id/tv_tests_done"
+                    style="@style/SubTitleTextStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0"
+                    tools:text="2"
+                    android:textSize="30sp"
+                    app:layout_constraintBottom_toBottomOf="@+id/pb_done_tests"
+                    app:layout_constraintEnd_toEndOf="@+id/pb_done_tests"
+                    app:layout_constraintStart_toStartOf="@+id/pb_done_tests"
+                    app:layout_constraintTop_toTopOf="@+id/pb_done_tests">
+
+                </TextView>
+
+                <com.mikhaellopez.circularprogressbar.CircularProgressBar
+                    android:id="@+id/pb_done_tests"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    app:layout_constraintBottom_toBottomOf="@+id/iv_subject"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginEnd="20dp"
+                    app:layout_constraintStart_toEndOf="@+id/iv_subject"
+                    app:layout_constraintTop_toTopOf="@+id/iv_subject" />
+
+                <com.airbnb.lottie.LottieAnimationView
+                    android:id="@+id/progress_flask"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:visibility="visible"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/iv_subject"
+                    app:lottie_autoPlay="true"
+                    app:lottie_fileName="progress_flask.json"
+                    app:lottie_loop="true">
+
+                </com.airbnb.lottie.LottieAnimationView>
+
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.core.widget.NestedScrollView>
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/appBar"
@@ -42,125 +141,25 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
-
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
-            <ImageView
-                android:id="@+id/iv_subject"
-                android:layout_width="140dp"
-                android:layout_height="140dp"
-                android:layout_marginTop="20dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/appBar"
-                app:layout_constraintVertical_bias="0.2" />
-
-            <TextView
-                android:id="@+id/textView6"
-                style="@style/TittleTextStyle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                android:text="Посуда"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/iv_subject">
-
-            </TextView>
-
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/constraintLayout6"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_marginTop="50dp"
-                android:background="@drawable/shape_rounded_corners"
-                android:backgroundTint="@color/light_blue"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/textView6"
-                app:layout_constraintVertical_bias="1">
-
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/rv_lectures"
-                    android:layout_width="match_parent"
+                <TextView
+                    android:id="@+id/tv_subject_title"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:paddingLeft="15dp"
-                    android:paddingTop="10dp"
-                    android:paddingRight="15dp"
+                    style="@style/TittleTextStyle"
+                    android:textColor="@color/white"
+                    app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent">
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:text="Посуда"/>
 
-                </androidx.recyclerview.widget.RecyclerView>
 
             </androidx.constraintlayout.widget.ConstraintLayout>
-
-            <com.mikhaellopez.circularprogressbar.CircularProgressBar
-                android:id="@+id/circularProgressBar"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="20dp"
-                android:layout_marginEnd="20dp"
-                app:layout_constraintBottom_toBottomOf="@+id/iv_subject"
-                app:layout_constraintEnd_toStartOf="@+id/iv_subject"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/iv_subject"/>
-
-            <TextView
-                style="@style/SubTitleTextStyle"
-                android:layout_width="wrap_content"
-                android:text="4"
-                android:textSize="30sp"
-                android:layout_height="wrap_content"
-                app:layout_constraintBottom_toBottomOf="@+id/circularProgressBar"
-                app:layout_constraintEnd_toEndOf="@+id/circularProgressBar"
-                app:layout_constraintStart_toStartOf="@+id/circularProgressBar"
-                app:layout_constraintTop_toTopOf="@+id/circularProgressBar">
-
-            </TextView>
-
-            <TextView
-                style="@style/SubTitleTextStyle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="2"
-                android:textSize="30sp"
-                app:layout_constraintBottom_toBottomOf="@+id/circularProgressBar2"
-                app:layout_constraintEnd_toEndOf="@+id/circularProgressBar2"
-                app:layout_constraintStart_toStartOf="@+id/circularProgressBar2"
-                app:layout_constraintTop_toTopOf="@+id/circularProgressBar2">
-
-            </TextView>
-
-            <com.mikhaellopez.circularprogressbar.CircularProgressBar
-                android:id="@+id/circularProgressBar2"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                app:layout_constraintBottom_toBottomOf="@+id/iv_subject"
-                app:layout_constraintEnd_toEndOf="parent"
-                android:layout_marginStart="20dp"
-                android:layout_marginEnd="20dp"
-                app:layout_constraintStart_toEndOf="@+id/iv_subject"
-                app:layout_constraintTop_toTopOf="@+id/iv_subject" />
-
-            <com.airbnb.lottie.LottieAnimationView
-                android:id="@+id/progress_flask"
-                android:layout_width="100dp"
-                android:layout_height="100dp"
-                android:visibility="gone"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:lottie_autoPlay="true"
-                app:lottie_fileName="progress_flask.json"
-                app:lottie_loop="true">
-
-            </com.airbnb.lottie.LottieAnimationView>
 
 
         </androidx.constraintlayout.widget.ConstraintLayout>
+
+
 
 
     </FrameLayout>

@@ -12,7 +12,9 @@ import com.example.youngchemist.ui.util.safeCall
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
 import com.google.firebase.storage.FirebaseStorage
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import java.lang.Exception
@@ -85,23 +87,14 @@ class FireStoreRepositoryImpl @Inject constructor(
     override suspend fun saveTest(userUid: String,passedUserTest: PassedUserTest): ResourceNetwork<String> {
         return withContext(Dispatchers.IO) {
             safeCall {
-                try {
-                    val result = firestore.collection("users").document(userUid).get().await()
-                    val user = result.toObject(User::class.java)
-                    Log.d("TAG", user.toString())
-                    user?.passedUserTests?.add(passedUserTest)
-                    firestore.collection("users").document(userUid).set(
-                        user!!,
-                        SetOptions.merge()
-                    )
-                } catch (e: Exception) {
-                    Log.d("TAG",e.localizedMessage)
-                } catch (e: ErrnoException) {
-                    Log.d("TAG",e.localizedMessage)
-                } catch (e: UnknownHostException) {
-                    Log.d("TAG",e.toString())
-                }
-
+                val result = firestore.collection("users").document(userUid).get().await()
+                val user = result.toObject(User::class.java)
+                Log.d("TAG", user.toString())
+                user?.passedUserTests?.add(passedUserTest)
+                firestore.collection("users").document(userUid).set(
+                    user!!,
+                    SetOptions.merge()
+                )
                 ResourceNetwork.Success("")
             }
         }
@@ -115,4 +108,24 @@ class FireStoreRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun getUser(userUid: String) = CoroutineScope(Dispatchers.IO).async {
+        safeCall {
+            val result = firestore.collection("users").document(userUid).get().await()
+            val user = result.toObject(User::class.java)
+            ResourceNetwork.Success(user)
+        }
+    }
+
+    override suspend fun updateReadenLectures(lectureId: String) = withContext(Dispatchers.IO) {
+        safeCall {
+            val result = firestore.collection("users").document("dJuRGOc06xhllmscaAEqQoHC9Ir2").get().await()
+            val user = result.toObject(User::class.java)
+            user?.readenLectures?.add(lectureId)
+            firestore.collection("users").document("dJuRGOc06xhllmscaAEqQoHC9Ir2").set(
+                user!!,
+                SetOptions.merge()
+            )
+            ResourceNetwork.Success("")
+        }
+    }
 }

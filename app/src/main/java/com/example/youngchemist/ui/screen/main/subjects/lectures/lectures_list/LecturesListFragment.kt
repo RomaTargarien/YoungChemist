@@ -1,5 +1,6 @@
 package com.example.youngchemist.ui.screen.main.subjects.lectures.lectures_list
 
+import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -37,6 +38,7 @@ class LecturesListFragment : Fragment() {
     private lateinit var binding: FragmentLecturesListBinding
     private var param1: Subject? = null
     private val viewModel: LecturesListViewModel by viewModels()
+    private val adapter = LecturesListAdapter()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -53,30 +55,63 @@ class LecturesListFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val adapter = LecturesListAdapter()
         binding.viewModel = viewModel
-        binding.rvLectures.layoutManager = GridLayoutManager(requireContext(),2)
+        binding.rvLectures.layoutManager = LinearLayoutManager(requireContext(),LinearLayoutManager.VERTICAL,false)
         binding.rvLectures.adapter = adapter
+        param1?.let {
+            viewModel.getData(it.collectionId)
+        }
         requireActivity().onBackPressedDispatcher.addCallback {
             viewModel.exit()
         }
         param1?.let {
             val bitmap = BitmapUtils.convertCompressedByteArrayToBitmap(it.iconByteArray)
             binding.ivSubject.setImageBitmap(bitmap)
-            binding.textView6.text = it.title
+            binding.tvSubjectTitle.text = it.title
         }
         adapter.setOnClickListener {
             viewModel.navigateToLectureScreen(it)
         }
         adapter.setOnBeginTestListener {
-            Log.d("TAG",it)
             viewModel.navigateToTestScreen(it)
         }
-
-        param1?.let {
+        viewModel.doneTests.observe(viewLifecycleOwner,{
             Log.d("TAG",it.toString())
-            viewModel.getAllLectures(it.collectionId)
-        }
+        })
+
+        viewModel.lecturesUi.observe(viewLifecycleOwner,{
+            var allAmountOfTests = 0
+            var doneTest = 0
+            val allAmountsOfLectures = it.size
+            var readLectures = 0
+            adapter.lectures = it.sortedBy {
+                it.lectureTitle
+            }
+            it.forEach {
+                if (it.testId.isNotEmpty()) {
+                    allAmountOfTests++
+                }
+                if (it.testId.isNotEmpty() && !it.isTestEnabled) {
+                    doneTest++
+                }
+                if (it.lectureWasReaden) {
+                    readLectures++
+                }
+            }
+            binding.pbDoneTests.apply {
+                progressMax = allAmountOfTests.toFloat()
+                setProgressWithAnimation(doneTest.toFloat(),1800)
+                progressBarColor = Color.GREEN
+            }
+            binding.pbReadLectures.apply {
+                progressMax = allAmountsOfLectures.toFloat()
+                setProgressWithAnimation(readLectures.toFloat(),1800)
+                progressBarColor = Color.GREEN
+            }
+            binding.tvReadLectures.text = readLectures.toString()
+            binding.tvTestsDone.text = doneTest.toString()
+        })
+
         viewModel.lecturesListState.observe(viewLifecycleOwner,{
             when (it) {
                 is ResourceNetwork.Loading -> {
@@ -84,10 +119,6 @@ class LecturesListFragment : Fragment() {
                 }
                 is ResourceNetwork.Success -> {
                     binding.progressFlask.isVisible = false
-                    it.data?.let {
-                        adapter.lectures = it
-                    }
-
                 }
                 is ResourceNetwork.Error -> {
 

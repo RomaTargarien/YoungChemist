@@ -3,6 +3,7 @@ package com.example.youngchemist.repositories
 import com.example.youngchemist.model.Lecture
 import com.example.youngchemist.model.PassedUserTest
 import com.example.youngchemist.model.Subject
+import kotlinx.coroutines.Deferred
 
 interface DatabaseRepository {
 
@@ -12,7 +13,7 @@ interface DatabaseRepository {
 
     suspend fun deleteAllSubjects()
 
-    suspend fun getAllLectures(collectionId: String): List<Lecture>
+    fun getAllLectures(collectionId: String): Deferred<List<Lecture>>
 
     suspend fun insertNewLectures(lectures: List<Lecture>)
 

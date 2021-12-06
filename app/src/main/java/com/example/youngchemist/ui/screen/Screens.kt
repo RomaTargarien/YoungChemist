@@ -1,6 +1,7 @@
 package com.example.youngchemist.ui.screen
 
 import com.example.youngchemist.model.Lecture
+import com.example.youngchemist.model.LectureUi
 import com.example.youngchemist.model.Subject
 import com.example.youngchemist.ui.screen.auth.AuthFragment
 import com.example.youngchemist.ui.screen.auth.login.LoginFragment
@@ -37,7 +38,7 @@ object Screens {
         LecturesListFragment.newInstance(subject)
     }
 
-    fun lectureScreen(lecture: Lecture) = FragmentScreen {
+    fun lectureScreen(lecture: LectureUi) = FragmentScreen {
         LectureFragment.newInstance(lecture)
     }
 

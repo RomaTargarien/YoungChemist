@@ -14,7 +14,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class LectureFragmentViewModel @Inject constructor(
-    private val router: Router
+    private val router: Router,
+    private val fireStoreRepository: FireStoreRepository
 ) : ViewModel() {
 
     private val _isPaginationVisible: MutableLiveData<Boolean> = MutableLiveData(false)
@@ -31,6 +32,12 @@ class LectureFragmentViewModel @Inject constructor(
     fun togglePagePaginationVisibility() {
         _isPaginationVisible.value?.let {
             _isPaginationVisible.postValue(!it)
+        }
+    }
+
+    fun lectureHasBeenReaden(lectureId: String) {
+        viewModelScope.launch {
+            fireStoreRepository.updateReadenLectures(lectureId)
         }
     }
 }
