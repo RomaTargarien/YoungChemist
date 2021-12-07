@@ -20,11 +20,11 @@ class ScanFragmentViewModel @Inject constructor(
     private val router: Router
 ) : ViewModel() {
 
-    fun navigateToQrCodeScreen(qrCodeRawValue: String) {
-        router.newRootScreen(Screens.mainScreen(qrCodeRawValue))
+    fun navigateToQrCodeScreen(qrCodeRawValue: String,lastSelectedItemPosition: Int) {
+        router.replaceScreen(Screens.qrCodeFragmnet(qrCodeRawValue,lastSelectedItemPosition))
     }
 
-    fun exit() {
-        router.newRootScreen(Screens.mainScreen(String.EMPTY))
+    fun exit(lastSelectedItemPosition: Int) {
+        router.newRootScreen(Screens.mainScreen(lastSelectedItemPosition))
     }
 }

@@ -43,7 +43,6 @@ fun View.updateAlpha(context: Context,animTime: Long): Animation {
 }
 
 fun View.slideUp(context: Context, anitTime: Long, startOffSet: Long) {
-
     val slideUp = AnimationUtils.loadAnimation(context, R.anim.slide_up_anim).apply {
         duration = anitTime
         interpolator = FastOutSlowInInterpolator()
@@ -76,19 +75,4 @@ fun Long.evaluateTime(): String {
     return "${if (minutes < 10) "0$minutes" else minutes}" + ":" +
                 "${if (seconds < 10) "0$seconds" else seconds}"
 
-}
-
-fun Int.toPx(context: Context): Int = (this * context.resources.displayMetrics.density).toInt()
-
-fun String.GLB() = this + ".glb"
-
-val Number.toPx get() = TypedValue.applyDimension(
-    TypedValue.COMPLEX_UNIT_DIP,
-    this.toFloat(),
-    getSystem().displayMetrics)
-
-fun Double.roundMark(tasksUiSize: Int): Double {
-    val df = DecimalFormat("#.#")
-    df.roundingMode = RoundingMode.CEILING
-    return df.format((this/tasksUiSize)*10.0).toDouble()
 }

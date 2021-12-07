@@ -3,7 +3,6 @@ package com.example.youngchemist.ui.screen.main.qr.analyzer
 import android.annotation.SuppressLint
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
-import androidx.lifecycle.ViewModel
 import com.google.android.gms.tasks.Task
 import com.google.mlkit.vision.common.InputImage
 
@@ -14,7 +13,7 @@ abstract class BaseImageAnalyzer<T> : ImageAnalysis.Analyzer {
     override fun analyze(image: ImageProxy) {
         val mediaImage = image.image
         mediaImage?.let {
-            detectInImage(InputImage.fromMediaImage(it,image.imageInfo.rotationDegrees))
+            detectInImage(InputImage.fromMediaImage(it, image.imageInfo.rotationDegrees))
                 .addOnSuccessListener { results ->
                     onSuccess(results)
                     image.close()
@@ -22,8 +21,9 @@ abstract class BaseImageAnalyzer<T> : ImageAnalysis.Analyzer {
                     onFailure(it)
                     image.close()
                 }
-
         }
+
+
     }
 
     abstract fun detectInImage(image: InputImage): Task<T>

@@ -8,6 +8,7 @@ import com.example.youngchemist.ui.screen.auth.login.LoginFragment
 import com.example.youngchemist.ui.screen.auth.password_restore.RestorePasswordFragment
 import com.example.youngchemist.ui.screen.auth.register.RegisterFragment
 import com.example.youngchemist.ui.screen.main.MainFragment
+import com.example.youngchemist.ui.screen.main.qr.qr_code.QrCodeFragment
 import com.example.youngchemist.ui.screen.main.qr.scan.ScanFragment
 import com.example.youngchemist.ui.screen.main.subjects.lectures.lecture.LectureFragment
 import com.example.youngchemist.ui.screen.main.subjects.lectures.lectures_list.LecturesListFragment
@@ -30,8 +31,8 @@ object Screens {
         RegisterFragment()
     }
 
-    fun mainScreen(qrCodeRawValue: String? = null) = FragmentScreen {
-        MainFragment.newInstance(qrCodeRawValue)
+    fun mainScreen(lastSelectedItemPosition: Int) = FragmentScreen {
+        MainFragment.newInstance(lastSelectedItemPosition)
     }
 
     fun lecturesListScreen(subject: Subject) = FragmentScreen {
@@ -42,8 +43,8 @@ object Screens {
         LectureFragment.newInstance(lecture)
     }
 
-    fun scanScreen() = FragmentScreen {
-        ScanFragment()
+    fun scanScreen(lastSelectedAnswerPosition: Int) = FragmentScreen {
+        ScanFragment.newInstance(lastSelectedAnswerPosition)
     }
 
     fun restorePasswordScreen() = FragmentScreen {
@@ -56,6 +57,10 @@ object Screens {
 
     fun testResultScreen(mark: Double) = FragmentScreen {
         TestResultFragment.newInstance(mark)
+    }
+
+    fun qrCodeFragmnet(result: String,lastSelectedItemPosition: Int) = FragmentScreen {
+        QrCodeFragment.newInstance(result,lastSelectedItemPosition)
     }
 
 }

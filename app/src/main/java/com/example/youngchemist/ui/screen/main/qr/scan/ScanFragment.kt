@@ -2,6 +2,7 @@ package com.example.youngchemist.ui.screen.main.qr.scan
 
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -10,12 +11,16 @@ import android.widget.Toast
 import androidx.activity.addCallback
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import com.example.youngchemist.R
 import com.example.youngchemist.databinding.FragmentScanBinding
+import com.example.youngchemist.ui.screen.main.MainFragment
 import com.example.youngchemist.ui.screen.main.qr.analyzer.CameraManager
 import com.example.youngchemist.ui.screen.main.user.BottomTabScreen
+import com.example.youngchemist.ui.util.slideUp
+import com.example.youngchemist.ui.util.slideUpViews
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -24,6 +29,14 @@ class ScanFragment : Fragment() {
     private lateinit var binding: FragmentScanBinding
     private lateinit var cameraManager: CameraManager
     private val viewModel: ScanFragmentViewModel by viewModels()
+    private var lastSelectedItemPosition: Int = 0
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        arguments?.let {
+            lastSelectedItemPosition = it.getInt(LAST_ITEM)
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -34,33 +47,32 @@ class ScanFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         createCameraManager()
-
+        binding.tvQrCodeHelper.slideUp(requireContext(),300,500)
         if (allPermissionsGranted()) {
             cameraManager.startCamera()
         } else {
-            ActivityCompat.requestPermissions(this.requireActivity(), REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS)
+            requestPermissions(REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS)
         }
 
         requireActivity().onBackPressedDispatcher.addCallback {
-            viewModel.exit()
+            viewModel.exit(lastSelectedItemPosition)
         }
         cameraManager.qrCodeImageAnalyzer.qrCode.observe(viewLifecycleOwner, {
-            viewModel.navigateToQrCodeScreen(it)
+            viewModel.navigateToQrCodeScreen(it,lastSelectedItemPosition)
         })
     }
+
 
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
         grantResults: IntArray
     ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == REQUEST_CODE_PERMISSIONS) {
             if (allPermissionsGranted()) {
                 cameraManager.startCamera()
             } else {
                 Toast.makeText(this.requireContext(), "Permissions were not granted", Toast.LENGTH_SHORT).show()
-                this.activity?.finish()
             }
         }
     }
@@ -73,11 +85,17 @@ class ScanFragment : Fragment() {
         cameraManager = CameraManager(this.requireContext(), binding.surfaceView, this)
     }
 
-
     companion object {
         private val REQUIRED_PERMISSIONS = arrayOf(android.Manifest.permission.CAMERA)
         private const val REQUEST_CODE_PERMISSIONS = 10
+        private const val LAST_ITEM = "last_item"
+
+        @JvmStatic
+        fun newInstance(lastSelectedItemPosition: Int) =
+            ScanFragment().apply {
+                arguments = Bundle().apply {
+                    putInt(LAST_ITEM,lastSelectedItemPosition)
+                }
+            }
     }
-
-
 }

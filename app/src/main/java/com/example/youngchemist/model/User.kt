@@ -40,3 +40,11 @@ data class AnswerUser(
     var questionPosition: Int = -1,
     var itIsRight: Boolean = false,
 )
+
+@Entity(tableName = "saved3DModels",primaryKeys = ["userId","modelId"])
+data class Saved3DModel(
+    var userId: String = "",
+    var modelId: String = "",
+    var modelUri: String = "",
+    var modelTitle: String = ""
+)

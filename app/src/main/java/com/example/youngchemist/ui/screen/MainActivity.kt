@@ -3,6 +3,7 @@ package com.example.youngchemist.ui.screen
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.viewModels
 import com.example.youngchemist.R
 import com.example.youngchemist.R.id.activity_container

@@ -99,7 +99,7 @@ class RegisterFragmentViewModel @Inject constructor(
     }
 
     fun enter() {
-        router.newRootScreen(Screens.mainScreen())
+        router.newRootScreen(Screens.mainScreen(0))
     }
 
     init {

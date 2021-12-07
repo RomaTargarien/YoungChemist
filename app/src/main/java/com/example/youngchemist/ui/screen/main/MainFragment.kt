@@ -1,6 +1,7 @@
 package com.example.youngchemist.ui.screen.main
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,7 +10,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.example.youngchemist.R
 import com.example.youngchemist.databinding.FragmentMainBinding
-import com.example.youngchemist.ui.screen.main.qr.QrCodeFragment
+import com.example.youngchemist.ui.screen.main.qr.qr_code.QrCodeFragment
 import com.example.youngchemist.ui.screen.main.stat.StatisticsFragment
 import com.example.youngchemist.ui.screen.main.subjects.SubjectsFragment
 import com.example.youngchemist.ui.screen.main.user.BottomTabScreen
@@ -24,6 +25,7 @@ class MainFragment : Fragment(), BottomTabScreen {
 
     private lateinit var binding: FragmentMainBinding
     private val viewModel: MainFragmentViewModel by viewModels()
+    private var lastSelectedItem = 0
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -55,22 +57,24 @@ class MainFragment : Fragment(), BottomTabScreen {
     }
 
     private fun checkArguments() {
-        val qrCodeRawValue = arguments?.getString(QR_CODE_RAW_VALUE)
-        if (qrCodeRawValue != null) {
-            replaceFragment(getFragmentForTabId(id_qr_code, qrCodeRawValue)!!)
-            binding.bnvMain.changeCurrentItem(id_qr_code)
-        } else {
-            replaceFragment(getFragmentForTabId(id_subjects)!!)
+        arguments?.let {
+            binding.bnvMain.changeCurrentItem(it.getInt(LAST_ITEM))
+            getFragmentForTabId(it.getInt(LAST_ITEM))?.run {
+               replaceFragment(this)
+           }
         }
     }
 
     private fun createBottomNavMenuItemSelectedListener() {
         binding.bnvMain.setSpaceOnClickListener(object : SpaceOnClickListener {
-            override fun onCentreButtonClick() {}
+            override fun onCentreButtonClick() {
+                viewModel.navigateToScanFragemnt(lastSelectedItem)
+            }
             override fun onItemClick(itemIndex: Int, itemName: String?) {
                 getFragmentForTabId(itemIndex)?.run {
                     replaceFragment(this)
                 }
+                lastSelectedItem = itemIndex
             }
 
             override fun onItemReselected(itemIndex: Int, itemName: String?) {}
@@ -86,7 +90,7 @@ class MainFragment : Fragment(), BottomTabScreen {
                 StatisticsFragment()
             }
             id_qr_code -> {
-                QrCodeFragment.newInstance(qrCodeRawValue)
+                QrCodeFragment()
             }
             id_person -> {
                 UserFragment()
@@ -105,17 +109,17 @@ class MainFragment : Fragment(), BottomTabScreen {
     }
 
     companion object {
-        private const val QR_CODE_RAW_VALUE = "qr_raw_value"
+        private const val LAST_ITEM = "last_item"
         private const val id_subjects = 0
         private const val id_statistics = 1
         private const val id_qr_code = 2
         private const val id_person = 3
 
         @JvmStatic
-        fun newInstance(qrCodeRawValue: String?) =
+        fun newInstance(lastSelectedItemPosition: Int) =
             MainFragment().apply {
                 arguments = Bundle().apply {
-                    putString(QR_CODE_RAW_VALUE, qrCodeRawValue)
+                    putInt(LAST_ITEM, lastSelectedItemPosition)
                 }
             }
     }

@@ -16,6 +16,6 @@ class TestResultFragmentViewModel @Inject constructor(
     }
 
     fun goToMainScreen() {
-        router.newRootScreen(Screens.mainScreen())
+        router.newRootScreen(Screens.mainScreen(0))
     }
 }

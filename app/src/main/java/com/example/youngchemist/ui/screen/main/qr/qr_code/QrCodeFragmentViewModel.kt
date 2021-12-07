@@ -1,4 +1,4 @@
-package com.example.youngchemist.ui.screen.main.qr
+package com.example.youngchemist.ui.screen.main.qr.qr_code
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
@@ -14,7 +14,7 @@ class QrCodeFragmentViewModel @Inject constructor(
     private val router: Router
 ) : ViewModel() {
 
-    fun navigateToScanScreen(){
-        router.navigateTo(Screens.scanScreen())
+    fun exit(lastSelectedItemPosition: Int) {
+        router.newRootScreen(Screens.mainScreen(lastSelectedItemPosition))
     }
 }

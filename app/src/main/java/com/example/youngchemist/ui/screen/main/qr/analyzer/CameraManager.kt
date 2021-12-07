@@ -21,7 +21,6 @@ class CameraManager(
     private var preview: Preview? = null
     private var camera: Camera? = null
     private lateinit var cameraExecutor: ExecutorService
-    private var cameraSelectorOption = CameraSelector.LENS_FACING_FRONT
     private var cameraProvider: ProcessCameraProvider? = null
     val qrCodeImageAnalyzer: QrCodeImageAnalyzer = QrCodeImageAnalyzer()
 
@@ -38,7 +37,7 @@ class CameraManager(
     fun startCamera() {
         val cameraProviderFuture = ProcessCameraProvider.getInstance(context)
         cameraProviderFuture.addListener(
-            Runnable {
+            {
                 cameraProvider = cameraProviderFuture.get()
                 preview = Preview.Builder()
                     .build()
@@ -58,14 +57,6 @@ class CameraManager(
 
     private fun selectAnalyzer(): ImageAnalysis.Analyzer {
         return qrCodeImageAnalyzer
-    }
-
-    fun changeCameraSelector() {
-        cameraProvider?.unbindAll()
-        cameraSelectorOption =
-            if (cameraSelectorOption == CameraSelector.LENS_FACING_BACK) CameraSelector.LENS_FACING_FRONT
-            else CameraSelector.LENS_FACING_BACK
-        startCamera()
     }
 
     private fun setCameraConfiguration(
