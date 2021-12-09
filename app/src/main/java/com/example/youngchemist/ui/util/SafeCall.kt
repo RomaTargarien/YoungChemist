@@ -8,7 +8,7 @@ inline fun <T> safeCall(action: () -> ResourceNetwork<T>): ResourceNetwork<T> {
     return try {
         action()
     } catch (e: Exception) {
-        Log.d("TAG",e.javaClass.toString())
+        Log.d("TAG",e.localizedMessage)
         ResourceNetwork.Error(e.localizedMessage)
     }
 }

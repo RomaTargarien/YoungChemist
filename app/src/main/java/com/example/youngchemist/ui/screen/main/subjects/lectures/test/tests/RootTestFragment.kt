@@ -14,6 +14,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.example.youngchemist.R
 import com.example.youngchemist.databinding.FragmentRootTestBinding
+import com.example.youngchemist.model.Test
 import com.example.youngchemist.ui.base.AnimationHelper
 import com.example.youngchemist.ui.screen.main.subjects.lectures.test.tests.dialogs.TestNoSaveDialogFragment
 import com.example.youngchemist.ui.screen.main.subjects.lectures.test.tests.dialogs.TestSaveDialogFragment
@@ -31,8 +32,7 @@ import kotlinx.coroutines.launch
 @AndroidEntryPoint
 class RootTestFragment : Fragment() {
 
-    private lateinit var testId: String
-
+    private lateinit var test: Test
     private lateinit var binding: FragmentRootTestBinding
     private val viewModel: TestFragmentViewModel by viewModels()
     private lateinit var animationHelper: AnimationHelper
@@ -41,7 +41,7 @@ class RootTestFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
-            testId = it.getString(TEST_ID) as String
+            test = it.getParcelable<Test>(TEST) as Test
         }
     }
 
@@ -56,22 +56,22 @@ class RootTestFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         binding.viewModel = viewModel
         binding.bmSheet.viewModel = viewModel
-        viewModel.retrieveTest(testId)
+        viewModel.createUserTest(test)
         initializeAnimationHepler()
         initializeBottomSheet()
-        observeTestState()
-        observeExitBehavior()
         observeTimeLeft()
         observeCurrentPageNumber()
         observeTimeIsUp()
         requireActivity().onBackPressedDispatcher.addCallback {
-            viewModel.tryExitTheTest()
+            showUnSavedDialogFragment()
         }
-        lifecycleScope.launch {
-            viewModel.test.filterNotNull().map { it.testTitle }.collect {
-                binding.bmSheet.tvTestTitle.text = it
-            }
+        binding.ivExit.setOnClickListener {
+            showUnSavedDialogFragment()
         }
+        binding.bmSheet.bnDone.setOnClickListener {
+            showSavedDialogFragment()
+        }
+        binding.bmSheet.tvTestTitle.text = test.testTitle
     }
 
     private fun observeTimeIsUp() {
@@ -97,44 +97,10 @@ class RootTestFragment : Fragment() {
                 replaceFragment(TestFragment.newInstance(pageNumber), animationBehavior)
                 toggleArrowsVisibility(pageNumber)
                 val page = (pageNumber + 1).toString()
-                val allPages = viewModel.tasksUi.value.size.toString()
+                val allPages = test.tasks.size.toString()
                 binding.bmSheet.tvTestPagination.text =
                     resources.getString(R.string.page_number_from_all_pages, page, allPages)
                 previousPosition = pageNumber
-            }
-        })
-    }
-
-    private fun observeTestState() {
-        viewModel.testState.observe(viewLifecycleOwner, {
-            when (it.getContentIfNotHandled()) {
-                is ResourceNetwork.Success -> {
-                    viewModel.enterTest()
-                    binding.progressFlask.isVisible = false
-                    binding.bmSheet.bnDone.isVisible = true
-                }
-                is ResourceNetwork.Error -> {
-                    binding.progressFlask.isVisible = false
-                }
-                is ResourceNetwork.Loading -> {
-                    binding.progressFlask.isVisible = true
-                }
-            }
-        })
-    }
-
-    private fun observeExitBehavior() {
-        viewModel.exitBehavior.observe(viewLifecycleOwner, {
-            when (it) {
-                is TestExitBehavior.ExitNoSave -> {
-                    showUnSavedDialogFragment()
-                }
-                is TestExitBehavior.Exit -> {
-                    viewModel.exit()
-                }
-                is TestExitBehavior.ExitSave -> {
-                    showSavedDialogFragment()
-                }
             }
         })
     }
@@ -223,8 +189,8 @@ class RootTestFragment : Fragment() {
     }
 
     private fun animateProgressBar(pageNumber: Int) {
-        val from = (((previousPosition.toFloat() + 1) / (viewModel.tasksUi.value.size)) * 100)
-        val to = ((pageNumber.toFloat() + 1) / (viewModel.tasksUi.value.size)) * 100
+        val from = (((previousPosition.toFloat() + 1) / (test.tasks.size)) * 100)
+        val to = ((pageNumber.toFloat() + 1) / (test.tasks.size)) * 100
         animationHelper.animateProgressBar(binding.progressBar, from, to)
     }
 
@@ -234,18 +200,18 @@ class RootTestFragment : Fragment() {
         if (pageNumber == 0) {
             binding.bmSheet.ivBackTest.isVisible = false
         }
-        if (pageNumber == viewModel.tasksUi.value.size - 1) {
+        if (pageNumber == test.tasks.size - 1) {
             binding.bmSheet.ivForwardTest.isVisible = false
         }
     }
 
     companion object {
-        private const val TEST_ID = "test.tests"
+        private const val TEST = "test"
         @JvmStatic
-        fun newInstance(testId: String) =
+        fun newInstance(test: Test) =
             RootTestFragment().apply {
                 arguments = Bundle().apply {
-                    putString(TEST_ID, testId)
+                    putParcelable(TEST,test)
                 }
             }
     }

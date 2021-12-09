@@ -26,7 +26,7 @@ class LectureFragmentViewModel @Inject constructor(
     }
 
     fun navigateToTestScreen() {
-        router.replaceScreen(Screens.rootTestScreen(""))
+        //router.replaceScreen(Screens.rootTestScreen(""))
     }
 
     fun togglePagePaginationVisibility() {

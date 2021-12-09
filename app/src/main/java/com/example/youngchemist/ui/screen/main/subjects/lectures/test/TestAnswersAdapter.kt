@@ -14,7 +14,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.youngchemist.R
 import com.example.youngchemist.databinding.ItemAnswerBinding
 import com.example.youngchemist.model.Answer
-import com.example.youngchemist.model.AnswerUi
+import com.example.youngchemist.model.ui.AnswerUi
+
 
 class TestAnswerAdapter(
     private val multipleAnswersAvailable: Boolean,

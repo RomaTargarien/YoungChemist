@@ -10,18 +10,27 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.youngchemist.model.*
+import com.example.youngchemist.model.Task
+import com.example.youngchemist.model.Test
+import com.example.youngchemist.model.ui.AnswerUi
+import com.example.youngchemist.model.ui.TaskUi
+import com.example.youngchemist.model.ui.TestUi
+import com.example.youngchemist.model.user.PassedUserTest
 import com.example.youngchemist.repositories.DatabaseRepository
 import com.example.youngchemist.repositories.FireStoreRepository
 import com.example.youngchemist.ui.screen.Screens
-import com.example.youngchemist.ui.util.*
-import com.example.youngchemist.ui.util.TestExitBehavior.*
+import com.example.youngchemist.ui.util.FragmentAnimationBehavior
+import com.example.youngchemist.ui.util.ResourceNetwork
+import com.example.youngchemist.ui.util.evaluateTime
 import com.github.terrakok.cicerone.Router
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -33,24 +42,20 @@ class TestFragmentViewModel @Inject constructor(
     private val databaseRepository: DatabaseRepository
 ) : ViewModel() {
 
-    private val _tasksUi: MutableStateFlow<MutableList<TaskUi>> = MutableStateFlow(mutableListOf())
-    val tasksUi: StateFlow<MutableList<TaskUi>> = _tasksUi
-
     private val _test: MutableStateFlow<Test?> = MutableStateFlow(null)
     val test: StateFlow<Test?> = _test
 
-    private val saveAndShowMark: MutableStateFlow<Pair<Boolean,Boolean>> = MutableStateFlow(Pair(false,false))
+    private val _tasksUi: MutableStateFlow<MutableList<TaskUi>> = MutableStateFlow(mutableListOf())
+    val tasksUi: StateFlow<MutableList<TaskUi>> = _tasksUi
 
-    private val _exitBehavior: MutableLiveData<TestExitBehavior> = MutableLiveData()
-    val exitBehavior: LiveData<TestExitBehavior> = _exitBehavior
+    private val saveAndShowMark: MutableStateFlow<Pair<Boolean, Boolean>> =
+        MutableStateFlow(Pair(false, false))
 
-    private val _currentPage: MutableLiveData<Pair<Int,FragmentAnimationBehavior>> = MutableLiveData(
-        Pair(-1,FragmentAnimationBehavior.Enter())
-    )
-    val currentPage: LiveData<Pair<Int,FragmentAnimationBehavior>> = _currentPage
-
-    private val _testState: MutableLiveData<Event<ResourceNetwork<Test>>> = MutableLiveData()
-    val testState: LiveData<Event<ResourceNetwork<Test>>> = _testState
+    private val _currentPage: MutableLiveData<Pair<Int, FragmentAnimationBehavior>> =
+        MutableLiveData(
+            Pair(-1, FragmentAnimationBehavior.Enter())
+        )
+    val currentPage: LiveData<Pair<Int, FragmentAnimationBehavior>> = _currentPage
 
     private val _timeLeft: MutableLiveData<String> = MutableLiveData()
     val timeLeft: LiveData<String> = _timeLeft
@@ -58,42 +63,30 @@ class TestFragmentViewModel @Inject constructor(
     private val _timeIsUp: MutableLiveData<Boolean> = MutableLiveData()
     val timeIsUp: LiveData<Boolean> = _timeIsUp
 
-    private var exitState: TestExitBehavior
     private lateinit var countDownTimer: CountDownTimer
 
 
     init {
-        exitState = Exit()
         observeSavingState()
-
     }
 
-    fun retrieveTest(testId: String) {
+    fun createUserTest(test: Test) {
         viewModelScope.launch {
-            Log.d("TAG",testId)
-            _testState.postValue(Event(ResourceNetwork.Loading()))
-            val result = fireStoreRepository.retriveTest(testId)
-            Log.d("TAG",result.data.toString())
-            if (result is ResourceNetwork.Success) {
-                exitState = ExitNoSave()
-                result.data?.let {
-                    initializeCountDownTimer(it.timeInMillis)
-                    _tasksUi.emit(initializeEmptyTaskUiList(it.tasks))
-                    _test.emit(it)
-                    countDownTimer.start()
-                }
-            }
-            _testState.postValue(Event(result))
+            _tasksUi.emit(initializeEmptyTaskUiList(test.tasks))
+            _test.emit(test)
+            initializeCountDownTimer(test.timeInMillis)
+            countDownTimer.start()
         }
+        enterTest()
     }
 
-    fun udpateTasksUi(pageNumber: Int,answersUi: List<AnswerUi>) {
+    fun udpateTasksUi(pageNumber: Int, answersUi: List<AnswerUi>) {
         _tasksUi.value[pageNumber].answersList = answersUi
     }
 
     private fun observeSavingState() {
         viewModelScope.launch(Dispatchers.Default) {
-            combine(test, tasksUi, saveAndShowMark) { test, tasks, save ->
+            combine(_test, tasksUi, saveAndShowMark) { test, tasks, save ->
                 Triple(test, tasks, save)
             }.collect {
                 val save = it.third.first
@@ -104,32 +97,42 @@ class TestFragmentViewModel @Inject constructor(
                     val testUi = TestUi(
                         "",
                         test.testId,
-                        if (saveWithNoProgress) ArrayList(initializeEmptyTaskUiList(test.tasks)) else ArrayList(tasks)
+                        if (saveWithNoProgress) ArrayList(initializeEmptyTaskUiList(test.tasks)) else ArrayList(
+                            tasks
+                        )
                     )
                     val passedUserTest = testUi.formatUserPassedTest(test)
-                    uploadTest(passedUserTest,saveWithNoProgress)
+                    uploadTest(passedUserTest, saveWithNoProgress)
                 }
             }
         }
     }
 
-    fun saveTest(save: Boolean,saveWithNoProgress: Boolean) {
+    fun saveTest(save: Boolean, saveWithNoProgress: Boolean) {
         viewModelScope.launch {
-            saveAndShowMark.emit(Pair(save,saveWithNoProgress))
+            saveAndShowMark.emit(Pair(save, saveWithNoProgress))
         }
     }
 
-    private fun uploadTest(passedUserTest: PassedUserTest,saveWithNoProgress: Boolean) {
+    private fun uploadTest(passedUserTest: PassedUserTest, saveWithNoProgress: Boolean) {
         viewModelScope.launch(Dispatchers.Default) {
             if (isOnline(context)) {
-                fireStoreRepository.saveTest("dJuRGOc06xhllmscaAEqQoHC9Ir2",passedUserTest)
+                val result = fireStoreRepository.saveTest("dJuRGOc06xhllmscaAEqQoHC9Ir2", passedUserTest)
+                if (result is ResourceNetwork.Error) {
+                    passedUserTest.wasTestUploaded = false
+                    databaseRepository.savePassedUserTest(passedUserTest)
+                } else {
+                    databaseRepository.savePassedUserTest(passedUserTest)
+                }
+            } else {
+                passedUserTest.wasTestUploaded = false
+                databaseRepository.savePassedUserTest(passedUserTest)
             }
-            databaseRepository.savePassedUserTest(passedUserTest)
             navigate(saveWithNoProgress, passedUserTest)
         }
     }
 
-    private fun navigate(saveWithNoProgress: Boolean,passedUserTest: PassedUserTest) {
+    private fun navigate(saveWithNoProgress: Boolean, passedUserTest: PassedUserTest) {
         viewModelScope.launch(Dispatchers.Main) {
             if (saveWithNoProgress) {
                 router.exit()
@@ -142,34 +145,26 @@ class TestFragmentViewModel @Inject constructor(
     fun enterTest() {
         currentPage.value?.let {
             var page = it.first
-            _currentPage.postValue(Pair(++page,FragmentAnimationBehavior.Enter()))
+            _currentPage.postValue(Pair(++page, FragmentAnimationBehavior.Enter()))
         }
     }
 
     fun goForward() {
         currentPage.value?.let {
             var page = it.first
-            _currentPage.postValue(Pair(++page,FragmentAnimationBehavior.Forward()))
+            _currentPage.postValue(Pair(++page, FragmentAnimationBehavior.Forward()))
         }
     }
 
     fun goBack() {
         currentPage.value?.let {
             var page = it.first
-            _currentPage.postValue(Pair(--page,FragmentAnimationBehavior.Back()))
+            _currentPage.postValue(Pair(--page, FragmentAnimationBehavior.Back()))
         }
-    }
-
-    fun tryExitTheTest() {
-        _exitBehavior.postValue(exitState)
     }
 
     fun exit() {
         router.exit()
-    }
-
-    fun done() {
-        _exitBehavior.postValue(ExitSave())
     }
 
     private fun initializeCountDownTimer(timeInMillis: Long) {
@@ -177,8 +172,9 @@ class TestFragmentViewModel @Inject constructor(
             override fun onTick(p0: Long) {
                 _timeLeft.postValue(p0.evaluateTime())
             }
+
             override fun onFinish() {
-               timeIsUp()
+                timeIsUp()
             }
         }
     }
@@ -197,7 +193,7 @@ class TestFragmentViewModel @Inject constructor(
             val taskUi = TaskUi(i)
             val answersList = arrayListOf<AnswerUi>()
             for (k in 0 until tasks[i].answers.size) {
-                val answerUi = AnswerUi(k,false)
+                val answerUi = AnswerUi(k, false)
                 answersList.add(answerUi)
             }
             taskUi.answersList = answersList

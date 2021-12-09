@@ -57,7 +57,7 @@ class ScanFragment : Fragment() {
         requireActivity().onBackPressedDispatcher.addCallback {
             viewModel.exit(lastSelectedItemPosition)
         }
-        cameraManager.qrCodeImageAnalyzer.qrCode.observe(viewLifecycleOwner, {
+        cameraManager.qrCodeImageAnalyzer.qrCodeId.observe(viewLifecycleOwner, {
             viewModel.navigateToQrCodeScreen(it,lastSelectedItemPosition)
         })
     }

@@ -1,4 +1,4 @@
-package com.example.youngchemist.db
+package com.example.youngchemist.db.dao
 
 import androidx.room.Dao
 import androidx.room.Insert

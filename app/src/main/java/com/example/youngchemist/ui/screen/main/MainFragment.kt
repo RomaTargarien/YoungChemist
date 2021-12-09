@@ -11,6 +11,7 @@ import androidx.fragment.app.viewModels
 import com.example.youngchemist.R
 import com.example.youngchemist.databinding.FragmentMainBinding
 import com.example.youngchemist.ui.screen.main.qr.qr_code.QrCodeFragment
+import com.example.youngchemist.ui.screen.main.saved_models.SavedModelsFragment
 import com.example.youngchemist.ui.screen.main.stat.StatisticsFragment
 import com.example.youngchemist.ui.screen.main.subjects.SubjectsFragment
 import com.example.youngchemist.ui.screen.main.user.BottomTabScreen
@@ -89,8 +90,8 @@ class MainFragment : Fragment(), BottomTabScreen {
             id_statistics -> {
                 StatisticsFragment()
             }
-            id_qr_code -> {
-                QrCodeFragment()
+            id_saved_models -> {
+                SavedModelsFragment()
             }
             id_person -> {
                 UserFragment()
@@ -112,7 +113,7 @@ class MainFragment : Fragment(), BottomTabScreen {
         private const val LAST_ITEM = "last_item"
         private const val id_subjects = 0
         private const val id_statistics = 1
-        private const val id_qr_code = 2
+        private const val id_saved_models = 2
         private const val id_person = 3
 
         @JvmStatic

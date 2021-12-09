@@ -1,11 +1,10 @@
 package com.example.youngchemist.repositories.impl
 
-import android.content.Intent
 import android.net.Uri
-import android.system.ErrnoException
 import android.util.Log
-import androidx.lifecycle.LiveData
 import com.example.youngchemist.model.*
+import com.example.youngchemist.model.user.Model3D
+import com.example.youngchemist.model.user.PassedUserTest
 import com.example.youngchemist.repositories.FireStoreRepository
 import com.example.youngchemist.ui.util.ResourceNetwork
 import com.example.youngchemist.ui.util.safeCall
@@ -17,15 +16,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
-import java.lang.Exception
-import java.net.UnknownHostException
-import java.util.ArrayList
 import javax.inject.Inject
 
 class FireStoreRepositoryImpl @Inject constructor(
     private val firestore: FirebaseFirestore,
     private val storage: FirebaseStorage
-): FireStoreRepository {
+) : FireStoreRepository {
 
     private val subjects = firestore.collection("subjects")
     private val testref = firestore.collection("tests")
@@ -33,7 +29,7 @@ class FireStoreRepositoryImpl @Inject constructor(
     override suspend fun getAllSubjects() = withContext(Dispatchers.IO) {
         safeCall {
             val result = subjects.get().await()
-            Log.d("TAG",result.toString())
+            Log.d("TAG", result.toString())
             val subjectsList = mutableListOf<Subject>()
             for (document in result.documents) {
                 document.toObject(Subject::class.java)?.let {
@@ -57,34 +53,28 @@ class FireStoreRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun get3DModel(name: String) = withContext(Dispatchers.IO) {
+    override suspend fun get3DModel(modelId: String) = withContext(Dispatchers.IO) {
         safeCall {
-            val model = storage.getReference(name)
-            val uri = model.downloadUrl.await()
-            val intentUri = Uri.parse("https://arvr.google.com/scene-viewer/1.0")
-                .buildUpon()
-                .appendQueryParameter(
-                    "file",
-                    uri.toString()
-                )
-                .appendQueryParameter("mode","3d_only")
-                .build()
-            ResourceNetwork.Success(intentUri)
+            val result = firestore.collection("3Dmodels").document(modelId).get().await()
+            val model = result.toObject(Model3D::class.java)
+            ResourceNetwork.Success(model)
         }
     }
 
     override suspend fun saveTest(test: Test) {
         withContext(Dispatchers.IO) {
             try {
-                Log.d("TAG","save")
                 testref.add(test).await()
             } catch (e: Exception) {
-                Log.d("Tag",e.localizedMessage)
+                Log.d("Tag", e.localizedMessage)
             }
         }
     }
 
-    override suspend fun saveTest(userUid: String,passedUserTest: PassedUserTest): ResourceNetwork<String> {
+    override suspend fun saveTest(
+        userUid: String,
+        passedUserTest: PassedUserTest
+    ): ResourceNetwork<String> {
         return withContext(Dispatchers.IO) {
             safeCall {
                 val result = firestore.collection("users").document(userUid).get().await()
@@ -118,13 +108,21 @@ class FireStoreRepositoryImpl @Inject constructor(
 
     override suspend fun updateReadenLectures(lectureId: String) = withContext(Dispatchers.IO) {
         safeCall {
-            val result = firestore.collection("users").document("dJuRGOc06xhllmscaAEqQoHC9Ir2").get().await()
+            val result =
+                firestore.collection("users").document("dJuRGOc06xhllmscaAEqQoHC9Ir2").get().await()
             val user = result.toObject(User::class.java)
             user?.readenLectures?.add(lectureId)
             firestore.collection("users").document("dJuRGOc06xhllmscaAEqQoHC9Ir2").set(
                 user!!,
                 SetOptions.merge()
             )
+            ResourceNetwork.Success("")
+        }
+    }
+
+    override suspend fun saveLecture(lecture: Lecture) = withContext(Dispatchers.IO) {
+        safeCall {
+            firestore.collection("vessels").document(lecture.lectureId).set(lecture).await()
             ResourceNetwork.Success("")
         }
     }

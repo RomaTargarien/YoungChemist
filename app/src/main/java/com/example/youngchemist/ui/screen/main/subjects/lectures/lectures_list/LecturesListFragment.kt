@@ -76,7 +76,7 @@ class LecturesListFragment : Fragment() {
             viewModel.navigateToTestScreen(it)
         }
         viewModel.doneTests.observe(viewLifecycleOwner,{
-            Log.d("TAG",it.toString())
+
         })
 
         viewModel.lecturesUi.observe(viewLifecycleOwner,{
@@ -87,26 +87,26 @@ class LecturesListFragment : Fragment() {
             adapter.lectures = it.sortedBy {
                 it.lectureTitle
             }
-            it.forEach {
-                if (it.testId.isNotEmpty()) {
+            it.forEach { lecture ->
+                lecture.test?.let {
                     allAmountOfTests++
+                    if (!lecture.isTestEnabled) {
+                        doneTest++
+                    }
                 }
-                if (it.testId.isNotEmpty() && !it.isTestEnabled) {
-                    doneTest++
-                }
-                if (it.lectureWasReaden) {
+                if (lecture.lectureWasReaden) {
                     readLectures++
                 }
             }
             binding.pbDoneTests.apply {
                 progressMax = allAmountOfTests.toFloat()
                 setProgressWithAnimation(doneTest.toFloat(),1800)
-                progressBarColor = Color.GREEN
+                progressBarColor = resources.getColor(R.color.teal_200)
             }
             binding.pbReadLectures.apply {
                 progressMax = allAmountsOfLectures.toFloat()
                 setProgressWithAnimation(readLectures.toFloat(),1800)
-                progressBarColor = Color.GREEN
+                progressBarColor = resources.getColor(R.color.teal_200)
             }
             binding.tvReadLectures.text = readLectures.toString()
             binding.tvTestsDone.text = doneTest.toString()

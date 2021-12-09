@@ -1,8 +1,8 @@
 package com.example.youngchemist.ui.screen
 
-import com.example.youngchemist.model.Lecture
-import com.example.youngchemist.model.LectureUi
+import com.example.youngchemist.model.ui.LectureUi
 import com.example.youngchemist.model.Subject
+import com.example.youngchemist.model.Test
 import com.example.youngchemist.ui.screen.auth.AuthFragment
 import com.example.youngchemist.ui.screen.auth.login.LoginFragment
 import com.example.youngchemist.ui.screen.auth.password_restore.RestorePasswordFragment
@@ -13,7 +13,6 @@ import com.example.youngchemist.ui.screen.main.qr.scan.ScanFragment
 import com.example.youngchemist.ui.screen.main.subjects.lectures.lecture.LectureFragment
 import com.example.youngchemist.ui.screen.main.subjects.lectures.lectures_list.LecturesListFragment
 import com.example.youngchemist.ui.screen.main.subjects.lectures.test.tests.RootTestFragment
-import com.example.youngchemist.ui.screen.main.subjects.lectures.test.tests.TestFragment
 import com.example.youngchemist.ui.screen.main.subjects.lectures.test.result.TestResultFragment
 import com.github.terrakok.cicerone.androidx.FragmentScreen
 
@@ -51,8 +50,8 @@ object Screens {
         RestorePasswordFragment()
     }
 
-    fun rootTestScreen(testId: String) = FragmentScreen {
-        RootTestFragment.newInstance(testId)
+    fun rootTestScreen(test: Test) = FragmentScreen {
+        RootTestFragment.newInstance(test)
     }
 
     fun testResultScreen(mark: Double) = FragmentScreen {

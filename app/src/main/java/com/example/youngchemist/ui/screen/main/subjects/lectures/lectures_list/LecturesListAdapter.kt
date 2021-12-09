@@ -2,7 +2,6 @@ package com.example.youngchemist.ui.screen.main.subjects.lectures.lectures_list
 
 import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.view.animation.AnimationUtils
@@ -12,8 +11,8 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.youngchemist.R
 import com.example.youngchemist.databinding.ItemLectureInListBinding
-import com.example.youngchemist.model.Lecture
-import com.example.youngchemist.model.LectureUi
+import com.example.youngchemist.model.ui.LectureUi
+import com.example.youngchemist.model.Test
 
 class LecturesListAdapter : RecyclerView.Adapter<LecturesListAdapter.LectureViewHolder>() {
 
@@ -38,21 +37,19 @@ class LecturesListAdapter : RecyclerView.Adapter<LecturesListAdapter.LectureView
         fun bind(item: LectureUi) {
             binding.tvTitle.text = item.lectureTitle
             binding.tvDescription.text = item.lectureDescription
-            binding.bnBeginTest.alpha = 0.7f
             binding.bnBeginTest.isEnabled = false
-            binding.bnBeginTest.isVisible = true
+            item.test?.let {
+                binding.bnBeginTest.alpha = 0.7f
+                binding.bnBeginTest.isVisible = true
+                if (item.isTestEnabled) {
+                    binding.bnBeginTest.alpha = 1f
+                    binding.bnBeginTest.isEnabled = true
+                }
+            }
             if (item.lectureWasReaden) {
                 val pregressAnimator = ObjectAnimator.ofInt(binding.pbLecture, "progress", 0, 100)
                 pregressAnimator.duration = 1800
                 pregressAnimator.start()
-            }
-            if (item.testId.isEmpty()) {
-                binding.bnBeginTest.isVisible = false
-            }
-            Log.d("TAG",item.testId + " " + item.isTestEnabled + " " + item.mark)
-            if (item.isTestEnabled) {
-                binding.bnBeginTest.isEnabled = true
-                binding.bnBeginTest.alpha = 1f
             }
             val animator = ValueAnimator.ofFloat(0.0f,item.mark.toFloat())
             animator.duration = 2000
@@ -71,7 +68,7 @@ class LecturesListAdapter : RecyclerView.Adapter<LecturesListAdapter.LectureView
             }
             binding.bnBeginTest.setOnClickListener {
                 onBeginTestButtonClicked?.let { click ->
-                    click(item.testId)
+                    item.test?.let { click(it) }
                 }
             }
         }
@@ -95,8 +92,8 @@ class LecturesListAdapter : RecyclerView.Adapter<LecturesListAdapter.LectureView
 
     override fun getItemCount() = lectures.size
 
-    private var onBeginTestButtonClicked: ((String) -> Unit)? = null
-    fun setOnBeginTestListener(listener: (String) -> Unit) {
+    private var onBeginTestButtonClicked: ((Test) -> Unit)? = null
+    fun setOnBeginTestListener(listener: (Test) -> Unit) {
         onBeginTestButtonClicked = listener
     }
 

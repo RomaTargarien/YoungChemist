@@ -1,9 +1,8 @@
-package com.example.youngchemist.model
+package com.example.youngchemist.model.ui
 
-import android.util.Log
-import com.example.youngchemist.ui.util.roundMark
-import java.math.RoundingMode
-import java.text.DecimalFormat
+import com.example.youngchemist.model.Test
+import com.example.youngchemist.model.user.AnswerUser
+import com.example.youngchemist.model.user.PassedUserTest
 
 data class TestUi(
     var userUid: String = "",
@@ -27,8 +26,8 @@ data class TestUi(
             userAnswersList.add(answer)
         }
         passedUserTest.answers = userAnswersList
-        val del = mark/tasksUi.size
-        val roundedMark: Double = Math.round(del*100.0)/10.0
+        val del = mark / tasksUi.size
+        val roundedMark: Double = Math.round(del * 100.0) / 10.0
         passedUserTest.mark = roundedMark
         return passedUserTest
     }
@@ -44,12 +43,5 @@ data class TestUi(
     }
 }
 
-data class TaskUi(
-    var position: Int = -1,
-    var answersList: List<AnswerUi> = listOf()
-)
 
-data class AnswerUi(
-    var position: Int = -1,
-    var itIsRight: Boolean = false
-)
+

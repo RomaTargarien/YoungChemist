@@ -22,12 +22,13 @@
             android:background="@drawable/main_background">
 
             <androidx.appcompat.widget.AppCompatButton
-                android:id="@+id/appCompatButton2"
+                android:id="@+id/bn_save"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@drawable/shape_rounded_button"
                 android:text="Сохранить"
                 android:visibility="gone"
+                android:onClick="@{view -> viewModel.save()}"
                 android:textColor="@color/white"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -39,7 +40,7 @@
             </androidx.appcompat.widget.AppCompatButton>
 
             <androidx.appcompat.widget.AppCompatButton
-                android:id="@+id/appCompatButton3"
+                android:id="@+id/bn_exit"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@drawable/shape_rounded_button"
@@ -50,10 +51,25 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.5"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/appCompatButton2"
+                app:layout_constraintTop_toBottomOf="@+id/bn_save"
                 app:layout_constraintVertical_bias="0.061">
 
             </androidx.appcompat.widget.AppCompatButton>
+
+            <com.airbnb.lottie.LottieAnimationView
+                android:id="@+id/progress_flask"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:lottie_autoPlay="true"
+                app:lottie_fileName="progress_flask.json"
+                app:lottie_loop="true">
+
+            </com.airbnb.lottie.LottieAnimationView>
 
 
         </androidx.constraintlayout.widget.ConstraintLayout>

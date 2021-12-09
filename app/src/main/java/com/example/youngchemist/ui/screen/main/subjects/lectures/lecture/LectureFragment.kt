@@ -2,7 +2,6 @@ package com.example.youngchemist.ui.screen.main.subjects.lectures.lecture
 
 import android.annotation.SuppressLint
 import android.content.Intent
-import android.graphics.Interpolator
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -12,19 +11,13 @@ import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.transition.TransitionManager
 import androidx.viewpager2.widget.ViewPager2
 import com.example.youngchemist.R
 import com.example.youngchemist.databinding.FragmentLectureBinding
-import com.example.youngchemist.model.Lecture
-import com.example.youngchemist.model.LectureUi
+import com.example.youngchemist.model.ui.LectureUi
 import com.example.youngchemist.ui.listeners.OnPageNumberChangedListener
 import com.example.youngchemist.ui.listeners.OnUriGetting
-import com.example.youngchemist.ui.util.ResourceNetwork
 import com.google.android.material.bottomsheet.BottomSheetBehavior
-import com.google.common.io.LineReader
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint

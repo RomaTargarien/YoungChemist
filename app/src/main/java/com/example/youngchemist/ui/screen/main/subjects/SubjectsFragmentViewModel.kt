@@ -7,10 +7,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.youngchemist.model.Answer
-import com.example.youngchemist.model.Subject
-import com.example.youngchemist.model.Task
-import com.example.youngchemist.model.Test
+import com.example.youngchemist.model.*
 import com.example.youngchemist.repositories.DatabaseRepository
 import com.example.youngchemist.repositories.FireStoreRepository
 import com.example.youngchemist.ui.screen.Screens
@@ -28,6 +25,7 @@ import java.io.InputStream
 import java.net.HttpURLConnection
 import java.net.URL
 import java.nio.ByteBuffer
+import java.util.*
 import javax.inject.Inject
 
 var array: ByteArray? = null
@@ -49,11 +47,21 @@ class SubjectsFragmentViewModel @Inject constructor(
     }
 
     fun navigateToTestScreen() {
-        router.navigateTo(Screens.rootTestScreen(""))
+        //router.navigateTo(Screens.rootTestScreen(""))
     }
 
     init {
         getAllSubjects()
+        val data = arrayListOf<String>()
+        data.add("<html lang=\"en\"> <head>     <meta charset=\"UTF-8\">     <meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\">     <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"> </head> <body>     <div>         <p align = \"center\";\">             Метан         </p>         <p align = \"center\";\">          <img src=\"https://firebasestorage.googleapis.com/v0/b/youngchemist-c52a2.appspot.com/o/metan.png?alt=media&token=b2873f55-8b1c-4a5e-856b-d996193e0935\"                 data-token=\"https://firebasestorage.googleapis.com/v0/b/youngchemist-c52a2.appspot.com/o/metan.glb?alt=media&token=e83f8e86-e127-4dca-a220-827ae27de555\"                 alt=\"\\\"                  id=\"image\"                 width=\"300\"                  height=\"300\"                 onclick=\"onClickHandler(this)\">                    </p>     </div> </body> <script lang=\"javascript\" type=\"text/javascript\">     function onClickHandler(element) {         let token = element.dataset.token;         androidImage.get3DImageUrl(token)     } </script> </html>")
+        data.add("<!DOCTYPE html> <html lang=\"en\"> <head>     <meta charset=\"UTF-8\">     <meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\">     <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"> </head> <body>     <p  align=\"center\">         Малорастворим в воде, почти в два раза легче воздуха. Метан нетоксичен,          но при высокой концентрации в воздухе обладает слабым наркотическим действием.           Имеются данные, что метан при хроническом воздействии малых концентраций в воздухе неблагоприятно влияет            на центральную нервную систему.             Наркотическое действие метана CH4 ослабляется его малой              растворимостью в воде и крови и химической инертностью. Класс токсичности — четвёртый.     </p>           </body> </html>")
+        val lecture = Lecture(
+            UUID.randomUUID().toString(),
+            "vessels",
+            "Лекция 1",
+            "Применение метана и его структура",
+            data
+        )
         val answers = arrayListOf<Answer>(
             Answer("a1",false,0),
             Answer("a2",false,1),
@@ -70,8 +78,15 @@ class SubjectsFragmentViewModel @Inject constructor(
             Answer("a4",false,3)
         )
         val task2 = Task("q1",answers2,multipleAnswersAvailable = true)
-        //val test = Test(0,0,"Первый тест", arrayListOf(task,task2,task2,task2,task,task2,task,task2,task,task2,task2,task,task),30000)
+        val test = Test(
+            UUID.randomUUID().toString(),
+            "Первый тест",
+            arrayListOf(task,task,task,task2,task,task2),
+            30000
+        )
+        //lecture.test = test
         viewModelScope.launch {
+            //fireStoreRepository.saveLecture(lecture)
             //fireStoreRepository.saveTest(test)
         }
     }

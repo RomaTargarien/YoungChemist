@@ -13,6 +13,7 @@ import android.view.inputmethod.InputMethodManager
 import androidx.fragment.app.Fragment
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import com.example.youngchemist.R
+import com.example.youngchemist.model.ui.LectureUi
 import java.math.RoundingMode
 import java.nio.ByteBuffer
 import java.text.DecimalFormat
@@ -68,6 +69,16 @@ fun Fragment.closeKeyBoard() {
 fun Int.toDp(context: Context): Int = TypedValue.applyDimension(
     TypedValue.COMPLEX_UNIT_DIP, this.toFloat(), context.resources.displayMetrics
 ).toInt()
+
+fun MutableList<LectureUi>.getAmountOffTests(): Int {
+    var amount = 0
+    for (item in this) {
+        item.test?.let {
+            amount++
+        }
+    }
+    return amount
+}
 
 fun Long.evaluateTime(): String {
     val minutes = this / 1000 / 60

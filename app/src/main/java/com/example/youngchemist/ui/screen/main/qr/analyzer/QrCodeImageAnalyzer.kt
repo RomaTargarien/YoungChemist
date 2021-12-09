@@ -10,8 +10,8 @@ import com.google.mlkit.vision.common.InputImage
 
 class QrCodeImageAnalyzer : BaseImageAnalyzer<List<Barcode>>() {
 
-    private val _qrCode: MutableLiveData<String> = MutableLiveData<String>()
-    val qrCode: LiveData<String> = _qrCode
+    private val _qrCodeId: MutableLiveData<String> = MutableLiveData<String>()
+    val qrCodeId: LiveData<String> = _qrCodeId
 
     private val options = BarcodeScannerOptions.Builder()
         .setBarcodeFormats(
@@ -38,7 +38,7 @@ class QrCodeImageAnalyzer : BaseImageAnalyzer<List<Barcode>>() {
     override fun onSuccess(results: List<Barcode>) {
         results.forEach { barCode ->
             barCode.rawValue?.let {
-                _qrCode.postValue(it)
+                _qrCodeId.postValue(it)
                 stop()
                 return
             }
