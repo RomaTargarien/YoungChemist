@@ -70,8 +70,11 @@ class DatabaseRepositoryImpl @Inject constructor(
         }
     }
 
-    override fun getAll3DModels(userId: String): Flow<List<Model3D>> {
-        return model3DDao.getAllModels(userId)
+    override suspend fun getAll3DModels(userId: String): List<Model3D> {
+        return withContext(Dispatchers.IO) {
+            model3DDao.getAllModels(userId)
+        }
+
     }
 
     override suspend fun deleteModel(model3D: Model3D) = withContext(Dispatchers.IO) {

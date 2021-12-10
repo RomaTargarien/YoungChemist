@@ -1,15 +1,15 @@
 package com.example.youngchemist.ui.screen.main.saved_models
 
 import android.content.Intent
-import android.graphics.Canvas
+import android.graphics.*
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -18,62 +18,138 @@ import androidx.transition.TransitionManager
 import com.example.youngchemist.R
 import com.example.youngchemist.databinding.FragmentSavedModelsBinding
 import com.example.youngchemist.model.user.Model3D
-import com.example.youngchemist.ui.screen.main.qr.qr_code.QrCodeFragment
-import com.example.youngchemist.ui.screen.main.subjects.lectures.test.HorizontalItemDecoration
 import dagger.hilt.android.AndroidEntryPoint
+
 
 @AndroidEntryPoint
 class SavedModelsFragment : Fragment() {
 
     private val viewModel: SavedModelsFragmentViewModel by viewModels()
     private lateinit var binding: FragmentSavedModelsBinding
-
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
+    private var models3DUi = mutableListOf<Model3D>()
+    private lateinit var model3DAdapter: Model3DAdapter
+    private lateinit var bitmap: Bitmap
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View =
-        FragmentSavedModelsBinding.inflate(inflater,container,false).also { binding = it }.root
+        FragmentSavedModelsBinding.inflate(inflater, container, false).also { binding = it }.root
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val model3DAdapter = Model3DAdapter()
+        model3DAdapter = Model3DAdapter()
+        enableSwipe()
         binding.rv3DModels.apply {
-            layoutManager = LinearLayoutManager(requireContext(),LinearLayoutManager.VERTICAL,false)
+            layoutManager =
+                LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
             adapter = model3DAdapter
         }
+        bitmap = BitmapFactory.decodeResource(resources, R.drawable.trash)
 
-        viewModel.model3DState.observe(viewLifecycleOwner,{
-            model3DAdapter.differ.submitList(it)
-            if (it.isEmpty()) {
-                binding.tvEmptyList.isVisible = true
-                if (binding.tvAmountOffModels.isVisible) {
-                    TransitionManager.beginDelayedTransition(binding.mainContainer)
-                    binding.tvAmountOffModels.isVisible = false
-                }
-            } else {
-                TransitionManager.beginDelayedTransition(binding.mainContainer)
-                binding.tvAmountOffModels.text = it.size.toString()
-                binding.tvAmountOffModels.isVisible = true
-            }
+        viewModel.model3DState.observe(viewLifecycleOwner, {
+            models3DUi.addAll(it)
+            model3DAdapter.submitList(models3DUi)
+            animateTextNumberVisibility(models3DUi.size)
         })
+
         model3DAdapter.setOnClickListener {
             startActivity(createIntent(it.modelUri))
         }
-//        model3DAdapter.setOnDeleteListener {
-//            viewModel.deleteModel3D(it)
-//        }
+
+        model3DAdapter.setOnDeleteListener {
+            viewModel.deleteModel3D(it)
+            models3DUi.remove(it)
+            model3DAdapter.submitList(models3DUi)
+            animateTextNumberVisibility(models3DUi.size)
+        }
+
+    }
+
+    private fun enableSwipe() {
+        val simpleItemTouchHelper =
+            object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
+                override fun onMove(
+                    recyclerView: RecyclerView,
+                    viewHolder: RecyclerView.ViewHolder,
+                    target: RecyclerView.ViewHolder
+                ): Boolean {
+                    return false
+                }
+
+                override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                    val position = viewHolder.adapterPosition
+                    if (direction == ItemTouchHelper.LEFT) {
+                        val deletedModel = models3DUi[position]
+                        viewModel.deleteModel3D(deletedModel)
+                        models3DUi.remove(deletedModel)
+                        model3DAdapter.submitList(models3DUi)
+                        animateTextNumberVisibility(models3DUi.size)
+                    }
+                }
+
+                override fun onChildDraw(
+                    c: Canvas,
+                    recyclerView: RecyclerView,
+                    viewHolder: RecyclerView.ViewHolder,
+                    dX: Float,
+                    dY: Float,
+                    actionState: Int,
+                    isCurrentlyActive: Boolean
+                ) {
+                    super.onChildDraw(
+                        c,
+                        recyclerView,
+                        viewHolder,
+                        dX,
+                        dY,
+                        actionState,
+                        isCurrentlyActive
+                    )
+                    val p = Paint()
+                    if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE) {
+                        val itemView = viewHolder.itemView
+                        val height = itemView.bottom.toFloat() - itemView.top.toFloat()
+                        val width = height / 3
+                        if (dX < 0) {
+                            val iconDest = RectF(
+                                itemView.right.toFloat() - 2 * width,
+                                itemView.top.toFloat() + width,
+                                itemView.right.toFloat() - width,
+                                itemView.bottom.toFloat() - width
+                            )
+                            val alpha = ((-dX/itemView.width.toFloat())*255).toInt()
+                            p.alpha = alpha
+                            c.drawBitmap(bitmap, null, iconDest, p)
+                        }
+                    }
+                }
+            }
+        val itemTouchHelper = ItemTouchHelper(simpleItemTouchHelper)
+        itemTouchHelper.attachToRecyclerView(binding.rv3DModels)
+    }
+
+    private fun animateTextNumberVisibility(size: Int) {
+        if (size == 0) {
+            binding.tvEmptyList.isVisible = true
+            if (binding.tvAmountOffModels.isVisible) {
+                TransitionManager.beginDelayedTransition(binding.mainContainer)
+                binding.tvAmountOffModels.isVisible = false
+            }
+        } else {
+            if (!binding.tvAmountOffModels.isVisible) {
+                TransitionManager.beginDelayedTransition(binding.mainContainer)
+                binding.tvAmountOffModels.isVisible = true
+            }
+            binding.tvAmountOffModels.text = size.toString()
+        }
     }
 
     private fun createIntent(modelUrl: String): Intent {
         val intent = Intent(Intent.ACTION_VIEW)
         val uri = Uri.parse(AR_URI).buildUpon()
             .appendQueryParameter(FILE, modelUrl)
-            .appendQueryParameter(MODE,MODE_TYPE)
+            .appendQueryParameter(MODE, MODE_TYPE)
             .build()
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         intent.data = uri

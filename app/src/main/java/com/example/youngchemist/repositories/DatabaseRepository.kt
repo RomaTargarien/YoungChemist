@@ -26,7 +26,7 @@ interface DatabaseRepository {
 
     suspend fun save3DModel(model3D: Model3D)
 
-    fun getAll3DModels(userId: String): Flow<List<Model3D>>
+    suspend fun getAll3DModels(userId: String): List<Model3D>
 
     suspend fun deleteModel(model3D: Model3D)
 

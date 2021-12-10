@@ -10,11 +10,11 @@
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="@drawable/main_background"
         tools:context=".ui.screen.main.saved_models.SavedModelsFragment">
 
         <androidx.core.widget.NestedScrollView
             android:layout_width="match_parent"
-            android:background="@drawable/main_background"
             android:layout_height="match_parent">
 
             <androidx.constraintlayout.widget.ConstraintLayout
@@ -65,10 +65,11 @@
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/rv_3D_models"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="600dp"
                     android:layout_marginTop="30dp"
                     android:nestedScrollingEnabled="false"
-                    app:layout_constraintTop_toBottomOf="@+id/tv_empty_list"/>
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/tv_empty_list" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 

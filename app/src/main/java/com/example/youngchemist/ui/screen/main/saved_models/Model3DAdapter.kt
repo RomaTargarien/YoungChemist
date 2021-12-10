@@ -1,6 +1,7 @@
 package com.example.youngchemist.ui.screen.main.saved_models
 
 import android.util.Log
+import android.view.Display
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,29 +16,18 @@ import com.example.youngchemist.model.user.Model3D
 
 class Model3DAdapter : RecyclerView.Adapter<Model3DAdapter.Model3DViewHoler>() {
 
-//    private val models3D = mutableListOf<Model3D>()
-//
-//    fun addList(models: List<Model3D>) {
-//        models3D.addAll(models)
-//
-//    }
+    private val models: MutableList<Model3D> = mutableListOf()
 
-
-    private val differCallBack = object : DiffUtil.ItemCallback<Model3D>() {
-        override fun areItemsTheSame(oldItem: Model3D, newItem: Model3D): Boolean {
-            return oldItem.hashCode() == newItem.hashCode()
-        }
-
-        override fun areContentsTheSame(oldItem: Model3D, newItem: Model3D): Boolean {
-            return oldItem == newItem
-        }
+    fun submitList(modelsList: List<Model3D>) {
+        val result: DiffUtil.DiffResult = DiffUtil.calculateDiff(DiffCallback(models,modelsList))
+        result.dispatchUpdatesTo(this)
+        models.clear()
+        models.addAll(modelsList)
     }
-
-    val differ = AsyncListDiffer(this, differCallBack)
 
     inner class Model3DViewHoler(val binding: Item3dBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        fun bind(item: Model3D,position: Int) {
+        fun bind(item: Model3D) {
             binding.tvTitle.text = item.modelTitle
             binding.cvModel.setOnClickListener {
                 onClick?.let { click ->
@@ -45,7 +35,6 @@ class Model3DAdapter : RecyclerView.Adapter<Model3DAdapter.Model3DViewHoler>() {
                 }
             }
             binding.ivDelete.setOnClickListener{
-                Log.d("TAG","click")
                 onDeleteClick?.let { click ->
                     click(item)
                 }
@@ -60,12 +49,12 @@ class Model3DAdapter : RecyclerView.Adapter<Model3DAdapter.Model3DViewHoler>() {
     }
 
     override fun onBindViewHolder(holder: Model3DViewHoler, position: Int) {
-        holder.bind(differ.currentList[position],position)
-//        val animation = AnimationUtils.loadAnimation(holder.itemView.context, R.anim.alpha_anim)
-//        holder.binding.clMain.startAnimation(animation)
+        holder.bind(models[position])
+        val animation = AnimationUtils.loadAnimation(holder.itemView.context, R.anim.alpha_anim)
+        holder.binding.clMain.startAnimation(animation)
     }
 
-    override fun getItemCount() = differ.currentList.size
+    override fun getItemCount() = models.size
 
     private var onClick: ((Model3D) -> Unit)? = null
     fun setOnClickListener(listener: (Model3D) -> Unit) {
@@ -75,5 +64,24 @@ class Model3DAdapter : RecyclerView.Adapter<Model3DAdapter.Model3DViewHoler>() {
     private var onDeleteClick: ((Model3D) -> Unit)? = null
     fun setOnDeleteListener(listener: (Model3D) -> Unit) {
         onDeleteClick = listener
+    }
+}
+
+class DiffCallback(private val oldList: List<Model3D>,private val newList: List<Model3D>): DiffUtil.Callback() {
+
+    override fun getOldListSize(): Int {
+        return oldList.size
+    }
+
+    override fun getNewListSize(): Int {
+        return newList.size
+    }
+
+    override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+        return oldList[oldItemPosition].hashCode() == newList[newItemPosition].hashCode()
+    }
+
+    override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+        return oldList[oldItemPosition].modelId == newList[newItemPosition].modelId
     }
 }

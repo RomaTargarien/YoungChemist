@@ -11,6 +11,7 @@ import com.example.youngchemist.ui.screen.Screens
 import com.example.youngchemist.ui.util.ResourceNetwork
 import com.github.terrakok.cicerone.Router
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
@@ -57,6 +58,7 @@ class QrCodeFragmentViewModel @Inject constructor(
     fun get3DModel(modelId: String) {
         viewModelScope.launch {
             _model3DState.postValue(ResourceNetwork.Loading())
+            delay(3000)
             val result = fireStoreRepository.get3DModel(modelId)
             if (result is ResourceNetwork.Success) {
                 result.data?.let {

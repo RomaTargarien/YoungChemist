@@ -64,6 +64,7 @@ class MainFragment : Fragment(), BottomTabScreen {
                replaceFragment(this)
            }
         }
+        arguments?.clear()
     }
 
     private fun createBottomNavMenuItemSelectedListener() {

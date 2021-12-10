@@ -44,15 +44,20 @@ class QrCodeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.viewModel = viewModel
+        toggleButtonsBehavior(false)
         requireActivity().onBackPressedDispatcher.addCallback {
             viewModel.exit(lastSelectedItemPosition)
         }
         binding.ivExit.setOnClickListener {
             viewModel.exit(lastSelectedItemPosition)
         }
+        binding.bnExit.setOnClickListener {
+            viewModel.exit(lastSelectedItemPosition)
+        }
         modelId?.let {
             viewModel.get3DModel(it)
         }
+
         viewModel.model3DState.observe(viewLifecycleOwner,{
             when (it) {
                 is ResourceNetwork.Loading -> {
@@ -60,10 +65,12 @@ class QrCodeFragment : Fragment() {
                 }
                 is ResourceNetwork.Success -> {
                     binding.progressFlask.isVisible = false
-                    binding.bnExit.isVisible = true
-                    binding.bnSave.isVisible = true
-                    it.data?.let {
-                        startActivity(createIntent(it.modelUri))
+                    toggleButtonsBehavior(true)
+                    it.data?.let { model ->
+                        binding.bnOpen.setOnClickListener {
+                            startActivity(createIntent(model.modelUri))
+                        }
+                        binding.tvTitle.text = model.modelTitle
                     }
                 }
                 is ResourceNetwork.Error -> {
@@ -71,7 +78,6 @@ class QrCodeFragment : Fragment() {
                 }
             }
         })
-
     }
 
     private fun createIntent(modelUrl: String): Intent {
@@ -84,6 +90,15 @@ class QrCodeFragment : Fragment() {
         intent.data = uri
         intent.setPackage(PACKAGE_NAME)
         return intent
+    }
+
+    private fun toggleButtonsBehavior(enable: Boolean) {
+        binding.bnSave.alpha = if (enable) 1f else 0.5f
+        binding.bnOpen.alpha = if (enable) 1f else 0.5f
+        binding.iv3d.alpha = if (enable) 1f else 0.5f
+        binding.iv3d.alpha = if (enable) 1f else 0.5f
+        binding.bnSave.isEnabled = enable
+        binding.bnOpen.isEnabled = enable
     }
 
     companion object {

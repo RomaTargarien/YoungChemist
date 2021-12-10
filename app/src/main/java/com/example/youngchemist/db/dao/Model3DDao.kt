@@ -11,7 +11,7 @@ interface Model3DDao {
     fun saveModel3D(model3D: Model3D)
 
     @Query("SELECT * FROM saved3DModels WHERE userId LIKE :currentUserId")
-    fun getAllModels(currentUserId: String): Flow<List<Model3D>>
+    fun getAllModels(currentUserId: String): List<Model3D>
 
     @Delete
     suspend fun deleteModel(model3D: Model3D)
