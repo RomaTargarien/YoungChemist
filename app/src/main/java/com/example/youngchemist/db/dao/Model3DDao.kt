@@ -15,4 +15,8 @@ interface Model3DDao {
 
     @Delete
     suspend fun deleteModel(model3D: Model3D)
+
+    @Query("SELECT * FROM saved3DModels WHERE userId LIKE :currentUserId AND modelId LIKE :modelId")
+    fun getModel(currentUserId: String,modelId: String): List<Model3D>
+
 }

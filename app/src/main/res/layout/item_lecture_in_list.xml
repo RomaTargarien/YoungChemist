@@ -98,7 +98,6 @@
                     android:backgroundTint="@color/teal_200"
                     android:text="Начать тест"
                     android:visibility="gone"
-                    android:enabled="false"
                     android:textColor="@color/white"
                     android:textStyle="bold"
                     app:layout_constraintStart_toStartOf="@+id/tvDescription"
@@ -114,6 +113,8 @@
                     android:layout_marginBottom="16dp"
                     android:text="@string/test_mark"
                     android:textStyle="bold"
+                    android:textSize="18sp"
+                    android:visibility="gone"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="@+id/tvDescription"
                     app:layout_constraintTop_toBottomOf="@+id/bn_begin_test"
@@ -123,15 +124,15 @@
                     android:id="@+id/tvTestMark"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="5dp"
-                    android:layout_marginTop="10dp"
-                    android:layout_marginBottom="16dp"
+                    android:layout_marginStart="12dp"
+                    android:textSize="22sp"
+                    android:textStyle="bold"
+                    android:visibility="gone"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/tvTextTestMark"
-                    app:layout_constraintTop_toBottomOf="@+id/bn_begin_test"
+                    app:layout_constraintTop_toBottomOf="@+id/tvDescription"
+                    android:layout_marginBottom="8dp"
                     tools:text="4.5" />
-
-
 
 
             </androidx.constraintlayout.widget.ConstraintLayout>

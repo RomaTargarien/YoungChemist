@@ -28,7 +28,7 @@ class SavedModelsFragmentViewModel @Inject constructor(
 
     fun getAllModels3D() {
         viewModelScope.launch {
-            val models = databaseRepository.getAll3DModels("dJuRGOc06xhllmscaAEqQoHC9Ir2")
+            val models = databaseRepository.getAll3DModels("76V1UE5VssV0W8mXenibeUpvQxm1")
             _models3DState.postValue(models)
         }
     }

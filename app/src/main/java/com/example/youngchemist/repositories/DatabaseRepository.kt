@@ -5,6 +5,7 @@ import com.example.youngchemist.model.Lecture
 import com.example.youngchemist.model.Subject
 import com.example.youngchemist.model.user.Model3D
 import com.example.youngchemist.model.user.PassedUserTest
+import com.example.youngchemist.model.user.UserProgress
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.flow.Flow
 
@@ -29,5 +30,13 @@ interface DatabaseRepository {
     suspend fun getAll3DModels(userId: String): List<Model3D>
 
     suspend fun deleteModel(model3D: Model3D)
+
+    suspend fun getModel(currentUserId: String,modelId: String): Model3D?
+
+    suspend fun saveProgress(userProgress: UserProgress)
+
+    suspend fun getProgress(userId: String): List<UserProgress>
+
+    suspend fun getAllPassedUserTests(userId: String): List<PassedUserTest>
 
 }

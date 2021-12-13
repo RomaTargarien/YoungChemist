@@ -109,10 +109,10 @@ class FireStoreRepositoryImpl @Inject constructor(
     override suspend fun updateReadenLectures(lectureId: String) = withContext(Dispatchers.IO) {
         safeCall {
             val result =
-                firestore.collection("users").document("dJuRGOc06xhllmscaAEqQoHC9Ir2").get().await()
+                firestore.collection("users").document("76V1UE5VssV0W8mXenibeUpvQxm1").get().await()
             val user = result.toObject(User::class.java)
             user?.readenLectures?.add(lectureId)
-            firestore.collection("users").document("dJuRGOc06xhllmscaAEqQoHC9Ir2").set(
+            firestore.collection("users").document("76V1UE5VssV0W8mXenibeUpvQxm1").set(
                 user!!,
                 SetOptions.merge()
             )
@@ -124,6 +124,27 @@ class FireStoreRepositoryImpl @Inject constructor(
         safeCall {
             firestore.collection("vessels").document(lecture.lectureId).set(lecture).await()
             ResourceNetwork.Success("")
+        }
+    }
+
+    override suspend fun save3DModel(model3D: Model3D) = withContext(Dispatchers.IO) {
+        safeCall {
+            val result = firestore.collection("users").document("76V1UE5VssV0W8mXenibeUpvQxm1").get().await()
+            val user = result.toObject(User::class.java)
+            user?.saved3DModels?.add(model3D)
+            firestore.collection("users").document("76V1UE5VssV0W8mXenibeUpvQxm1").set(
+                user!!,
+                SetOptions.merge()
+            )
+            ResourceNetwork.Success("")
+        }
+    }
+
+    override suspend fun getUserModels3D(userId: String) = withContext(Dispatchers.IO) {
+        safeCall {
+            val result = firestore.collection("users").document(userId).get().await()
+            val user = result.toObject(User::class.java)
+            ResourceNetwork.Success(user?.saved3DModels)
         }
     }
 }

@@ -1,5 +1,6 @@
 package com.example.youngchemist.ui.screen.main.qr.qr_code
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -12,11 +13,13 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import com.example.youngchemist.R
 import com.example.youngchemist.databinding.FragmentQrCodeScannerBinding
 import com.example.youngchemist.ui.util.ResourceNetwork
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
@@ -44,15 +47,10 @@ class QrCodeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.viewModel = viewModel
+        viewModel.lastSelectedItemPosition = lastSelectedItemPosition
         toggleButtonsBehavior(false)
         requireActivity().onBackPressedDispatcher.addCallback {
-            viewModel.exit(lastSelectedItemPosition)
-        }
-        binding.ivExit.setOnClickListener {
-            viewModel.exit(lastSelectedItemPosition)
-        }
-        binding.bnExit.setOnClickListener {
-            viewModel.exit(lastSelectedItemPosition)
+            viewModel.exit()
         }
         modelId?.let {
             viewModel.get3DModel(it)
@@ -74,10 +72,25 @@ class QrCodeFragment : Fragment() {
                     }
                 }
                 is ResourceNetwork.Error -> {
-                    Log.d("TAG","error")
+                    binding.progressFlask.isVisible = false
+                    binding.tvErrorText.isVisible = true
+                    binding.tvTryAgain.isVisible = true
                 }
             }
         })
+        viewModel.wasSaved.observe(viewLifecycleOwner,{
+            if (it) {
+                toggleSaveButtonState()
+            }
+        })
+    }
+
+    @SuppressLint("UseCompatLoadingForDrawables")
+    private fun toggleSaveButtonState() {
+        binding.bnSave.background = resources.getDrawable(R.drawable.shape_outlined_rectangle_for_saving_model)
+        binding.ivSave.setImageResource(R.drawable.ic_icon_done)
+        binding.bnSave.isEnabled = false
+        binding.bnSave.alpha = 0.7f
     }
 
     private fun createIntent(modelUrl: String): Intent {

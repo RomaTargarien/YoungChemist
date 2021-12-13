@@ -11,8 +11,9 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.youngchemist.R
 import com.example.youngchemist.databinding.ItemLectureInListBinding
-import com.example.youngchemist.model.ui.LectureUi
 import com.example.youngchemist.model.Test
+import com.example.youngchemist.model.ui.LectureUi
+import kotlin.math.roundToInt
 
 class LecturesListAdapter : RecyclerView.Adapter<LecturesListAdapter.LectureViewHolder>() {
 
@@ -37,26 +38,21 @@ class LecturesListAdapter : RecyclerView.Adapter<LecturesListAdapter.LectureView
         fun bind(item: LectureUi) {
             binding.tvTitle.text = item.lectureTitle
             binding.tvDescription.text = item.lectureDescription
-            binding.bnBeginTest.isEnabled = false
             item.test?.let {
-                binding.bnBeginTest.alpha = 0.7f
-                binding.bnBeginTest.isVisible = true
-                if (item.isTestEnabled) {
-                    binding.bnBeginTest.alpha = 1f
-                    binding.bnBeginTest.isEnabled = true
-                }
+                toggleTestState(item.isTestEnabled)
             }
-            if (item.lectureWasReaden) {
-                val pregressAnimator = ObjectAnimator.ofInt(binding.pbLecture, "progress", 0, 100)
+            item.userProgress?.let {
+                val to = ((it.lastReadenPage.toFloat() / item.data.size.toFloat()) * 100).toInt()
+                val pregressAnimator = ObjectAnimator.ofInt(binding.pbLecture, "progress", 0, to)
                 pregressAnimator.duration = 1800
                 pregressAnimator.start()
             }
-            val animator = ValueAnimator.ofFloat(0.0f,item.mark.toFloat())
+            val animator = ValueAnimator.ofFloat(0.0f, item.mark.toFloat())
             animator.duration = 2000
             animator.addUpdateListener(object : ValueAnimator.AnimatorUpdateListener {
                 override fun onAnimationUpdate(p0: ValueAnimator?) {
                     val number = (p0?.animatedValue as Float).toDouble()
-                    val roundedNumber: Double = Math.round(number*10.0)/10.0
+                    val roundedNumber: Double = (number * 10.0).roundToInt() / 10.0
                     binding.tvTestMark.text = roundedNumber.toString()
                 }
             })
@@ -70,6 +66,15 @@ class LecturesListAdapter : RecyclerView.Adapter<LecturesListAdapter.LectureView
                 onBeginTestButtonClicked?.let { click ->
                     item.test?.let { click(it) }
                 }
+            }
+        }
+
+        private fun toggleTestState(isTestEnabled: Boolean) {
+            if (isTestEnabled) {
+                binding.bnBeginTest.isVisible = true
+            } else {
+                binding.tvTextTestMark.isVisible = true
+                binding.tvTestMark.isVisible = true
             }
         }
     }

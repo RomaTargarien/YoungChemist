@@ -1,18 +1,15 @@
 package com.example.youngchemist.repositories.impl
 
-import com.example.youngchemist.db.dao.LectureDao
-import com.example.youngchemist.db.dao.Model3DDao
-import com.example.youngchemist.db.dao.SubjectDao
-import com.example.youngchemist.db.dao.TestDao
+import com.example.youngchemist.db.dao.*
 import com.example.youngchemist.model.Lecture
 import com.example.youngchemist.model.Subject
 import com.example.youngchemist.model.user.Model3D
 import com.example.youngchemist.model.user.PassedUserTest
+import com.example.youngchemist.model.user.UserProgress
 import com.example.youngchemist.repositories.DatabaseRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
@@ -20,7 +17,8 @@ class DatabaseRepositoryImpl @Inject constructor(
     private val subjectsDao: SubjectDao,
     private val lecturesDao: LectureDao,
     private val testDao: TestDao,
-    private val model3DDao: Model3DDao
+    private val model3DDao: Model3DDao,
+    private val userProgressDao: UserProgressDao
 ) : DatabaseRepository {
 
     override suspend fun getAllSubjects(): List<Subject> {
@@ -79,5 +77,27 @@ class DatabaseRepositoryImpl @Inject constructor(
 
     override suspend fun deleteModel(model3D: Model3D) = withContext(Dispatchers.IO) {
         model3DDao.deleteModel(model3D)
+    }
+
+    override suspend fun getModel(currentUserId: String, modelId: String) =
+        withContext(Dispatchers.IO) {
+            val models = model3DDao.getModel(currentUserId, modelId)
+            if (models.isNotEmpty()) {
+                models[0]
+            } else null
+        }
+
+    override suspend fun saveProgress(userProgress: UserProgress) {
+        withContext(Dispatchers.IO) {
+            userProgressDao.writeProgress(userProgress)
+        }
+    }
+
+    override suspend fun getProgress(userId: String) = withContext(Dispatchers.IO) {
+        userProgressDao.getProgress(userId)
+    }
+
+    override suspend fun getAllPassedUserTests(userId: String) = withContext(Dispatchers.IO) {
+        testDao.getAllTests(userId)
     }
 }

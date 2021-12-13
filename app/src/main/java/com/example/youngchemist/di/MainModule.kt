@@ -2,11 +2,10 @@ package com.example.youngchemist.di
 
 import android.content.Context
 import androidx.room.Room
-import com.example.youngchemist.db.*
-import com.example.youngchemist.db.dao.LectureDao
-import com.example.youngchemist.db.dao.Model3DDao
-import com.example.youngchemist.db.dao.SubjectDao
-import com.example.youngchemist.db.dao.TestDao
+import com.example.youngchemist.db.SubjectDatabase
+import com.example.youngchemist.db.dao.*
+import com.example.youngchemist.db.shared_pref.UserPreferenceImpl
+import com.example.youngchemist.db.shared_pref.UserPreferences
 import com.example.youngchemist.repositories.DatabaseRepository
 import com.example.youngchemist.repositories.FireStoreRepository
 import com.example.youngchemist.repositories.impl.DatabaseRepositoryImpl
@@ -31,8 +30,20 @@ object MainModule {
 
     @Provides
     @Singleton
-    fun provideDatabaseRepository(subjectDao: SubjectDao, lectureDao: LectureDao, testDao: TestDao, model3DDao: Model3DDao) =
-        DatabaseRepositoryImpl(subjectDao,lectureDao,testDao,model3DDao) as DatabaseRepository
+    fun provideDatabaseRepository(
+        subjectDao: SubjectDao,
+        lectureDao: LectureDao,
+        testDao: TestDao,
+        model3DDao: Model3DDao,
+        userProgressDao: UserProgressDao
+    ) =
+        DatabaseRepositoryImpl(
+            subjectDao,
+            lectureDao,
+            testDao,
+            model3DDao,
+            userProgressDao
+        ) as DatabaseRepository
 
 
     @Provides
@@ -60,5 +71,15 @@ object MainModule {
     @Provides
     @Singleton
     fun provideModel3DDao(db: SubjectDatabase) = db.getModel3DDao()
+
+    @Provides
+    @Singleton
+    fun provideUserProgressDao(db: SubjectDatabase) = db.getUserProgressDao()
+
+    @Provides
+    @Singleton
+    fun provideUserPreference(@ApplicationContext context: Context) =
+        UserPreferenceImpl(context) as UserPreferences
+
 
 }

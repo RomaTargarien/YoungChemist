@@ -2,6 +2,7 @@ package com.example.youngchemist.model.ui
 
 import android.os.Parcelable
 import com.example.youngchemist.model.Test
+import com.example.youngchemist.model.user.UserProgress
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize
@@ -13,6 +14,6 @@ data class LectureUi(
     var data: ArrayList<String> = arrayListOf(),
     var isTestEnabled: Boolean = false,
     var mark: Double = 0.0,
-    var lectureWasReaden: Boolean = false,
-    var test: Test? = null
+    var test: Test? = null,
+    var userProgress: UserProgress? = null
 ): Parcelable

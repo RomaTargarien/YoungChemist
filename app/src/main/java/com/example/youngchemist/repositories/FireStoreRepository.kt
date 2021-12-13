@@ -28,4 +28,8 @@ interface FireStoreRepository {
     suspend fun updateReadenLectures(lectureId: String): ResourceNetwork<String>
 
     suspend fun saveLecture(lecture: Lecture): ResourceNetwork<String>
+
+    suspend fun save3DModel(model3D: Model3D): ResourceNetwork<String>
+
+    suspend fun getUserModels3D(userId: String): ResourceNetwork<ArrayList<Model3D>>
 }

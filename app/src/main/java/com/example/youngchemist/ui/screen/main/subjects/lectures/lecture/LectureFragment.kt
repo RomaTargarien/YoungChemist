@@ -128,6 +128,11 @@ class LectureFragment : Fragment() {
         Log.d("TAG",lastPage.toString())
     }
 
+    override fun onPause() {
+        super.onPause()
+        viewModel.saveProgress(lecture.userProgress,lastPage)
+    }
+
     companion object {
         private const val LECTURE_PARAM = "lectures.lecture"
 

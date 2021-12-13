@@ -117,7 +117,7 @@ class TestFragmentViewModel @Inject constructor(
     private fun uploadTest(passedUserTest: PassedUserTest, saveWithNoProgress: Boolean) {
         viewModelScope.launch(Dispatchers.Default) {
             if (isOnline(context)) {
-                val result = fireStoreRepository.saveTest("dJuRGOc06xhllmscaAEqQoHC9Ir2", passedUserTest)
+                val result = fireStoreRepository.saveTest("76V1UE5VssV0W8mXenibeUpvQxm1", passedUserTest)
                 if (result is ResourceNetwork.Error) {
                     passedUserTest.wasTestUploaded = false
                     databaseRepository.savePassedUserTest(passedUserTest)

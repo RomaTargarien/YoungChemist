@@ -14,6 +14,7 @@ import androidx.fragment.app.Fragment
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import com.example.youngchemist.R
 import com.example.youngchemist.model.ui.LectureUi
+import com.example.youngchemist.model.user.UserProgress
 import java.math.RoundingMode
 import java.nio.ByteBuffer
 import java.text.DecimalFormat
@@ -70,14 +71,20 @@ fun Int.toDp(context: Context): Int = TypedValue.applyDimension(
     TypedValue.COMPLEX_UNIT_DIP, this.toFloat(), context.resources.displayMetrics
 ).toInt()
 
-fun MutableList<LectureUi>.getAmountOffTests(): Int {
-    var amount = 0
+fun Collection<LectureUi>.getLecturesId(): List<String> {
+    val lecturesId = mutableListOf<String>()
     for (item in this) {
-        item.test?.let {
-            amount++
-        }
+        lecturesId.add(item.lectureId)
     }
-    return amount
+    return lecturesId
+}
+
+fun Collection<UserProgress>.getLocalLecturesId(): List<String> {
+    val lecturesId = mutableListOf<String>()
+    for (item in this) {
+        lecturesId.add(item.lectureId)
+    }
+    return lecturesId
 }
 
 fun Long.evaluateTime(): String {

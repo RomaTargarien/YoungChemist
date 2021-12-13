@@ -48,5 +48,5 @@
     <string name="good">Почти превосходно!</string>
     <string name="very_good">Вау! Идеальный результат!</string>
     <string name="time_is_up">Время истекло</string>
-    <string name="test_mark">Оценка за тест</string>
+    <string name="test_mark">Оценка за тест:</string>
 </resources>
