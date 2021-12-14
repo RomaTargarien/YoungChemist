@@ -10,6 +10,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.work.Data
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
 import com.example.youngchemist.model.Task
 import com.example.youngchemist.model.Test
 import com.example.youngchemist.model.ui.AnswerUi
@@ -18,6 +21,7 @@ import com.example.youngchemist.model.ui.TestUi
 import com.example.youngchemist.model.user.PassedUserTest
 import com.example.youngchemist.repositories.DatabaseRepository
 import com.example.youngchemist.repositories.FireStoreRepository
+import com.example.youngchemist.ui.base.workers.TestUploadingWorker
 import com.example.youngchemist.ui.screen.Screens
 import com.example.youngchemist.ui.util.FragmentAnimationBehavior
 import com.example.youngchemist.ui.util.ResourceNetwork
@@ -38,6 +42,7 @@ import javax.inject.Inject
 class TestFragmentViewModel @Inject constructor(
     private val router: Router,
     private val fireStoreRepository: FireStoreRepository,
+    private val workManager: WorkManager,
     @ApplicationContext val context: Context,
     private val databaseRepository: DatabaseRepository
 ) : ViewModel() {
@@ -116,18 +121,12 @@ class TestFragmentViewModel @Inject constructor(
 
     private fun uploadTest(passedUserTest: PassedUserTest, saveWithNoProgress: Boolean) {
         viewModelScope.launch(Dispatchers.Default) {
-            if (isOnline(context)) {
-                val result = fireStoreRepository.saveTest("76V1UE5VssV0W8mXenibeUpvQxm1", passedUserTest)
-                if (result is ResourceNetwork.Error) {
-                    passedUserTest.wasTestUploaded = false
-                    databaseRepository.savePassedUserTest(passedUserTest)
-                } else {
-                    databaseRepository.savePassedUserTest(passedUserTest)
-                }
-            } else {
-                passedUserTest.wasTestUploaded = false
-                databaseRepository.savePassedUserTest(passedUserTest)
-            }
+            databaseRepository.savePassedUserTest(passedUserTest)
+            val data = Data.Builder()
+                .putString(KEY_USER_ID,passedUserTest.userUid)
+                .putString(KEY_TEST_ID,passedUserTest.testUid)
+                .build()
+            workManager.enqueue(OneTimeWorkRequestBuilder<TestUploadingWorker>().setInputData(data).build())
             navigate(saveWithNoProgress, passedUserTest)
         }
     }
@@ -202,27 +201,32 @@ class TestFragmentViewModel @Inject constructor(
         return emptyTaskUiList
     }
 
-    private fun isOnline(context: Context): Boolean {
-        val connectivityManager =
-            context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        val capabilities =
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                connectivityManager.getNetworkCapabilities(connectivityManager.activeNetwork)
-            } else {
-                null
-            }
-        if (capabilities != null) {
-            if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)) {
-                Log.d("TAG", "NetworkCapabilities.TRANSPORT_CELLULAR")
-                return true
-            } else if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) {
-                Log.d("TAG", "NetworkCapabilities.TRANSPORT_WIFI")
-                return true
-            } else if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET)) {
-                Log.d("TAG", "NetworkCapabilities.TRANSPORT_ETHERNET")
-                return true
-            }
-        }
-        return false
+    companion object {
+        private const val KEY_USER_ID = "key.user"
+        private const val KEY_TEST_ID = "key.test"
     }
+
+//    private fun isOnline(context: Context): Boolean {
+//        val connectivityManager =
+//            context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+//        val capabilities =
+//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+//                connectivityManager.getNetworkCapabilities(connectivityManager.activeNetwork)
+//            } else {
+//                null
+//            }
+//        if (capabilities != null) {
+//            if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)) {
+//                Log.d("TAG", "NetworkCapabilities.TRANSPORT_CELLULAR")
+//                return true
+//            } else if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) {
+//                Log.d("TAG", "NetworkCapabilities.TRANSPORT_WIFI")
+//                return true
+//            } else if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET)) {
+//                Log.d("TAG", "NetworkCapabilities.TRANSPORT_ETHERNET")
+//                return true
+//            }
+//        }
+//        return false
+//    }
 }

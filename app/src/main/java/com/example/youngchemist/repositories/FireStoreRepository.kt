@@ -6,6 +6,7 @@ import com.example.youngchemist.model.Test
 import com.example.youngchemist.model.User
 import com.example.youngchemist.model.user.Model3D
 import com.example.youngchemist.model.user.PassedUserTest
+import com.example.youngchemist.model.user.UserProgress
 import com.example.youngchemist.ui.util.ResourceNetwork
 import kotlinx.coroutines.Deferred
 
@@ -29,7 +30,9 @@ interface FireStoreRepository {
 
     suspend fun saveLecture(lecture: Lecture): ResourceNetwork<String>
 
-    suspend fun save3DModel(model3D: Model3D): ResourceNetwork<String>
+    suspend fun save3DModels(userId: String,models3D: List<Model3D>): ResourceNetwork<String>
+
+    suspend fun saveUserProgress(userId: String,userProgress: List<UserProgress>): ResourceNetwork<String>
 
     suspend fun getUserModels3D(userId: String): ResourceNetwork<ArrayList<Model3D>>
 }

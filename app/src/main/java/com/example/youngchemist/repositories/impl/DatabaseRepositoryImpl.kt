@@ -100,4 +100,12 @@ class DatabaseRepositoryImpl @Inject constructor(
     override suspend fun getAllPassedUserTests(userId: String) = withContext(Dispatchers.IO) {
         testDao.getAllTests(userId)
     }
+
+    override suspend fun getPassedUserTest(userId: String, testId: String) =
+        withContext(Dispatchers.IO) {
+            val tests = testDao.getTest(userId, testId)
+            if (tests.isNotEmpty()) {
+                tests[0]
+            } else null
+        }
 }

@@ -2,6 +2,7 @@ package com.example.youngchemist.model.user
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.example.youngchemist.model.UserInfo
 
 @Entity(tableName = "unsavedTests")
 data class PassedUserTest(
@@ -10,7 +11,7 @@ data class PassedUserTest(
     var mark: Double = 0.0,
     var answers: ArrayList<AnswerUser> = arrayListOf(),
     var wasTestUploaded: Boolean = true
-) {
+): UserInfo {
     @PrimaryKey(autoGenerate = true)
     var testPrimaryKey: Int = 0
 }

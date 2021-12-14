@@ -14,4 +14,7 @@ interface TestDao {
 
     @Query("SELECT * FROM unsavedTests WHERE userUid LIKE :userId")
     fun getAllTests(userId: String): List<PassedUserTest>
+
+    @Query("SELECT * FROM unsavedTests WHERE userUid LIKE :userId AND testUid LIKE :testId")
+    fun getTest(userId: String,testId: String): List<PassedUserTest>
 }

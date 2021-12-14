@@ -52,7 +52,6 @@ class QrCodeFragmentViewModel @Inject constructor(
                     if (pair.second) {
                         pair.first.userId = "76V1UE5VssV0W8mXenibeUpvQxm1"
                         databaseRepository.save3DModel(pair.first)
-                        fireStoreRepository.save3DModel(pair.first)
                         _wasSaved.postValue(true)
                     }
                 }

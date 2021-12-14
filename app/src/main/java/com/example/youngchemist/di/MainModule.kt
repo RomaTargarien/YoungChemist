@@ -2,6 +2,7 @@ package com.example.youngchemist.di
 
 import android.content.Context
 import androidx.room.Room
+import androidx.work.WorkManager
 import com.example.youngchemist.db.SubjectDatabase
 import com.example.youngchemist.db.dao.*
 import com.example.youngchemist.db.shared_pref.UserPreferenceImpl
@@ -80,6 +81,10 @@ object MainModule {
     @Singleton
     fun provideUserPreference(@ApplicationContext context: Context) =
         UserPreferenceImpl(context) as UserPreferences
+
+    @Provides
+    @Singleton
+    fun provideWorkManager(@ApplicationContext context: Context): WorkManager = WorkManager.getInstance(context)
 
 
 }

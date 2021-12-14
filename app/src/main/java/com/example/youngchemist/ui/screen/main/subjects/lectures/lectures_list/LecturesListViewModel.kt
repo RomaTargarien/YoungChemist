@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.youngchemist.model.Lecture
 import com.example.youngchemist.model.Test
 import com.example.youngchemist.model.ui.LectureUi
+import com.example.youngchemist.model.user.PassedUserTest
 import com.example.youngchemist.model.user.UserProgress
 import com.example.youngchemist.repositories.DatabaseRepository
 import com.example.youngchemist.repositories.FireStoreRepository
@@ -44,7 +45,6 @@ class LecturesListViewModel @Inject constructor(
             val progressList = databaseRepository.getProgress("")
             val passedUserTests = databaseRepository.getAllPassedUserTests("")
             var data = result.await()
-
             if (data.isEmpty()) {
                 fireStoreRepository.getAllLectures(collectionId).let {
                     if (it is ResourceNetwork.Success) {
@@ -64,29 +64,35 @@ class LecturesListViewModel @Inject constructor(
             data.forEach {
                 lecturesUi.add(it.convertToLectureUi())
             }
-
             lecturesUi.forEach { lectureUi ->
-                if (!(lectureUi.lectureId in progressList.getLocalLecturesId())) {
-                    val userProgress = UserProgress("",lectureUi.lectureId,0)
-                    lectureUi.userProgress = userProgress
-                    databaseRepository.saveProgress(userProgress)
-                } else {
-                    lectureUi.userProgress = progressList.find { userProgress ->
-                        userProgress.lectureId.equals(lectureUi.lectureId)
-                    }
+                addUserProgress(lectureUi,progressList)
+                addUserPassedTests(lectureUi,passedUserTests)
+            }
+        }
+    }
+
+    private fun addUserProgress(lectureUi: LectureUi,userProgressList: List<UserProgress>) {
+        viewModelScope.launch {
+            if (!(lectureUi.lectureId in userProgressList.getLocalLecturesId())) {
+                val userProgress = UserProgress("",lectureUi.lectureId,0)
+                lectureUi.userProgress = userProgress
+                databaseRepository.saveProgress(userProgress)
+            } else {
+                lectureUi.userProgress = userProgressList.find { userProgress ->
+                    userProgress.lectureId.equals(lectureUi.lectureId)
                 }
             }
+        }
+    }
 
-            lecturesUi.forEach{ lectureUi ->
-                lectureUi.test?.let { test ->
-                    val passedUserTest = passedUserTests.find { passedUserTest ->
-                        test.testId.equals(passedUserTest.testUid)
-                    }
-                    passedUserTest?.let {
-                        lectureUi.isTestEnabled = false
-                        lectureUi.mark = it.mark
-                    }
-                }
+    private fun addUserPassedTests(lectureUi: LectureUi,userPassedTests: List<PassedUserTest>) {
+        lectureUi.test?.let { test ->
+            val passedUserTest = userPassedTests.find { passedUserTest ->
+                test.testId.equals(passedUserTest.testUid)
+            }
+            passedUserTest?.let {
+                lectureUi.isTestEnabled = false
+                lectureUi.mark = it.mark
             }
         }
     }

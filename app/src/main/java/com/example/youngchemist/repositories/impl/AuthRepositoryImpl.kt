@@ -27,9 +27,7 @@ class AuthRepositoryImpl @Inject constructor(
         authResults: AuthResults
     ) = withContext(Dispatchers.IO) {
         safeCall {
-            Log.d("TAG", "here")
             val result = auth.createUserWithEmailAndPassword(authResults.login!!, authResults.password!!).await()
-            Log.d("TAG", result.user.toString())
             val uid = result.user?.uid
             val user = User(uid!!, authResults.surname!!)
             users.document(uid).set(user).await()
