@@ -48,10 +48,4 @@ class LectureFragmentViewModel @Inject constructor(
             }
         }
     }
-
-    fun lectureHasBeenReaden(lectureId: String) {
-        viewModelScope.launch {
-            fireStoreRepository.updateReadenLectures(lectureId)
-        }
-    }
 }

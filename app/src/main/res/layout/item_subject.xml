@@ -12,6 +12,7 @@
         android:orientation="vertical">
 
         <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/container_item"
             android:layout_width="90dp"
             android:layout_height="90dp"
             android:layout_gravity="center"

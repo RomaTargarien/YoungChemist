@@ -1,6 +1,7 @@
 package com.example.youngchemist.ui.screen.main.subjects.lectures.lectures_list
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,6 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.youngchemist.R
 import com.example.youngchemist.databinding.FragmentLecturesListBinding
 import com.example.youngchemist.model.Subject
+import com.example.youngchemist.ui.screen.main.subjects.lectures.test.tests.dialogs.TestNoSaveDialogFragment
 import com.example.youngchemist.ui.util.BitmapUtils
 import com.example.youngchemist.ui.util.ResourceNetwork
 import dagger.hilt.android.AndroidEntryPoint
@@ -62,18 +64,13 @@ class LecturesListFragment : Fragment() {
         adapter.setOnBeginTestListener {
             viewModel.navigateToTestScreen(it)
         }
-        viewModel.doneTests.observe(viewLifecycleOwner, {
-
-        })
 
         viewModel.lecturesUi.observe(viewLifecycleOwner, {
             var allAmountOfTests = 0
             var doneTest = 0
             val allAmountsOfLectures = it.size
             var readLectures = 0
-            adapter.lectures = it.sortedBy {
-                it.lectureTitle
-            }
+            adapter.submitList(it)
             it.forEach { lecture ->
                 lecture.test?.let {
                     allAmountOfTests++

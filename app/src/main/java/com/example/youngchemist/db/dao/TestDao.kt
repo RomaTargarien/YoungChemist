@@ -5,6 +5,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.example.youngchemist.model.user.PassedUserTest
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface TestDao {
@@ -13,7 +14,7 @@ interface TestDao {
     fun savePassedUserTest(passedUserTest: PassedUserTest)
 
     @Query("SELECT * FROM unsavedTests WHERE userUid LIKE :userId")
-    fun getAllTests(userId: String): List<PassedUserTest>
+    fun getAllTests(userId: String): Flow<List<PassedUserTest>>
 
     @Query("SELECT * FROM unsavedTests WHERE userUid LIKE :userId AND testUid LIKE :testId")
     fun getTest(userId: String,testId: String): List<PassedUserTest>

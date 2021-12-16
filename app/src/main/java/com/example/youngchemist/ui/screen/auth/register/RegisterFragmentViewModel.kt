@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.youngchemist.R
+import com.example.youngchemist.db.shared_pref.UserPreferences
 import com.example.youngchemist.model.AuthResults
 import com.example.youngchemist.repositories.AuthRepository
 import com.example.youngchemist.ui.base.validation.ValidationImpl.*
@@ -13,6 +14,7 @@ import com.example.youngchemist.ui.screen.Screens
 import com.example.youngchemist.ui.util.Event
 import com.example.youngchemist.ui.util.Resource
 import com.example.youngchemist.ui.util.ResourceNetwork
+import com.example.youngchemist.ui.util.UserState
 import com.github.terrakok.cicerone.Router
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -33,7 +35,8 @@ class RegisterFragmentViewModel @Inject constructor(
     private val passwordValidation: PasswordValidation,
     private val surnameValidation: SurnameValidation,
     private val authRepository: AuthRepository,
-    @ApplicationContext private val context: Context
+    @ApplicationContext private val context: Context,
+    private val userPreferences: UserPreferences
 ) : ViewModel() {
 
     val authResults: AuthResults
@@ -99,6 +102,7 @@ class RegisterFragmentViewModel @Inject constructor(
     }
 
     fun enter() {
+        userPreferences.userState = UserState.REGISTER
         router.newRootScreen(Screens.mainScreen(0))
     }
 

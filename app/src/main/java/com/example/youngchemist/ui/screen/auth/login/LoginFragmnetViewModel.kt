@@ -5,6 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.youngchemist.db.shared_pref.UserPreferences
 import com.example.youngchemist.repositories.AuthRepository
 import com.example.youngchemist.ui.base.validation.ValidationImpl.LoginValidation
 import com.example.youngchemist.ui.base.validation.ValidationImpl.PasswordValidation
@@ -12,6 +13,7 @@ import com.example.youngchemist.ui.screen.Screens
 import com.example.youngchemist.ui.util.Event
 import com.example.youngchemist.ui.util.Resource
 import com.example.youngchemist.ui.util.ResourceNetwork
+import com.example.youngchemist.ui.util.UserState
 import com.github.terrakok.cicerone.Router
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -26,7 +28,8 @@ class LoginFragmnetViewModel @Inject constructor(
     private val router: Router,
     private val loginValidation: LoginValidation,
     private val passwordValidation: PasswordValidation,
-    private val authRepository: AuthRepository
+    private val authRepository: AuthRepository,
+    private val userPreferences: UserPreferences
 ) : ViewModel() {
 
 
@@ -77,6 +80,7 @@ class LoginFragmnetViewModel @Inject constructor(
     }
 
     fun enter() {
+        userPreferences.userState = UserState.LOGIN
         router.newRootScreen(Screens.mainScreen(0))
     }
 

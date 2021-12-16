@@ -2,7 +2,12 @@ package com.example.youngchemist.db.shared_pref
 
 import android.content.Context
 import android.content.SharedPreferences
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import com.example.youngchemist.ui.util.Resource
+import com.example.youngchemist.ui.util.UserState
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.flow.MutableStateFlow
 import javax.inject.Inject
 
 class UserPreferenceImpl @Inject constructor(
@@ -31,4 +36,20 @@ class UserPreferenceImpl @Inject constructor(
             edit.apply()
             field = value
         }
+
+    override var loggedUserState: MutableLiveData<Set<String>> = sharedPref.let {
+        val liveData = MutableLiveData<Set<String>>()
+        liveData.postValue(sharedPref.getStringSet(KEY_USER_ID,null))
+        liveData
+    }
+        set(value) {
+            field = value
+        }
+    override var userState: Int = -1
+        get() = field
+        set(value) {
+            field = value
+        }
+
+    override val userStateFlow: MutableStateFlow<Resource<String>?> = MutableStateFlow(null)
 }

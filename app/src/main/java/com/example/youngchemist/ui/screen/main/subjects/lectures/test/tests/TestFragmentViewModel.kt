@@ -23,6 +23,7 @@ import com.example.youngchemist.repositories.DatabaseRepository
 import com.example.youngchemist.repositories.FireStoreRepository
 import com.example.youngchemist.ui.base.workers.TestUploadingWorker
 import com.example.youngchemist.ui.screen.Screens
+import com.example.youngchemist.ui.util.Constants.TEST_USER
 import com.example.youngchemist.ui.util.FragmentAnimationBehavior
 import com.example.youngchemist.ui.util.ResourceNetwork
 import com.example.youngchemist.ui.util.evaluateTime
@@ -41,7 +42,6 @@ import javax.inject.Inject
 @HiltViewModel
 class TestFragmentViewModel @Inject constructor(
     private val router: Router,
-    private val fireStoreRepository: FireStoreRepository,
     private val workManager: WorkManager,
     @ApplicationContext val context: Context,
     private val databaseRepository: DatabaseRepository
@@ -100,7 +100,7 @@ class TestFragmentViewModel @Inject constructor(
                     val test = it.first!!
                     val tasks = it.second
                     val testUi = TestUi(
-                        "",
+                        TEST_USER,
                         test.testId,
                         if (saveWithNoProgress) ArrayList(initializeEmptyTaskUiList(test.tasks)) else ArrayList(
                             tasks

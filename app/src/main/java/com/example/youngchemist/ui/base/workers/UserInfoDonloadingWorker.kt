@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
+import com.example.youngchemist.db.shared_pref.UserPreferences
 import com.example.youngchemist.model.UserInfo
 import com.example.youngchemist.model.user.Model3D
 import com.example.youngchemist.model.user.PassedUserTest
@@ -14,17 +15,16 @@ import com.example.youngchemist.repositories.FireStoreRepository
 import com.example.youngchemist.ui.util.ResourceNetwork
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
+import javax.inject.Inject
 
 @HiltWorker
 class UserInfoDonloadingWorker @AssistedInject constructor(
     @Assisted private val context: Context,
     @Assisted workerParameters: WorkerParameters,
     private val fireStoreRepository: FireStoreRepository,
-    private val databaseRepository: DatabaseRepository
+    private val databaseRepository: DatabaseRepository,
+    private val userPreferences: UserPreferences
 ): CoroutineWorker(context,workerParameters) {
 
     override suspend fun doWork(): Result {
@@ -41,6 +41,7 @@ class UserInfoDonloadingWorker @AssistedInject constructor(
                         resultUserProgress.await()
                         resultModels.await()
                     }
+                    saveUser(userId)
                     return@withContext Result.success()
                 }
                 is ResourceNetwork.Error -> {
@@ -53,21 +54,33 @@ class UserInfoDonloadingWorker @AssistedInject constructor(
         }
     }
 
+    private fun saveUser(userId: String) {
+        val setOfUsers = mutableSetOf<String>()
+        setOfUsers.addAll(userPreferences.loggedUsers)
+        setOfUsers.add(userId)
+        userPreferences.loggedUsers = setOfUsers
+        userPreferences.loggedUserState.postValue(setOfUsers)
+    }
+
     private fun saveData(data: List<UserInfo>) = CoroutineScope(Dispatchers.Default).async {
-        when (data[0]) {
-            is PassedUserTest -> {
-                for (item in data) {
-                    databaseRepository.savePassedUserTest(item as PassedUserTest)
+        //delay(15000)
+        Log.d("TAG","saving data")
+        if (data.isNotEmpty()) {
+            when (data[0]) {
+                is PassedUserTest -> {
+                    for (item in data) {
+                        databaseRepository.savePassedUserTest(item as PassedUserTest)
+                    }
                 }
-            }
-            is Model3D -> {
-                for (item in data) {
-                    databaseRepository.save3DModel(item as Model3D)
+                is Model3D -> {
+                    for (item in data) {
+                        databaseRepository.save3DModel(item as Model3D)
+                    }
                 }
-            }
-            is UserProgress -> {
-                for (item in data) {
-                    databaseRepository.saveProgress(item as UserProgress)
+                is UserProgress -> {
+                    for (item in data) {
+                        databaseRepository.saveProgress(item as UserProgress)
+                    }
                 }
             }
         }

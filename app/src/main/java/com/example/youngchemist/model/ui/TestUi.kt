@@ -12,6 +12,7 @@ data class TestUi(
     fun formatUserPassedTest(test: Test): PassedUserTest {
         val passedUserTest = PassedUserTest()
         passedUserTest.testUid = test.testId
+        passedUserTest.userUid = userUid
         var mark = 0.0
         val userAnswersList = arrayListOf<AnswerUser>()
         for (item in tasksUi) {

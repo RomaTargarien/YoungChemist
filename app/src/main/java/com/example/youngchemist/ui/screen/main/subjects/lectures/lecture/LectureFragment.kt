@@ -88,9 +88,6 @@ class LectureFragment : Fragment() {
                 if (lastPage < position+1) {
                     lastPage = position+1
                 }
-                if (position+1 == size) {
-                    viewModel.lectureHasBeenReaden(lecture.lectureId)
-                }
                 binding.bmSheet.rvPagesPagination.smoothScrollToPosition(position)
                 binding.tvPageNumber.text = "${position+1}/$size"
                 binding.bnBeginTest.isVisible = (position+1) == size

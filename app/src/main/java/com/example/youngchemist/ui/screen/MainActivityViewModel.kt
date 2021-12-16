@@ -14,43 +14,10 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MainActivityViewModel @Inject constructor(
-    private val router: Router,
-    private val userPreferences: UserPreferences,
-    private val fireStoreRepository: FireStoreRepository,
-    private val databaseRepository: DatabaseRepository
+    private val router: Router
 ) : ViewModel() {
 
     fun onActivityCreated() {
         router.newRootScreen(Screens.authScreen())
-    }
-
-    init {
-        viewModelScope.launch {
-            val userId = "76V1UE5VssV0W8mXenibeUpvQxm1"
-            if (userId in userPreferences.loggedUsers) {
-                Log.d("TAG","old user")
-            } else {
-                val result = fireStoreRepository.getUser(userId)
-                val user = result.await()
-                if (user is ResourceNetwork.Success) {
-                    user.data?.let {
-                        for (item in it.passedUserTests) {
-                            databaseRepository.savePassedUserTest(item)
-                        }
-                        for (item in it.saved3DModels) {
-                            databaseRepository.save3DModel(item)
-                        }
-                        for (item in it.userProgress) {
-                            databaseRepository.saveProgress(item)
-                        }
-                    }
-                }
-                val setOfUsers = mutableSetOf<String>()
-                setOfUsers.addAll(userPreferences.loggedUsers)
-                setOfUsers.add(userId)
-                userPreferences.loggedUsers = setOfUsers
-            }
-        }
-
     }
 }

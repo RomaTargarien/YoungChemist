@@ -11,6 +11,7 @@ import com.example.youngchemist.ui.util.BitmapUtils
 
 class SubjectsAdapter : RecyclerView.Adapter<SubjectsAdapter.SubjectViewHolder>() {
 
+    var isClickable: Boolean = false
 
     private val differCallBack = object : DiffUtil.ItemCallback<Subject>() {
         override fun areItemsTheSame(oldItem: Subject, newItem: Subject): Boolean {
@@ -32,12 +33,17 @@ class SubjectsAdapter : RecyclerView.Adapter<SubjectsAdapter.SubjectViewHolder>(
     inner class SubjectViewHolder(val binding: ItemSubjectBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(item: Subject) {
+            if (!isClickable) {
+                binding.containerItem.alpha = 0.5f
+            } else {
+                binding.containerItem.alpha = 1f
+            }
             binding.title.setText(item.title)
             val bitmap = BitmapUtils.convertCompressedByteArrayToBitmap(item.iconByteArray)
             binding.ivSubject.setImageBitmap(bitmap)
             binding.ivSubject.setOnClickListener {
                 onClick?.let { click ->
-                    click(item)
+                    if (isClickable) {click(item)}
                 }
             }
         }

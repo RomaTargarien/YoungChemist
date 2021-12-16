@@ -14,6 +14,8 @@ import android.graphics.BitmapFactory
 
 import android.graphics.Bitmap
 import androidx.core.view.isVisible
+import com.example.youngchemist.R
+import com.example.youngchemist.ui.util.Resource
 
 
 @AndroidEntryPoint
@@ -40,6 +42,27 @@ class SubjectsFragment : Fragment() {
         adapter.setOnClickListener {
             viewModel.navigateToLecturesListScreen(it)
         }
+        viewModel.userState.observe(viewLifecycleOwner,{
+            when (it) {
+                is Resource.Loading -> {
+                    binding.containerUserState.isVisible = true
+                    adapter.isClickable = false
+                }
+                is Resource.Error -> {
+                    binding.pbUserState.isVisible = false
+                    binding.ivUserState.isVisible = true
+                    adapter.isClickable = false
+                    binding.ivUserState.setImageResource(R.drawable.error)
+                }
+                is Resource.Success -> {
+                    binding.pbUserState.isVisible = false
+                    binding.ivUserState.isVisible = true
+                    adapter.isClickable = true
+                    adapter.notifyDataSetChanged()
+                    binding.ivUserState.setImageResource(R.drawable.success)
+                }
+            }
+        })
 
         viewModel.subjectsState.observe(viewLifecycleOwner,{
             when (it) {

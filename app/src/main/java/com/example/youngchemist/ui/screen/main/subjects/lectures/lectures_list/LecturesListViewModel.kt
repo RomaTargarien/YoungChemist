@@ -1,9 +1,9 @@
 package com.example.youngchemist.ui.screen.main.subjects.lectures.lectures_list
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import android.util.Log
+import androidx.lifecycle.*
+import androidx.work.WorkManager
+import com.example.youngchemist.db.shared_pref.UserPreferences
 import com.example.youngchemist.model.Lecture
 import com.example.youngchemist.model.Test
 import com.example.youngchemist.model.ui.LectureUi
@@ -12,19 +12,23 @@ import com.example.youngchemist.model.user.UserProgress
 import com.example.youngchemist.repositories.DatabaseRepository
 import com.example.youngchemist.repositories.FireStoreRepository
 import com.example.youngchemist.ui.screen.Screens
+import com.example.youngchemist.ui.util.Constants.TEST_USER
 import com.example.youngchemist.ui.util.ResourceNetwork
 import com.example.youngchemist.ui.util.getLecturesId
 import com.example.youngchemist.ui.util.getLocalLecturesId
 import com.github.terrakok.cicerone.Router
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class LecturesListViewModel @Inject constructor(
     private val router: Router,
+    private val workManager: WorkManager,
     private val fireStoreRepository: FireStoreRepository,
     private val databaseRepository: DatabaseRepository,
+    private val userPreferences: UserPreferences
 ) : ViewModel() {
 
     private val _lecturesListState: MutableLiveData<ResourceNetwork<List<Lecture>>> =
@@ -37,14 +41,27 @@ class LecturesListViewModel @Inject constructor(
     private val _doneTests: MutableLiveData<Pair<Int, Int>> = MutableLiveData()
     val doneTests: LiveData<Pair<Int, Int>> = _doneTests
 
+    private val userProgresshasBeenApproved = MutableStateFlow(false)
+
+    init {
+        viewModelScope.launch {
+            userPreferences.loggedUserState.asFlow().filterNotNull().collect {
+                if (TEST_USER in it) {
+                    userProgresshasBeenApproved.emit(true)
+                }
+            }
+        }
+    }
+
     fun getData(collectionId: String) {
         viewModelScope.launch {
             val lecturesUi = mutableListOf<LectureUi>()
             _lecturesListState.postValue(ResourceNetwork.Loading())
             val result = databaseRepository.getAllLectures(collectionId)
-            val progressList = databaseRepository.getProgress("")
-            val passedUserTests = databaseRepository.getAllPassedUserTests("")
+            val progressList = databaseRepository.getProgress(TEST_USER)
+            val passedUserTests = databaseRepository.getAllPassedUserTests(TEST_USER)
             var data = result.await()
+
             if (data.isEmpty()) {
                 fireStoreRepository.getAllLectures(collectionId).let {
                     if (it is ResourceNetwork.Success) {
@@ -64,17 +81,45 @@ class LecturesListViewModel @Inject constructor(
             data.forEach {
                 lecturesUi.add(it.convertToLectureUi())
             }
-            lecturesUi.forEach { lectureUi ->
-                addUserProgress(lectureUi,progressList)
-                addUserPassedTests(lectureUi,passedUserTests)
+            _lecturesUi.postValue(lecturesUi)
+            launch {
+                combine(userProgresshasBeenApproved,progressList){ a, b ->
+                    Pair(a,b)
+                }.collect {
+                    val available = it.first
+                    val userProgress = it.second
+                    if (available) {
+                        lecturesUi.forEach {
+                            addUserProgress(it,userProgress)
+                        }
+                        _lecturesUi.postValue(lecturesUi)
+                    }
+
+                }
+            }
+            launch {
+                combine(userProgresshasBeenApproved,passedUserTests) { a, b ->
+                    Pair(a,b)
+                }.collect {
+                    val available = it.first
+                    val passedTests = it.second
+                    if (available) {
+                        lecturesUi.forEach {
+                            addUserPassedTests(it,passedTests)
+                        }
+                        _lecturesUi.postValue(lecturesUi)
+                    }
+                }
             }
         }
     }
 
+
+
     private fun addUserProgress(lectureUi: LectureUi,userProgressList: List<UserProgress>) {
         viewModelScope.launch {
             if (!(lectureUi.lectureId in userProgressList.getLocalLecturesId())) {
-                val userProgress = UserProgress("",lectureUi.lectureId,0)
+                val userProgress = UserProgress(TEST_USER,lectureUi.lectureId,0)
                 lectureUi.userProgress = userProgress
                 databaseRepository.saveProgress(userProgress)
             } else {
@@ -87,6 +132,7 @@ class LecturesListViewModel @Inject constructor(
 
     private fun addUserPassedTests(lectureUi: LectureUi,userPassedTests: List<PassedUserTest>) {
         lectureUi.test?.let { test ->
+            lectureUi.isTestEnabled = true
             val passedUserTest = userPassedTests.find { passedUserTest ->
                 test.testId.equals(passedUserTest.testUid)
             }

@@ -7,16 +7,20 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.youngchemist.db.shared_pref.UserPreferences
 import com.example.youngchemist.model.*
 import com.example.youngchemist.repositories.DatabaseRepository
 import com.example.youngchemist.repositories.FireStoreRepository
 import com.example.youngchemist.ui.screen.Screens
 import com.example.youngchemist.ui.util.BitmapUtils
+import com.example.youngchemist.ui.util.Resource
 import com.example.youngchemist.ui.util.ResourceNetwork
 import com.example.youngchemist.ui.util.safeCall
 import com.github.terrakok.cicerone.Router
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.ByteArrayOutputStream
@@ -33,7 +37,8 @@ var array: ByteArray? = null
 class SubjectsFragmentViewModel @Inject constructor(
     private val router: Router,
     private val fireStoreRepository: FireStoreRepository,
-    private val databaseRepository: DatabaseRepository
+    private val databaseRepository: DatabaseRepository,
+    private val userPreferences: UserPreferences
 ): ViewModel() {
 
     private val _subjectsState: MutableLiveData<ResourceNetwork<List<Subject>>> = MutableLiveData()
@@ -41,6 +46,9 @@ class SubjectsFragmentViewModel @Inject constructor(
 
     private val _imageBitmap: MutableLiveData<Bitmap> = MutableLiveData()
     val imageBitmap: LiveData<Bitmap> = _imageBitmap
+
+    private val _userState: MutableLiveData<Resource<String>> = MutableLiveData()
+    val userState: LiveData<Resource<String>> = _userState
 
     fun navigateToLecturesListScreen(subject: Subject) {
         router.navigateTo(Screens.lecturesListScreen(subject))
@@ -52,6 +60,12 @@ class SubjectsFragmentViewModel @Inject constructor(
 
     init {
         getAllSubjects()
+        viewModelScope.launch {
+            userPreferences.userStateFlow.filterNotNull().collect {
+                Log.d("TAG",it.toString())
+                _userState.postValue(it)
+            }
+        }
         val data = arrayListOf<String>()
         data.add("<html lang=\"en\"> <head>     <meta charset=\"UTF-8\">     <meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\">     <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"> </head> <body>     <div>         <p align = \"center\";\">             Метан         </p>         <p align = \"center\";\">          <img src=\"https://firebasestorage.googleapis.com/v0/b/youngchemist-c52a2.appspot.com/o/metan.png?alt=media&token=b2873f55-8b1c-4a5e-856b-d996193e0935\"                 data-token=\"https://firebasestorage.googleapis.com/v0/b/youngchemist-c52a2.appspot.com/o/metan.glb?alt=media&token=e83f8e86-e127-4dca-a220-827ae27de555\"                 alt=\"\\\"                  id=\"image\"                 width=\"300\"                  height=\"300\"                 onclick=\"onClickHandler(this)\">                    </p>     </div> </body> <script lang=\"javascript\" type=\"text/javascript\">     function onClickHandler(element) {         let token = element.dataset.token;         androidImage.get3DImageUrl(token)     } </script> </html>")
         data.add("<!DOCTYPE html> <html lang=\"en\"> <head>     <meta charset=\"UTF-8\">     <meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\">     <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"> </head> <body>     <p  align=\"center\">         Малорастворим в воде, почти в два раза легче воздуха. Метан нетоксичен,          но при высокой концентрации в воздухе обладает слабым наркотическим действием.           Имеются данные, что метан при хроническом воздействии малых концентраций в воздухе неблагоприятно влияет            на центральную нервную систему.             Наркотическое действие метана CH4 ослабляется его малой              растворимостью в воде и крови и химической инертностью. Класс токсичности — четвёртый.     </p>           </body> </html>")

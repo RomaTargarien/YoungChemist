@@ -6,6 +6,7 @@ import com.example.youngchemist.model.user.Model3D
 import com.example.youngchemist.model.user.PassedUserTest
 import com.example.youngchemist.model.user.UserProgress
 import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.flow.Flow
 
 interface DatabaseRepository {
 
@@ -33,9 +34,9 @@ interface DatabaseRepository {
 
     suspend fun saveProgress(userProgress: UserProgress)
 
-    suspend fun getProgress(userId: String = "%"): List<UserProgress>
+    suspend fun getProgress(userId: String = "%"): Flow<List<UserProgress>>
 
-    suspend fun getAllPassedUserTests(userId: String): List<PassedUserTest>
+    suspend fun getAllPassedUserTests(userId: String): Flow<List<PassedUserTest>>
 
     suspend fun getPassedUserTest(userId: String, testId: String): PassedUserTest?
 

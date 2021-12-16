@@ -36,6 +36,7 @@ class MainFragment : Fragment(), BottomTabScreen {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        viewModel
         createBottomNavMenu()
         createBottomNavMenuItemSelectedListener()
         replaceFragment(getFragmentForTabId(id_subjects)!!)

@@ -2,11 +2,11 @@ package com.example.youngchemist.ui.screen.main.subjects.lectures.lectures_list
 
 import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.view.animation.AnimationUtils
 import androidx.core.view.isVisible
-import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.youngchemist.R
@@ -17,27 +17,25 @@ import kotlin.math.roundToInt
 
 class LecturesListAdapter : RecyclerView.Adapter<LecturesListAdapter.LectureViewHolder>() {
 
-    private val differCallBack = object : DiffUtil.ItemCallback<LectureUi>() {
-        override fun areItemsTheSame(oldItem: LectureUi, newItem: LectureUi): Boolean {
-            return oldItem.hashCode() == newItem.hashCode()
-        }
+    private val lectures: MutableList<LectureUi> = mutableListOf()
 
-        override fun areContentsTheSame(oldItem: LectureUi, newItem: LectureUi): Boolean {
-            return oldItem.lectureId == newItem.lectureId
-        }
+    fun submitList(modelsList: List<LectureUi>) {
+        val result: DiffUtil.DiffResult = DiffUtil.calculateDiff(DiffCallback(lectures, modelsList))
+        result.dispatchUpdatesTo(this)
+        Log.d("TAG","list_submitted")
+        lectures.clear()
+        lectures.addAll(modelsList)
+        notifyDataSetChanged()
     }
-
-    private val differ = AsyncListDiffer(this, differCallBack)
-
-    var lectures: List<LectureUi>
-        get() = differ.currentList
-        set(value) = differ.submitList(value)
 
     inner class LectureViewHolder(val binding: ItemLectureInListBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(item: LectureUi) {
             binding.tvTitle.text = item.lectureTitle
             binding.tvDescription.text = item.lectureDescription
+            binding.bnBeginTest.isVisible = false
+            binding.tvTextTestMark.isVisible = false
+            binding.tvTestMark.isVisible = false
             item.test?.let {
                 toggleTestState(item.isTestEnabled)
             }
@@ -105,5 +103,26 @@ class LecturesListAdapter : RecyclerView.Adapter<LecturesListAdapter.LectureView
     private var onClick: ((LectureUi) -> Unit)? = null
     fun setOnClickListener(listener: (LectureUi) -> Unit) {
         onClick = listener
+    }
+}
+
+class DiffCallback(private val oldList: List<LectureUi>, private val newList: List<LectureUi>) :
+    DiffUtil.Callback() {
+
+    override fun getOldListSize(): Int {
+        return oldList.size
+    }
+
+    override fun getNewListSize(): Int {
+        return newList.size
+    }
+
+    override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+        return oldList[oldItemPosition].hashCode() == newList[newItemPosition].hashCode()
+    }
+
+    override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+        return (oldList[oldItemPosition].lectureId == newList[newItemPosition].lectureId)
+                && (oldList[oldItemPosition].userProgress?.lastReadenPage == newList[newItemPosition].userProgress?.lastReadenPage)
     }
 }
