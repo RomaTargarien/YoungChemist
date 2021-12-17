@@ -11,6 +11,7 @@ data class LectureUi(
     var collectionId: String = "",
     var lectureTitle: String = "",
     var lectureDescription: String ="",
+    var lectureKeyWord: String = "",
     var data: ArrayList<String> = arrayListOf(),
     var isTestEnabled: Boolean = false,
     var mark: Double = 0.0,

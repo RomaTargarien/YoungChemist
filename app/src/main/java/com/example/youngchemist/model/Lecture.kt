@@ -14,6 +14,7 @@ data class Lecture(
     var collectionId: String = "",
     var lectureTitle: String = "",
     var lectureDescription: String = "",
+    var lectureKeyWord: String ="",
     var data: ArrayList<String> = arrayListOf(),
     var test: Test? = null
 ) : Parcelable {
@@ -23,6 +24,7 @@ data class Lecture(
         collectionId,
         lectureTitle,
         lectureDescription,
+        lectureKeyWord,
         data,
         false,
         test = test

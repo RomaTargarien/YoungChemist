@@ -64,6 +64,10 @@ class LecturesListFragment : Fragment() {
         adapter.setOnBeginTestListener {
             viewModel.navigateToTestScreen(it)
         }
+        adapter.setOnLectureIsUnlockedListener {
+            it.userProgress?.let { viewModel.saveProgress(it) }
+            viewModel.navigateToLectureScreen(it)
+        }
 
         viewModel.lecturesUi.observe(viewLifecycleOwner, {
             var allAmountOfTests = 0

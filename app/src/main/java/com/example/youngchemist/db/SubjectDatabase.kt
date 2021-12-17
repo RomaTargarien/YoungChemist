@@ -10,7 +10,10 @@ import com.example.youngchemist.model.user.Model3D
 import com.example.youngchemist.model.user.PassedUserTest
 import com.example.youngchemist.model.user.UserProgress
 
-@Database(entities = [Subject::class, Lecture::class, PassedUserTest::class,Model3D::class,UserProgress::class], version = 16)
+@Database(
+    entities = [Subject::class, Lecture::class, PassedUserTest::class, Model3D::class, UserProgress::class],
+    version = 18
+)
 @TypeConverters(Converters::class)
 abstract class SubjectDatabase : RoomDatabase() {
     abstract fun getSubjectdao(): SubjectDao

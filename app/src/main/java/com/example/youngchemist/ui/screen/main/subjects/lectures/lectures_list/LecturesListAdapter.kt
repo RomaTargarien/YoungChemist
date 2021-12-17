@@ -1,9 +1,11 @@
 package com.example.youngchemist.ui.screen.main.subjects.lectures.lectures_list
 
+import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AnimationUtils
 import androidx.core.view.isVisible
@@ -13,6 +15,9 @@ import com.example.youngchemist.R
 import com.example.youngchemist.databinding.ItemLectureInListBinding
 import com.example.youngchemist.model.Test
 import com.example.youngchemist.model.ui.LectureUi
+import com.example.youngchemist.model.user.UserProgress
+import com.example.youngchemist.ui.util.animateProgress
+import com.example.youngchemist.ui.util.shake
 import kotlin.math.roundToInt
 
 class LecturesListAdapter : RecyclerView.Adapter<LecturesListAdapter.LectureViewHolder>() {
@@ -22,7 +27,6 @@ class LecturesListAdapter : RecyclerView.Adapter<LecturesListAdapter.LectureView
     fun submitList(modelsList: List<LectureUi>) {
         val result: DiffUtil.DiffResult = DiffUtil.calculateDiff(DiffCallback(lectures, modelsList))
         result.dispatchUpdatesTo(this)
-        Log.d("TAG","list_submitted")
         lectures.clear()
         lectures.addAll(modelsList)
         notifyDataSetChanged()
@@ -40,31 +44,9 @@ class LecturesListAdapter : RecyclerView.Adapter<LecturesListAdapter.LectureView
                 toggleTestState(item.isTestEnabled)
             }
             item.userProgress?.let {
-                val to = ((it.lastReadenPage.toFloat() / item.data.size.toFloat()) * 100).toInt()
-                val pregressAnimator = ObjectAnimator.ofInt(binding.pbLecture, "progress", 0, to)
-                pregressAnimator.duration = 1800
-                pregressAnimator.start()
+                toggleUserProgressState(it,item)
             }
-            val animator = ValueAnimator.ofFloat(0.0f, item.mark.toFloat())
-            animator.duration = 2000
-            animator.addUpdateListener(object : ValueAnimator.AnimatorUpdateListener {
-                override fun onAnimationUpdate(p0: ValueAnimator?) {
-                    val number = (p0?.animatedValue as Float).toDouble()
-                    val roundedNumber: Double = (number * 10.0).roundToInt() / 10.0
-                    binding.tvTestMark.text = roundedNumber.toString()
-                }
-            })
-            animator.start()
-            binding.cvLecture.setOnClickListener {
-                onClick?.let { click ->
-                    click(item)
-                }
-            }
-            binding.bnBeginTest.setOnClickListener {
-                onBeginTestButtonClicked?.let { click ->
-                    item.test?.let { click(it) }
-                }
-            }
+            setOnClickListeners(item)
         }
 
         private fun toggleTestState(isTestEnabled: Boolean) {
@@ -73,6 +55,74 @@ class LecturesListAdapter : RecyclerView.Adapter<LecturesListAdapter.LectureView
             } else {
                 binding.tvTextTestMark.isVisible = true
                 binding.tvTestMark.isVisible = true
+            }
+        }
+
+        private fun toggleUserProgressState(userProgress: UserProgress,lectureUi: LectureUi) {
+            if (userProgress.isLectureEnabled) {
+                binding.ivLectureAvailable.setImageResource(R.drawable.success)
+                val to = ((userProgress.lastReadenPage.toFloat() / lectureUi.data.size.toFloat()) * 100).toInt()
+                binding.pbLecture.animateProgress(0,to)
+                val animator = ValueAnimator.ofFloat(0.0f, lectureUi.mark.toFloat())
+                animator.duration = 2000
+                animator.addUpdateListener(object : ValueAnimator.AnimatorUpdateListener {
+                    override fun onAnimationUpdate(p0: ValueAnimator?) {
+                        val number = (p0?.animatedValue as Float).toDouble()
+                        val roundedNumber: Double = (number * 10.0).roundToInt() / 10.0
+                        binding.tvTestMark.text = roundedNumber.toString()
+                    }
+                })
+                animator.start()
+            }
+        }
+
+        private fun setOnClickListeners(lectureUi: LectureUi) {
+            binding.cvLecture.setOnClickListener {
+                lectureUi.userProgress?.let {
+                    if (it.isLectureEnabled) {
+                        onClick?.let { click ->
+                            click(lectureUi)
+                        }
+                    } else {
+                        binding.ivLectureAvailable.shake().start()
+                    }
+                }
+            }
+
+            binding.bnBeginTest.setOnClickListener {
+                lectureUi.userProgress?.let {
+                    if (it.isLectureEnabled) {
+                        onBeginTestButtonClicked?.let { click ->
+                            lectureUi.test?.let { click(it) }
+                        }
+                    }
+                }
+            }
+
+            var flag = false
+            binding.ivLecture.setOnClickListener {
+                lectureUi.userProgress?.let {
+                    if (!it.isLectureEnabled) {
+                        if (flag) {
+                            binding.clMain.transitionToState(R.id.start)
+                            flag = false
+                        } else {
+                            binding.clMain.transitionToState(R.id.end)
+                            flag = true
+                        }
+                    }
+                }
+            }
+
+            binding.ivEnterKey.setOnClickListener {
+                if (binding.etKey.text.toString() == lectureUi.lectureKeyWord) {
+                    onLectureIsUnlockedClicked?.let { click ->
+                        lectureUi.userProgress?.isLectureEnabled = true
+                        click(lectureUi)
+                    }
+                } else {
+                    binding.ivEnterKey.shake().start()
+                }
             }
         }
     }
@@ -103,6 +153,11 @@ class LecturesListAdapter : RecyclerView.Adapter<LecturesListAdapter.LectureView
     private var onClick: ((LectureUi) -> Unit)? = null
     fun setOnClickListener(listener: (LectureUi) -> Unit) {
         onClick = listener
+    }
+
+    private var onLectureIsUnlockedClicked: ((LectureUi)-> Unit)? = null
+    fun setOnLectureIsUnlockedListener(listener: (LectureUi) -> Unit) {
+        onLectureIsUnlockedClicked = listener
     }
 }
 

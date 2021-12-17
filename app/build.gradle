@@ -141,8 +141,6 @@ dependencies {
     //CircularProgressBar
     implementation 'com.mikhaellopez:circularprogressbar:3.1.0'
 
-    implementation 'io.github.glailton.expandabletextview:expandabletextview:1.0.1'
-
     implementation "androidx.room:room-runtime:2.2.5"
     kapt "androidx.room:room-compiler:2.2.5"
     implementation "androidx.room:room-ktx:2.2.5"

@@ -37,17 +37,17 @@ class UserInfoUploadingWorker @AssistedInject constructor(
                             throw Exception(result.message)
                         }
                     }
-//                val userProgress = databaseRepository.getProgress()
-//                userProgress.collect {
-//                    Log.d("TAG","worker_save")
-//                    it.groupBy { it.userId }
-//                        .forEach {
-//                        val result = fireStoreRepository.saveUserProgress(it.key,it.value)
-//                        if (result is ResourceNetwork.Error) {
-//                            throw Exception(result.message)
-//                        }
-//                    }
-//                }
+                val userProgress = databaseRepository.getProgress()
+                userProgress.collect {
+                    Log.d("TAG","worker_save")
+                    it.groupBy { it.userId }
+                        .forEach {
+                        val result = fireStoreRepository.saveUserProgress(it.key,it.value)
+                        if (result is ResourceNetwork.Error) {
+                            throw Exception(result.message)
+                        }
+                    }
+                }
                 return@withContext Result.success()
             } catch (e: Exception) {
                 e.localizedMessage?.let {

@@ -130,6 +130,12 @@ class LecturesListViewModel @Inject constructor(
         }
     }
 
+    fun saveProgress(userProgress: UserProgress) {
+        viewModelScope.launch {
+            databaseRepository.saveProgress(userProgress)
+        }
+    }
+
     private fun addUserPassedTests(lectureUi: LectureUi,userPassedTests: List<PassedUserTest>) {
         lectureUi.test?.let { test ->
             lectureUi.isTestEnabled = true

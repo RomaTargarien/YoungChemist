@@ -12,7 +12,8 @@ import kotlinx.android.parcel.Parcelize
 data class UserProgress(
     var userId: String = "",
     var lectureId: String = "",
-    var lastReadenPage: Int = 0
+    var lastReadenPage: Int = 0,
+    var isLectureEnabled: Boolean = false
 ): Parcelable,UserInfo {
     @PrimaryKey(autoGenerate = true)
     var userProgressPrimaryKey: Int = 0

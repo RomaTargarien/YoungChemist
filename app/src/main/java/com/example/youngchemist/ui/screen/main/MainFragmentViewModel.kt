@@ -49,7 +49,7 @@ class MainFragmentViewModel @Inject constructor(
                 }
             }
         }
-        workManager.enqueue(PeriodicWorkRequestBuilder<UserInfoUploadingWorker>(4,TimeUnit.HOURS).build())
+        //workManager.enqueue(OneTimeWorkRequestBuilder<UserInfoUploadingWorker>().build())
     }
 
     fun exit() {
