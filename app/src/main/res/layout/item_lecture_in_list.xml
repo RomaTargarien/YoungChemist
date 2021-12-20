@@ -17,25 +17,26 @@
             android:id="@+id/iv_lecture"
             android:layout_width="110dp"
             android:layout_height="110dp"
-            android:layout_marginLeft="15dp"
+            android:layout_marginStart="16dp"
             android:layout_marginTop="8dp"
             android:elevation="10dp"
             android:scaleType="fitXY"
             android:src="@drawable/ic_icon_lecture"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintBottom_toBottomOf="@+id/cv_lecture"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="@+id/cv_lecture" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/key_container"
             android:layout_width="wrap_content"
-            android:layout_height="60dp"
+            android:layout_height="0dp"
             android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
             android:background="@drawable/shape_rounded_rectangle_for_edittext"
             android:backgroundTint="@color/white"
             android:minWidth="200dp"
             android:orientation="horizontal"
-            android:visibility="gone"
+            android:visibility="invisible"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="@+id/iv_lecture"
             app:layout_constraintStart_toStartOf="@+id/iv_lecture"
@@ -72,16 +73,15 @@
             android:layout_width="match_parent"
             android:layout_height="150dp"
             android:layout_marginStart="100dp"
-            android:layout_marginLeft="100dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="16dp"
-            android:layout_marginRight="16dp"
-            android:layout_marginBottom="16dp"
+            android:layout_marginEnd="20dp"
+            android:layout_marginTop="30dp"
+            android:layout_marginBottom="10dp"
             app:cardCornerRadius="20dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.3">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
@@ -96,8 +96,10 @@
                     android:progressDrawable="@drawable/lecture_progress"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.0"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintVertical_bias="0.0" />
 
                 <ImageView
                     android:id="@+id/iv_lecture_available"
@@ -115,7 +117,7 @@
                     android:id="@+id/tvTitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="60dp"
+                    android:layout_marginStart="40dp"
                     android:layout_marginTop="24dp"
                     android:layout_marginEnd="8dp"
                     android:minWidth="180dp"
@@ -131,7 +133,7 @@
                     android:id="@+id/tvDescription"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="60dp"
+                    android:layout_marginStart="40dp"
                     android:layout_marginLeft="60dp"
                     android:layout_marginEnd="16dp"
                     android:layout_marginRight="8dp"

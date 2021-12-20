@@ -19,6 +19,7 @@ import com.example.youngchemist.ui.util.safeCall
 import com.github.terrakok.cicerone.Router
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
@@ -103,6 +104,10 @@ class SubjectsFragmentViewModel @Inject constructor(
 //            //fireStoreRepository.saveLecture(lecture)
 //            //fireStoreRepository.saveTest(test)
 //        }
+    }
+
+    fun tryAgain() {
+        getAllSubjects()
     }
 
     private fun getAllSubjects() {

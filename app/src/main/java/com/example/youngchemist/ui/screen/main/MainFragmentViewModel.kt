@@ -2,9 +2,7 @@ package com.example.youngchemist.ui.screen.main
 
 import android.content.SharedPreferences
 import android.util.Log
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asFlow
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import androidx.work.*
 import com.example.youngchemist.db.shared_pref.UserPreferences
 import com.example.youngchemist.ui.base.workers.UserInfoDonloadingWorker
@@ -19,6 +17,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -30,7 +29,13 @@ class MainFragmentViewModel @Inject constructor(
     private val router: Router
 ): ViewModel() {
 
+    private val _bottomSheetState: MutableLiveData<Float> = MutableLiveData()
+    val bottomSheetState: LiveData<Float> = _bottomSheetState
+
     init {
+        viewModelScope.launch {
+            userSharedPreferences.bottomSheetState.emit(-1f)
+        }
         when (userSharedPreferences.userState) {
             UserState.REGISTER -> {
                 saveUser(TEST_USER)
@@ -47,6 +52,13 @@ class MainFragmentViewModel @Inject constructor(
                         userSharedPreferences.userStateFlow.emit(Resource.Success())
                     }
                 }
+            }
+        }
+
+        viewModelScope.launch {
+            userSharedPreferences.bottomSheetState.filterNotNull().collect {
+                Log.d("TAG",it.toString())
+                _bottomSheetState.postValue(it)
             }
         }
         //workManager.enqueue(OneTimeWorkRequestBuilder<UserInfoUploadingWorker>().build())
@@ -86,6 +98,11 @@ class MainFragmentViewModel @Inject constructor(
         setOfUsers.addAll(userSharedPreferences.loggedUsers)
         setOfUsers.add(userId)
         userSharedPreferences.loggedUsers = setOfUsers
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        Log.d("TAG","onCleared main")
     }
 
     companion object {

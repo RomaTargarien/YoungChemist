@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.addCallback
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.example.youngchemist.R
@@ -19,6 +20,8 @@ import com.example.youngchemist.ui.screen.main.user.UserFragment
 import com.luseen.spacenavigation.SpaceItem
 import com.luseen.spacenavigation.SpaceOnClickListener
 import dagger.hilt.android.AndroidEntryPoint
+import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent
+import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEventListener
 
 
 @AndroidEntryPoint
@@ -42,6 +45,20 @@ class MainFragment : Fragment(), BottomTabScreen {
         replaceFragment(getFragmentForTabId(id_subjects)!!)
         checkArguments()
 
+        viewModel.bottomSheetState.observe(viewLifecycleOwner,{
+            val slideOffSet = (1 - (0.5+it/2)).toFloat()
+            binding.bnvMain.animate().alpha(slideOffSet).setDuration(0).start()
+        })
+
+        KeyboardVisibilityEvent.setEventListener(
+            requireActivity(),
+            object : KeyboardVisibilityEventListener {
+                override fun onVisibilityChanged(isOpen: Boolean) {
+                    binding.bnvMain.isVisible = !isOpen
+                }
+            })
+
+        
         requireActivity().onBackPressedDispatcher.addCallback {
             viewModel.exit()
         }

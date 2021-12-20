@@ -1,5 +1,6 @@
 package com.example.youngchemist.ui.screen.main.subjects
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -13,9 +14,13 @@ import dagger.hilt.android.AndroidEntryPoint
 import android.graphics.BitmapFactory
 
 import android.graphics.Bitmap
+import android.util.Log
+import android.view.inputmethod.InputMethodManager
 import androidx.core.view.isVisible
 import com.example.youngchemist.R
 import com.example.youngchemist.ui.util.Resource
+import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent
+import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEventListener
 
 
 @AndroidEntryPoint
@@ -35,7 +40,11 @@ class SubjectsFragment : Fragment() {
 
         val adapter = SubjectsAdapter()
         binding.viewModel = viewModel
-
+        binding.ivSearch.setOnClickListener {
+            binding.etSubjectSearch.isEnabled = true
+            binding.etSubjectSearch.requestFocus()
+            binding.etSubjectSearch.showKeyboard()
+        }
 
         binding.rvSubjects.layoutManager = GridLayoutManager(this.requireContext(),3)
         binding.rvSubjects.adapter = adapter
@@ -64,6 +73,12 @@ class SubjectsFragment : Fragment() {
             }
         })
 
+        binding.tvTryAgain.setOnClickListener {
+            viewModel.tryAgain()
+            binding.tvError.isVisible = false
+            binding.tvTryAgain.isVisible = false
+        }
+
         viewModel.subjectsState.observe(viewLifecycleOwner,{
             when (it) {
                 is ResourceNetwork.Loading -> {
@@ -76,11 +91,17 @@ class SubjectsFragment : Fragment() {
                     }
                 }
                 is ResourceNetwork.Error -> {
-
+                    binding.progressFlask.isVisible = false
+                    binding.tvError.isVisible = true
+                    binding.tvTryAgain.isVisible = true
                 }
             }
         })
+    }
 
+    private fun View.showKeyboard() {
+        val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0)
     }
 
 

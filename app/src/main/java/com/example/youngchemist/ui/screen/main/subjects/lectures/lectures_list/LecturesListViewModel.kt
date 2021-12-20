@@ -25,10 +25,8 @@ import javax.inject.Inject
 @HiltViewModel
 class LecturesListViewModel @Inject constructor(
     private val router: Router,
-    private val workManager: WorkManager,
     private val fireStoreRepository: FireStoreRepository,
-    private val databaseRepository: DatabaseRepository,
-    private val userPreferences: UserPreferences
+    private val databaseRepository: DatabaseRepository
 ) : ViewModel() {
 
     private val _lecturesListState: MutableLiveData<ResourceNetwork<List<Lecture>>> =
@@ -38,20 +36,6 @@ class LecturesListViewModel @Inject constructor(
     private val _lecturesUi: MutableLiveData<List<LectureUi>> = MutableLiveData()
     val lecturesUi: LiveData<List<LectureUi>> = _lecturesUi
 
-    private val _doneTests: MutableLiveData<Pair<Int, Int>> = MutableLiveData()
-    val doneTests: LiveData<Pair<Int, Int>> = _doneTests
-
-    private val userProgresshasBeenApproved = MutableStateFlow(false)
-
-    init {
-        viewModelScope.launch {
-            userPreferences.loggedUserState.asFlow().filterNotNull().collect {
-                if (TEST_USER in it) {
-                    userProgresshasBeenApproved.emit(true)
-                }
-            }
-        }
-    }
 
     fun getData(collectionId: String) {
         viewModelScope.launch {
@@ -83,32 +67,19 @@ class LecturesListViewModel @Inject constructor(
             }
             _lecturesUi.postValue(lecturesUi)
             launch {
-                combine(userProgresshasBeenApproved,progressList){ a, b ->
-                    Pair(a,b)
-                }.collect {
-                    val available = it.first
-                    val userProgress = it.second
-                    if (available) {
-                        lecturesUi.forEach {
-                            addUserProgress(it,userProgress)
-                        }
-                        _lecturesUi.postValue(lecturesUi)
+                progressList.collect { userProgress ->
+                    lecturesUi.forEach {
+                        addUserProgress(it,userProgress)
                     }
-
+                    _lecturesUi.postValue(lecturesUi)
                 }
             }
             launch {
-                combine(userProgresshasBeenApproved,passedUserTests) { a, b ->
-                    Pair(a,b)
-                }.collect {
-                    val available = it.first
-                    val passedTests = it.second
-                    if (available) {
-                        lecturesUi.forEach {
-                            addUserPassedTests(it,passedTests)
-                        }
-                        _lecturesUi.postValue(lecturesUi)
+                passedUserTests.collect { passedTests ->
+                    lecturesUi.forEach {
+                        addUserPassedTests(it,passedTests)
                     }
+                    _lecturesUi.postValue(lecturesUi)
                 }
             }
         }

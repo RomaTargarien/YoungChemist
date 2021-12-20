@@ -120,11 +120,6 @@ class LectureFragment : Fragment() {
         startActivity(intent)
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        Log.d("TAG",lastPage.toString())
-    }
-
     override fun onPause() {
         super.onPause()
         viewModel.saveProgress(lecture.userProgress,lastPage)

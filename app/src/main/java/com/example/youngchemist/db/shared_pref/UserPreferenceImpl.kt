@@ -37,14 +37,6 @@ class UserPreferenceImpl @Inject constructor(
             field = value
         }
 
-    override var loggedUserState: MutableLiveData<Set<String>> = sharedPref.let {
-        val liveData = MutableLiveData<Set<String>>()
-        liveData.postValue(sharedPref.getStringSet(KEY_USER_ID,null))
-        liveData
-    }
-        set(value) {
-            field = value
-        }
     override var userState: Int = -1
         get() = field
         set(value) {
@@ -52,4 +44,6 @@ class UserPreferenceImpl @Inject constructor(
         }
 
     override val userStateFlow: MutableStateFlow<Resource<String>?> = MutableStateFlow(null)
+
+    override val bottomSheetState: MutableStateFlow<Float?> = MutableStateFlow(null)
 }

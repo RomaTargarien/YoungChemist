@@ -59,7 +59,6 @@ class UserInfoDonloadingWorker @AssistedInject constructor(
         setOfUsers.addAll(userPreferences.loggedUsers)
         setOfUsers.add(userId)
         userPreferences.loggedUsers = setOfUsers
-        userPreferences.loggedUserState.postValue(setOfUsers)
     }
 
     private fun saveData(data: List<UserInfo>) = CoroutineScope(Dispatchers.Default).async {

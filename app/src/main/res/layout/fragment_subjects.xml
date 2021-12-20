@@ -55,14 +55,17 @@
                 app:layout_constraintTop_toBottomOf="@+id/textView2">
 
                 <ImageView
+                    android:id="@+id/iv_search"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:src="@drawable/ic_baseline_search_24" />
 
                 <EditText
+                    android:id="@+id/et_subject_search"
                     android:layout_width="250dp"
                     android:layout_height="wrap_content"
                     android:background="@null"
+                    android:enabled="false"
                     android:hint="Поиск по предметам"
                     android:paddingLeft="10dp" />
             </LinearLayout>
@@ -151,6 +154,32 @@
                 app:layout_constraintTop_toBottomOf="@+id/constraintLayout">
 
             </TextView>
+
+            <TextView
+                android:id="@+id/tv_error"
+                style="@style/SubTitleTextStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Не удалось загрузить!"
+                android:layout_marginTop="20dp"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textView5">
+            </TextView>
+
+            <TextView
+                android:id="@+id/tv_try_again"
+                style="@style/SubTitleTextStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Попрбовать еще раз"
+                android:textColor="#0084FF"
+                android:layout_marginTop="5dp"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tv_error" />
 
             <com.airbnb.lottie.LottieAnimationView
                 android:id="@+id/progress_flask"

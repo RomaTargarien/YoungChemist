@@ -12,6 +12,7 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.youngchemist.R
+import com.example.youngchemist.databinding.ItemAnswerBinding
 import com.example.youngchemist.databinding.ItemLectureInListBinding
 import com.example.youngchemist.model.Test
 import com.example.youngchemist.model.ui.LectureUi
@@ -24,6 +25,9 @@ class LecturesListAdapter : RecyclerView.Adapter<LecturesListAdapter.LectureView
 
     private val lectures: MutableList<LectureUi> = mutableListOf()
 
+    private val mapBinding: MutableMap<Int, ItemLectureInListBinding> = mutableMapOf()
+    private var previousSelectedPosition: Int? = null
+
     fun submitList(modelsList: List<LectureUi>) {
         val result: DiffUtil.DiffResult = DiffUtil.calculateDiff(DiffCallback(lectures, modelsList))
         result.dispatchUpdatesTo(this)
@@ -34,7 +38,7 @@ class LecturesListAdapter : RecyclerView.Adapter<LecturesListAdapter.LectureView
 
     inner class LectureViewHolder(val binding: ItemLectureInListBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        fun bind(item: LectureUi) {
+        fun bind(item: LectureUi,position: Int) {
             binding.tvTitle.text = item.lectureTitle
             binding.tvDescription.text = item.lectureDescription
             binding.bnBeginTest.isVisible = false
@@ -46,7 +50,8 @@ class LecturesListAdapter : RecyclerView.Adapter<LecturesListAdapter.LectureView
             item.userProgress?.let {
                 toggleUserProgressState(it,item)
             }
-            setOnClickListeners(item)
+            setOnClickListeners(item,position)
+
         }
 
         private fun toggleTestState(isTestEnabled: Boolean) {
@@ -76,7 +81,7 @@ class LecturesListAdapter : RecyclerView.Adapter<LecturesListAdapter.LectureView
             }
         }
 
-        private fun setOnClickListeners(lectureUi: LectureUi) {
+        private fun setOnClickListeners(lectureUi: LectureUi,position: Int) {
             binding.cvLecture.setOnClickListener {
                 lectureUi.userProgress?.let {
                     if (it.isLectureEnabled) {
@@ -98,17 +103,19 @@ class LecturesListAdapter : RecyclerView.Adapter<LecturesListAdapter.LectureView
                     }
                 }
             }
-
-            var flag = false
             binding.ivLecture.setOnClickListener {
                 lectureUi.userProgress?.let {
                     if (!it.isLectureEnabled) {
-                        if (flag) {
+                        if (position != previousSelectedPosition && previousSelectedPosition != null) {
+                            mapBinding[previousSelectedPosition]?.clMain?.transitionToState(R.id.start)
+                            previousSelectedPosition = null
+                        }
+                        if (position == previousSelectedPosition) {
                             binding.clMain.transitionToState(R.id.start)
-                            flag = false
+                            previousSelectedPosition = null
                         } else {
                             binding.clMain.transitionToState(R.id.end)
-                            flag = true
+                            previousSelectedPosition = position
                         }
                     }
                 }
@@ -138,7 +145,14 @@ class LecturesListAdapter : RecyclerView.Adapter<LecturesListAdapter.LectureView
     }
 
     override fun onBindViewHolder(holder: LectureViewHolder, position: Int) {
-        holder.bind(lectures[position])
+        mapBinding[position] = holder.binding
+        mapBinding.filterValues { it == holder.binding }.keys
+            .toList()
+            .filter { it != position }
+            .forEach {
+                mapBinding.remove(it)
+            }
+        holder.bind(lectures[position],position)
         val animation = AnimationUtils.loadAnimation(holder.itemView.context, R.anim.alpha_anim)
         holder.binding.clMain.startAnimation(animation)
     }
