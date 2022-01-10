@@ -55,6 +55,7 @@ class MainFragment : Fragment(), BottomTabScreen {
             object : KeyboardVisibilityEventListener {
                 override fun onVisibilityChanged(isOpen: Boolean) {
                     binding.bnvMain.isVisible = !isOpen
+                    binding.bnvMain.isEnabled = !isOpen
                 }
             })
 

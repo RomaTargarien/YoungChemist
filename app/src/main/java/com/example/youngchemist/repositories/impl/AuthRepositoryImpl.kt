@@ -7,6 +7,7 @@ import com.example.youngchemist.model.User
 import com.example.youngchemist.repositories.AuthRepository
 import com.example.youngchemist.ui.util.ResourceNetwork
 import com.example.youngchemist.ui.util.safeCall
+import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -50,4 +51,21 @@ class AuthRepositoryImpl @Inject constructor(
                 ResourceNetwork.Success("")
             }
         }
+
+    override suspend fun reauthenticate(password: String) = withContext(Dispatchers.IO) {
+        safeCall {
+            auth.currentUser?.email?.let {
+                val credentials = EmailAuthProvider.getCredential(it,password)
+                auth.currentUser?.reauthenticate(credentials)?.await()
+            }
+            ResourceNetwork.Success("")
+        }
+    }
+    override suspend fun updateEmail(email: String): ResourceNetwork<String> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun updatePassword(password: String): ResourceNetwork<String> {
+        TODO("Not yet implemented")
+    }
 }

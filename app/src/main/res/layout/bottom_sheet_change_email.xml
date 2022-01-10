@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+        <variable
+            name="text"
+            type="int" />
+        <variable
+            name="viewModel"
+            type="com.example.youngchemist.ui.screen.main.user.UserFragmentViewModel" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/bottom_sheet_container"
+        android:layout_width="match_parent"
+        android:background="@drawable/shape_rounded_corners"
+        android:layout_height="580dp"
+        android:paddingRight="30dp"
+        android:paddingLeft="30dp"
+        app:behavior_hideable="true"
+        app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
+
+        <ImageView
+            android:id="@+id/iv_close"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginTop="16dp"
+            android:src="@drawable/ic_baseline_close"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="#6E6E6E">
+
+        </ImageView>
+
+        <TextView
+            style="@style/TittleTextStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/email_changing"
+            app:layout_constraintBottom_toTopOf="@+id/password_container"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+        </TextView>
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/password_container"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/test"
+            android:background="@drawable/shape_rounded_rectangle_for_edittext"
+            android:backgroundTint="@color/white"
+            android:orientation="horizontal"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintVertical_bias="0.3"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <EditText
+                android:id="@+id/et_password"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@null"
+                android:hint="@string/enter_password"
+                android:inputType="textPassword">
+
+            </EditText>
+
+            <ImageView
+                android:id="@+id/iv_is_password_shown"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:src="@drawable/ic_icon_hide_password"
+                app:layout_constraintBottom_toBottomOf="@+id/password_container"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/password_container">
+
+            </ImageView>
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <TextView
+            android:id="@+id/tv_next"
+            style="@style/TittleTextStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="5dp"
+            android:text="@string/next"
+            android:textColor="#2196F3"
+            android:textSize="18sp"
+            app:layout_constraintEnd_toEndOf="@+id/password_container"
+            app:layout_constraintTop_toBottomOf="@+id/password_container" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/new_email_container"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/test"
+            android:background="@drawable/shape_rounded_rectangle_for_edittext"
+            android:backgroundTint="@color/white"
+            android:orientation="horizontal"
+            android:layout_marginTop="30dp"
+            app:layout_constraintTop_toBottomOf="@+id/tv_next"
+            tools:layout_editor_absoluteX="30dp">
+
+            <EditText
+                android:id="@+id/et_new_email"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@null"
+                android:hint="@string/enter_new_email">
+
+            </EditText>
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <TextView
+            android:id="@+id/tv_change"
+            style="@style/TittleTextStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="@string/change"
+            android:textColor="#2196F3"
+            android:textSize="20sp"
+            app:layout_constraintEnd_toEndOf="@+id/new_email_container"
+            app:layout_constraintTop_toBottomOf="@+id/new_email_container" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
