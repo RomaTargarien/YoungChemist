@@ -29,8 +29,14 @@ object AuthModule {
 
     @Provides
     @Singleton
+    fun provideNameValidation(@ApplicationContext context: Context) =
+        ValidationImpl.NameValidation(context)
+
+    @Provides
+    @Singleton
     fun provideSurnameValidation(@ApplicationContext context: Context) =
         ValidationImpl.SurnameValidation(context)
+
 
     @Provides
     @Singleton

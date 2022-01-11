@@ -3,20 +3,20 @@ package com.example.youngchemist.ui.screen.auth.register
 import android.os.Bundle
 import android.text.method.HideReturnsTransformationMethod
 import android.text.method.PasswordTransformationMethod
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.animation.Animation
-import android.view.animation.AnimationUtils
 import androidx.activity.addCallback
 import androidx.core.view.isVisible
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.transition.TransitionManager
 import com.example.youngchemist.R
 import com.example.youngchemist.databinding.FragmentRegisterBinding
 import com.example.youngchemist.ui.base.AnimationHelper
-import com.example.youngchemist.ui.util.*
+import com.example.youngchemist.ui.util.ResourceNetwork
+import com.example.youngchemist.ui.util.closeKeyBoard
+import com.example.youngchemist.ui.util.slideUpViews
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -41,7 +41,8 @@ class RegisterFragment : Fragment() {
         animationHelper = initializeAnimationHepler()
         slideUpViews(
             binding.loginContainer,
-            binding.familyNameContainer,
+            binding.nameContainer,
+            binding.surnameContainer,
             binding.passwordContainer,
             binding.repetaedPasswordContainer,
             binding.bnRegister

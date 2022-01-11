@@ -74,21 +74,22 @@
 
             </LinearLayout>
 
+
             <TextView
-                android:id="@+id/tv_surname_error_message"
+                android:id="@+id/tv_name_error_message"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
                 android:textColor="#F44336"
                 android:visibility="gone"
-                app:layout_constraintBottom_toTopOf="@+id/family_name_container"
+                app:layout_constraintBottom_toTopOf="@+id/name_container"
                 app:layout_constraintStart_toStartOf="parent">
 
             </TextView>
 
 
             <LinearLayout
-                android:id="@+id/family_name_container"
+                android:id="@+id/name_container"
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
                 android:background="@drawable/shape_rounded_rectangle_for_edittext"
@@ -97,6 +98,45 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/login_container"
+                app:layout_constraintVertical_bias="0.05">
+
+                <EditText
+                    android:id="@+id/et_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@null"
+                    android:hint="@string/name"
+                    android:onTextChanged="@{viewModel.onNameTextChanged}"
+                    android:selection="@{viewModel.authResults.name.length()}"
+                    android:text="@={viewModel.authResults.name}">
+
+                </EditText>
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/tv_surname_error_message"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:textColor="#F44336"
+                android:visibility="gone"
+                app:layout_constraintBottom_toTopOf="@+id/surname_container"
+                app:layout_constraintStart_toStartOf="parent">
+
+            </TextView>
+
+
+            <LinearLayout
+                android:id="@+id/surname_container"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:background="@drawable/shape_rounded_rectangle_for_edittext"
+                android:backgroundTint="@color/white"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/name_container"
                 app:layout_constraintVertical_bias="0.06">
 
                 <EditText
@@ -134,7 +174,7 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/family_name_container"
+                app:layout_constraintTop_toBottomOf="@+id/surname_container"
                 app:layout_constraintVertical_bias="0.08">
 
                 <EditText

@@ -32,6 +32,7 @@ import javax.inject.Inject
 class RegisterFragmentViewModel @Inject constructor(
     private val router: Router,
     private val loginValidation: LoginValidation,
+    private val nameValidation: NameValidation,
     private val passwordValidation: PasswordValidation,
     private val surnameValidation: SurnameValidation,
     private val authRepository: AuthRepository,
@@ -42,11 +43,13 @@ class RegisterFragmentViewModel @Inject constructor(
     val authResults: AuthResults
 
     private var loginJob: Job? = null
+    private var nameJob: Job? = null
     private var surnameJob: Job? = null
     private var passwordJob: Job? = null
     private var repeatesPasswordJob: Job? = null
 
     private val stateLogin = MutableStateFlow<Resource<String>>(Resource.Error(""))
+    private val stateName = MutableStateFlow<Resource<String>>(Resource.Error(""))
     private val stateSurname = MutableStateFlow<Resource<String>>(Resource.Error(""))
     private val statePassword = MutableStateFlow<Resource<String>>(Resource.Error(""))
     private val stateRepeatedPassword = MutableStateFlow<Resource<String>>(Resource.Error(""))
@@ -54,6 +57,10 @@ class RegisterFragmentViewModel @Inject constructor(
     private val _errorLoginMessageBehavior: MutableLiveData<Pair<String?, Boolean>> =
         MutableLiveData<Pair<String?, Boolean>>()
     val errorLoginMessageBehavior: LiveData<Pair<String?, Boolean>> = _errorLoginMessageBehavior
+
+    private val _errorNameMessageBehavior: MutableLiveData<Pair<String?, Boolean>> =
+        MutableLiveData<Pair<String?, Boolean>>()
+    val errorNameMessageBehavior: LiveData<Pair<String?, Boolean>> = _errorNameMessageBehavior
 
     private val _errorSurnameMessageBehavior: MutableLiveData<Pair<String?, Boolean>> =
         MutableLiveData<Pair<String?, Boolean>>()
@@ -111,6 +118,7 @@ class RegisterFragmentViewModel @Inject constructor(
         observe()
     }
 
+
     fun onLoginlTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
         loginJob?.cancel()
         authResults.login = s.toString()
@@ -125,6 +133,24 @@ class RegisterFragmentViewModel @Inject constructor(
                     _errorLoginMessageBehavior.postValue(Pair(it.message, true))
                 }
                 stateLogin.emit(it)
+            }
+        }
+    }
+
+    fun onNameTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
+        nameJob?.cancel()
+        authResults.name = s.toString()
+        _errorNameMessageBehavior.postValue(Pair(null, false))
+        _registerButtonEnabled.postValue(false)
+        nameJob = viewModelScope.launch(Dispatchers.Default) {
+            flow {
+                delay(1000)
+                emit(nameValidation.validate(s.toString()))
+            }.collect {
+                if (it is Resource.Error) {
+                    _errorNameMessageBehavior.postValue(Pair(it.message, true))
+                }
+                stateName.emit(it)
             }
         }
     }
@@ -187,12 +213,14 @@ class RegisterFragmentViewModel @Inject constructor(
         viewModelScope.launch {
             combine(
                 stateLogin,
+                stateName,
                 stateSurname,
                 statePassword,
                 stateRepeatedPassword
-            ) { login, surname, password, repeatedPassword ->
+            ) { login, name, surname, password, repeatedPassword ->
                 AuthResults(
                     loginValidation = login,
+                    nameValidation = name,
                     surnameValidation = surname,
                     passwordValidation = password,
                     repeatedPasswordValidation = repeatedPassword

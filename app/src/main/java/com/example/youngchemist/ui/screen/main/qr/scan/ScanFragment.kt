@@ -2,25 +2,17 @@ package com.example.youngchemist.ui.screen.main.qr.scan
 
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.addCallback
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
-import com.example.youngchemist.R
 import com.example.youngchemist.databinding.FragmentScanBinding
-import com.example.youngchemist.ui.screen.main.MainFragment
 import com.example.youngchemist.ui.screen.main.qr.analyzer.CameraManager
-import com.example.youngchemist.ui.screen.main.user.BottomTabScreen
 import com.example.youngchemist.ui.util.slideUp
-import com.example.youngchemist.ui.util.slideUpViews
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint

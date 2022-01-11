@@ -30,7 +30,7 @@ class AuthRepositoryImpl @Inject constructor(
         safeCall {
             val result = auth.createUserWithEmailAndPassword(authResults.login!!, authResults.password!!).await()
             val uid = result.user?.uid
-            val user = User(uid!!, authResults.surname!!)
+            val user = User(uid!!, authResults.name!!,authResults.surname!!)
             users.document(uid).set(user).await()
             ResourceNetwork.Success("")
         }
@@ -61,11 +61,11 @@ class AuthRepositoryImpl @Inject constructor(
             ResourceNetwork.Success("")
         }
     }
-    override suspend fun updateEmail(email: String): ResourceNetwork<String> {
+    override suspend fun updateEmail(email: String,userId: String): ResourceNetwork<String> {
         TODO("Not yet implemented")
     }
 
-    override suspend fun updatePassword(password: String): ResourceNetwork<String> {
+    override suspend fun updatePassword(password: String,userId: String): ResourceNetwork<String> {
         TODO("Not yet implemented")
     }
 }

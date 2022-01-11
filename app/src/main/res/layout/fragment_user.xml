@@ -55,13 +55,23 @@
 
                 <EditText
                     android:id="@+id/et_name"
-                    android:text="Roma"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:background="@null"
                     android:textColor="@color/black"
                     android:enabled="false"
                     android:hint="@string/name" />
+
+                <ProgressBar
+                    android:id="@+id/progress_bar_name"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:visibility="gone"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                </ProgressBar>
 
                 <ImageView
                     android:id="@+id/iv_name"
@@ -92,11 +102,21 @@
                     android:layout_height="match_parent"
                     android:background="@null"
                     android:enabled="false"
-                    android:text="Tolstikov"
                     android:textColor="@color/black"
                     android:hint="@string/family_name_hint"
                     app:layout_constraintBottom_toBottomOf="parent"
                     tools:layout_editor_absoluteX="15dp" />
+
+                <ProgressBar
+                    android:id="@+id/progress_bar_surname"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:visibility="visible"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                </ProgressBar>
 
                 <ImageView
                     android:id="@+id/iv_family_name"

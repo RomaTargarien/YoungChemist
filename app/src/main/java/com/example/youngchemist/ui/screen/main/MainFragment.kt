@@ -1,7 +1,6 @@
 package com.example.youngchemist.ui.screen.main
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,11 +10,9 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.example.youngchemist.R
 import com.example.youngchemist.databinding.FragmentMainBinding
-import com.example.youngchemist.ui.screen.main.qr.qr_code.QrCodeFragment
 import com.example.youngchemist.ui.screen.main.saved_models.SavedModelsFragment
 import com.example.youngchemist.ui.screen.main.stat.StatisticsFragment
 import com.example.youngchemist.ui.screen.main.subjects.SubjectsFragment
-import com.example.youngchemist.ui.screen.main.user.BottomTabScreen
 import com.example.youngchemist.ui.screen.main.user.UserFragment
 import com.luseen.spacenavigation.SpaceItem
 import com.luseen.spacenavigation.SpaceOnClickListener
@@ -25,7 +22,7 @@ import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEventList
 
 
 @AndroidEntryPoint
-class MainFragment : Fragment(), BottomTabScreen {
+class MainFragment : Fragment() {
 
     private lateinit var binding: FragmentMainBinding
     private val viewModel: MainFragmentViewModel by viewModels()
@@ -143,21 +140,5 @@ class MainFragment : Fragment(), BottomTabScreen {
                     putInt(LAST_ITEM, lastSelectedItemPosition)
                 }
             }
-    }
-
-    override fun navigateToSubjectsScreen() {
-        //binding.bnvMain.selectedItemId = R.id.subjects
-    }
-
-    override fun navigateToStatisticsScreen() {
-        //binding.bnvMain.selectedItemId = R.id.stat
-    }
-
-    override fun navigateToQrCodeScreen() {
-        //binding.bnvMain.selectedItemId = R.id.qrCode
-    }
-
-    override fun navigateToUserScreen() {
-        //binding.bnvMain.selectedItemId = R.id.person
     }
 }

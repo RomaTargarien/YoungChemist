@@ -26,6 +26,8 @@ interface FireStoreRepository {
 
     suspend fun getUser(userUid: String): Deferred<ResourceNetwork<User>>
 
+    suspend fun updateUserInfo(user: User): ResourceNetwork<String>
+
     suspend fun updateReadenLectures(lectureId: String): ResourceNetwork<String>
 
     suspend fun saveLecture(lecture: Lecture): ResourceNetwork<String>

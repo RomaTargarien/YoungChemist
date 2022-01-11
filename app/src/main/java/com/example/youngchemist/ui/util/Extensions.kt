@@ -71,6 +71,11 @@ fun Fragment.closeKeyBoard() {
     }
 }
 
+fun View.showKeyboard() {
+    val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+    imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0)
+}
+
 fun Int.toDp(context: Context): Int = TypedValue.applyDimension(
     TypedValue.COMPLEX_UNIT_DIP, this.toFloat(), context.resources.displayMetrics
 ).toInt()

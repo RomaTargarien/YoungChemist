@@ -39,6 +39,24 @@ sealed class ValidationImpl : Validation {
         }
     }
 
+    class NameValidation @Inject constructor(private val context: Context) : ValidationImpl() {
+        override fun validate(name: String): Resource<String> {
+            if (name.isEmpty()) {
+                return Resource.Error(context.getString(R.string.error_input_empty))
+            }
+            if (name.length < Constants.NAME_MIN_LENGHT) {
+                return Resource.Error(
+                    context.getString(
+                        R.string.error_name_too_short,
+                        Constants.NAME_MIN_LENGHT
+                    )
+                )
+            } else {
+                return Resource.Success()
+            }
+        }
+    }
+
     class SurnameValidation @Inject constructor(private val context: Context) : ValidationImpl() {
         override fun validate(surname: String): Resource<String> {
             if (surname.isEmpty()) {

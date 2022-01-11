@@ -57,7 +57,6 @@ class MainFragmentViewModel @Inject constructor(
 
         viewModelScope.launch {
             userSharedPreferences.bottomSheetState.filterNotNull().collect {
-                Log.d("TAG",it.toString())
                 _bottomSheetState.postValue(it)
             }
         }

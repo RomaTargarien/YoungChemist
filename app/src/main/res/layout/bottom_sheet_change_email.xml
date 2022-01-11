@@ -9,18 +9,19 @@
             type="int" />
         <variable
             name="viewModel"
-            type="com.example.youngchemist.ui.screen.main.user.UserFragmentViewModel" />
+            type="com.example.youngchemist.ui.screen.main.user.bottom_sheet.change_email.BottomSheetChangeEmailViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/bottom_sheet_container"
         android:layout_width="match_parent"
-        android:background="@drawable/shape_rounded_corners"
         android:layout_height="580dp"
-        android:paddingRight="30dp"
+        android:background="@drawable/shape_rounded_corners"
         android:paddingLeft="30dp"
+        android:paddingRight="30dp"
         app:behavior_hideable="true"
         app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
+
 
         <ImageView
             android:id="@+id/iv_close"
@@ -35,100 +36,160 @@
         </ImageView>
 
         <TextView
+            android:id="@+id/textView7"
             style="@style/TittleTextStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/email_changing"
-            app:layout_constraintBottom_toTopOf="@+id/password_container"
+            android:text="Смена почты"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.07">
 
         </TextView>
+
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/password_container"
+            android:id="@+id/main_container"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/test"
-            android:background="@drawable/shape_rounded_rectangle_for_edittext"
-            android:backgroundTint="@color/white"
-            android:orientation="horizontal"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintVertical_bias="0.3"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            android:animateLayoutChanges="true"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="40dp"
+            app:layout_constraintTop_toBottomOf="@+id/textView7">
 
-            <EditText
-                android:id="@+id/et_password"
+            <TextView
+                android:id="@+id/tv_error_message_password"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="2dp"
+                android:textColor="#F44336"
+                android:visibility="gone"
+                tools:text="Hello"
+                app:layout_constraintBottom_toTopOf="@+id/password_container"
+                app:layout_constraintStart_toStartOf="@+id/password_container" />
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/password_container"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="@null"
-                android:hint="@string/enter_password"
-                android:inputType="textPassword">
-
-            </EditText>
-
-            <ImageView
-                android:id="@+id/iv_is_password_shown"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:src="@drawable/ic_icon_hide_password"
-                app:layout_constraintBottom_toBottomOf="@+id/password_container"
+                android:layout_height="@dimen/test"
+                android:animateLayoutChanges="true"
+                android:background="@drawable/shape_rounded_rectangle_for_edittext"
+                android:backgroundTint="@color/white"
+                android:orientation="horizontal"
+                android:layout_marginTop="17dp"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/password_container">
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
 
-            </ImageView>
+                <EditText
+                    android:id="@+id/et_password"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@null"
+                    android:hint="@string/enter_password"
+                    android:inputType="textPassword"
+                    android:onTextChanged="@{viewModel.onPasswordTextChanged}"
+                    tools:layout_editor_absoluteX="15dp"
+                    tools:layout_editor_absoluteY="3dp">
+
+                </EditText>
+
+                <ImageView
+                    android:id="@+id/iv_is_password_shown"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:onClick="@{view -> viewModel.togglePasswordVisibility()}"
+                    android:src="@drawable/ic_icon_hide_password"
+                    app:layout_constraintBottom_toBottomOf="@+id/password_container"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/password_container">
+
+                </ImageView>
 
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <TextView
-            android:id="@+id/tv_next"
-            style="@style/TittleTextStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:layout_marginEnd="5dp"
-            android:text="@string/next"
-            android:textColor="#2196F3"
-            android:textSize="18sp"
-            app:layout_constraintEnd_toEndOf="@+id/password_container"
-            app:layout_constraintTop_toBottomOf="@+id/password_container" />
+            <com.airbnb.lottie.LottieAnimationView
+                android:id="@+id/progress_flask"
+                android:layout_width="70dp"
+                android:layout_height="70dp"
+                android:visibility="gone"
+                app:layout_constraintBottom_toTopOf="@+id/password_container"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/password_container"
+                app:lottie_autoPlay="true"
+                app:lottie_fileName="progress_flask.json"
+                app:lottie_loop="true">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/new_email_container"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/test"
-            android:background="@drawable/shape_rounded_rectangle_for_edittext"
-            android:backgroundTint="@color/white"
-            android:orientation="horizontal"
-            android:layout_marginTop="30dp"
-            app:layout_constraintTop_toBottomOf="@+id/tv_next"
-            tools:layout_editor_absoluteX="30dp">
+            </com.airbnb.lottie.LottieAnimationView>
 
-            <EditText
-                android:id="@+id/et_new_email"
+            <TextView
+                android:id="@+id/tv_next"
+                style="@style/TittleTextStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="5dp"
+                android:text="@string/next"
+                android:onClick="@{view -> viewModel.reauthenticate()}"
+                android:textColor="#2196F3"
+                android:textSize="18sp"
+                app:layout_constraintEnd_toEndOf="@+id/password_container"
+                app:layout_constraintTop_toBottomOf="@+id/password_container" />
+
+            <TextView
+                android:id="@+id/tv_error_message_new_email"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="2dp"
+                android:textColor="#F44336"
+                android:visibility="gone"
+                tools:text="Hello"
+                app:layout_constraintBottom_toTopOf="@+id/new_email_container"
+                app:layout_constraintStart_toStartOf="@+id/new_email_container">
+
+            </TextView>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/new_email_container"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="@null"
-                android:hint="@string/enter_new_email">
+                android:layout_height="@dimen/test"
+                android:layout_marginTop="30dp"
+                android:background="@drawable/shape_rounded_rectangle_for_edittext"
+                android:backgroundTint="@color/white"
+                android:orientation="horizontal"
+                app:layout_constraintTop_toBottomOf="@+id/tv_next"
+                tools:layout_editor_absoluteX="30dp">
 
-            </EditText>
+                <EditText
+                    android:id="@+id/et_new_email"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@null"
+                    android:enabled="false"
+                    android:onTextChanged="@{viewModel.onNewEmailTextChanged}"
+                    android:hint="@string/enter_new_email"/>
 
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <TextView
+                android:id="@+id/tv_change"
+                style="@style/TittleTextStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="5dp"
+                android:text="@string/change"
+                android:textColor="#2196F3"
+                android:textSize="20sp"
+                app:layout_constraintEnd_toEndOf="@+id/new_email_container"
+                app:layout_constraintTop_toBottomOf="@+id/new_email_container" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <TextView
-            android:id="@+id/tv_change"
-            style="@style/TittleTextStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:text="@string/change"
-            android:textColor="#2196F3"
-            android:textSize="20sp"
-            app:layout_constraintEnd_toEndOf="@+id/new_email_container"
-            app:layout_constraintTop_toBottomOf="@+id/new_email_container" />
+
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

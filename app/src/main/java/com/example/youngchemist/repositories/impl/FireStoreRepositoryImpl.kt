@@ -164,4 +164,11 @@ class FireStoreRepositoryImpl @Inject constructor(
             ResourceNetwork.Success(user?.saved3DModels)
         }
     }
+
+    override suspend fun updateUserInfo(user: User) = withContext(Dispatchers.IO) {
+        safeCall {
+            firestore.collection("users").document(user.uid).set(user, SetOptions.merge())
+            ResourceNetwork.Success("")
+        }
+    }
 }
