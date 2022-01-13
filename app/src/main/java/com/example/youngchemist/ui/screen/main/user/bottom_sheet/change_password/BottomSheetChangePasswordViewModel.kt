@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import com.example.youngchemist.repositories.AuthRepository
 import com.example.youngchemist.ui.base.validation.ValidationImpl
 import com.example.youngchemist.ui.screen.main.user.bottom_sheet.BottomSheetViewModelBase
+import com.example.youngchemist.ui.util.Constants.TEST_USER
 import com.example.youngchemist.ui.util.Resource
 import com.example.youngchemist.ui.util.ResourceNetwork
 import kotlinx.coroutines.*
@@ -18,8 +19,6 @@ class BottomSheetChangePasswordViewModel(
     private val passwordValidation: ValidationImpl.PasswordValidation,
     private val authRepository: AuthRepository
 ): BottomSheetViewModelBase {
-
-    private val passwordChangeState: MutableStateFlow<Unit?> = MutableStateFlow(null)
 
     private val _reauthenticateResult: MutableLiveData<ResourceNetwork<String>> = MutableLiveData()
     val reauthenticateResult: LiveData<ResourceNetwork<String>> = _reauthenticateResult
@@ -48,6 +47,11 @@ class BottomSheetChangePasswordViewModel(
     private val _buttonChangeState: MutableLiveData<Boolean> = MutableLiveData(false)
     val buttonChangeState: LiveData<Boolean> = _buttonChangeState
 
+    private val newPasswordFlow: MutableStateFlow<String?> = MutableStateFlow(null)
+    private val _changePasswordState: MutableLiveData<ResourceNetwork<String>> = MutableLiveData<ResourceNetwork<String>>()
+    val changePasswordState: LiveData<ResourceNetwork<String>> = _changePasswordState
+
+
     fun reauthenticate() {
         CoroutineScope(EmptyCoroutineContext).launch {
             _reauthenticateResult.postValue(ResourceNetwork.Loading())
@@ -58,7 +62,10 @@ class BottomSheetChangePasswordViewModel(
 
     fun changePassword() {
         CoroutineScope(EmptyCoroutineContext).launch {
-            passwordChangeState.emit(Unit)
+            newPasswordFlow.value?.let {
+                //val result = authRepository.updatePassword(it,TEST_USER)
+                _changePasswordState.postValue(ResourceNetwork.Success(""))
+            }
         }
     }
 
@@ -80,8 +87,8 @@ class BottomSheetChangePasswordViewModel(
         _buttonNextState.postValue(false)
         oldPasswordJob = CoroutineScope(EmptyCoroutineContext).launch(Dispatchers.Default) {
             flow {
-                Log.d("TAG",s.toString())
                 delay(1000)
+                newPasswordFlow.emit(s.toString())
                 emit(passwordValidation.validate(s.toString()))
             }.collect {
                 if (it is Resource.Success) {

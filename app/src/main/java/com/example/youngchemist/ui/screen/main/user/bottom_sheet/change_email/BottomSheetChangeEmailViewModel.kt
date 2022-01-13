@@ -53,7 +53,7 @@ class BottomSheetChangeEmailViewModel(
         }
     }
 
-    fun changePassword() {
+    fun changeEmail() {
         CoroutineScope(EmptyCoroutineContext).launch {
 
         }

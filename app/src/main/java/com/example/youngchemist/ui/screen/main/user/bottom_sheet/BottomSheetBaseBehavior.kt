@@ -85,4 +85,5 @@ interface BottomSheetBase {
     fun init(viewModel: BottomSheetViewModelBase)
     fun subscribeToObservers()
     fun removeObservers()
+    fun setOnDataHasChangedListener(listener: (String) -> Unit)
 }

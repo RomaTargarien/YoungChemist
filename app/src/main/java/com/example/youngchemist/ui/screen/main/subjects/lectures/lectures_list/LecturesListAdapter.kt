@@ -18,7 +18,7 @@ import com.example.youngchemist.model.Test
 import com.example.youngchemist.model.ui.LectureUi
 import com.example.youngchemist.model.user.UserProgress
 import com.example.youngchemist.ui.util.animateProgress
-import com.example.youngchemist.ui.util.shake
+import com.example.youngchemist.ui.util.bounce
 import kotlin.math.roundToInt
 
 class LecturesListAdapter : RecyclerView.Adapter<LecturesListAdapter.LectureViewHolder>() {
@@ -89,7 +89,7 @@ class LecturesListAdapter : RecyclerView.Adapter<LecturesListAdapter.LectureView
                             click(lectureUi)
                         }
                     } else {
-                        binding.ivLectureAvailable.shake().start()
+                        binding.ivLectureAvailable.bounce().start()
                     }
                 }
             }
@@ -128,7 +128,7 @@ class LecturesListAdapter : RecyclerView.Adapter<LecturesListAdapter.LectureView
                         click(lectureUi)
                     }
                 } else {
-                    binding.ivEnterKey.shake().start()
+                    binding.ivEnterKey.bounce().start()
                 }
             }
         }

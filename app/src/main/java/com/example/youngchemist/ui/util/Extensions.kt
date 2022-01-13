@@ -104,7 +104,7 @@ fun Long.evaluateTime(): String {
 
 }
 
-fun View.shake(): AnimatorSet {
+fun View.bounce(): AnimatorSet {
     val animatorSet = AnimatorSet()
 
     val object1: ObjectAnimator =
@@ -120,4 +120,12 @@ fun ProgressBar.animateProgress(from: Int, to: Int) {
     val pregressAnimator = ObjectAnimator.ofInt(this, "progress", from, to)
     pregressAnimator.duration = 1800
     pregressAnimator.start()
+}
+
+fun View.shake(): AnimatorSet {
+    val animatorSet = AnimatorSet()
+    val objectAnimator: ObjectAnimator =
+        ObjectAnimator.ofFloat(this, "translationX", 0f, 25f, -25f, 25f, -25f, 15f, -15f, 6f, -6f, 0f)
+    animatorSet.playTogether(objectAnimator)
+    return animatorSet
 }

@@ -14,13 +14,23 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
+import android.animation.ObjectAnimator
+
+import android.animation.AnimatorSet
+import android.util.Log
+import com.example.youngchemist.model.user.Model3D
+import com.example.youngchemist.ui.util.shake
+
 
 class BottomSheetChangePassword(private val bottomSheetChangePasswordBinding: BottomSheetChangePasswordBinding) :
     BottomSheetBaseBehavior() {
 
     val isKeyBoardOpen: MutableStateFlow<Boolean> = MutableStateFlow(false)
     val isReathenticationSuccess: MutableStateFlow<Boolean> = MutableStateFlow(false)
-
+    private var onPasswordHasChanged: ((String) -> Unit)? = null
+    override fun setOnDataHasChangedListener(listener: (String) -> Unit) {
+        onPasswordHasChanged = listener
+    }
     init {
         bottomSheetChangePasswordBinding.lifecycleOwner!!.lifecycleScope.launch {
             combine(isKeyBoardOpen, isReathenticationSuccess) { isOpen, isSuccess ->
@@ -48,6 +58,7 @@ class BottomSheetChangePassword(private val bottomSheetChangePasswordBinding: Bo
         observeReathenticationResult()
         observeButtonChangeState()
         observeButtonNextState()
+        observeChangePasswordState()
     }
 
     override fun removeObservers() {
@@ -61,6 +72,28 @@ class BottomSheetChangePassword(private val bottomSheetChangePasswordBinding: Bo
                 isOldPasswordShown.removeObservers(bottomSheetChangePasswordBinding.lifecycleOwner!!)
                 reauthenticateResult.removeObservers(bottomSheetChangePasswordBinding.lifecycleOwner!!)
             }
+        }
+    }
+
+    private fun observeChangePasswordState() {
+        bottomSheetChangePasswordBinding.viewModel?.let {
+            it.changePasswordState.observe(bottomSheetChangePasswordBinding.lifecycleOwner!!,{
+                when (it) {
+                    is ResourceNetwork.Loading -> {
+                        bottomSheetChangePasswordBinding.progressFlaskPasswordChange.isVisible = true
+                    }
+                    is ResourceNetwork.Success -> {
+                        bottomSheetChangePasswordBinding.progressFlaskPasswordChange.isVisible = false
+                        Log.d("TAG","success")
+                        onPasswordHasChanged?.let { change ->
+                            change("Password changed success")
+                        }
+                    }
+                    is ResourceNetwork.Error -> {
+                        bottomSheetChangePasswordBinding.progressFlaskPasswordChange.isVisible = false
+                    }
+                }
+            })
         }
     }
 
@@ -180,6 +213,7 @@ class BottomSheetChangePassword(private val bottomSheetChangePasswordBinding: Bo
                     }
                     is ResourceNetwork.Error -> {
                         bottomSheetChangePasswordBinding.progressFlask.isVisible = false
+                        bottomSheetChangePasswordBinding.etOldPassword.shake().start()
                     }
                 }
             })

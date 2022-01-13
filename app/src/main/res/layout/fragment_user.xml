@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
+
         <variable
             name="viewModel"
             type="com.example.youngchemist.ui.screen.main.user.UserFragmentViewModel" />
@@ -15,20 +16,13 @@
         android:layout_height="match_parent"
         tools:context=".ui.screen.main.user.UserFragment">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:orientation="horizontal"
-            android:layout_height="match_parent">
-
-        </LinearLayout>
-
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/container"
             android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:background="@drawable/main_background"
-            android:paddingRight="30dp"
             android:paddingLeft="30dp"
-            android:layout_height="match_parent">
+            android:paddingRight="30dp">
 
             <ImageView
                 android:id="@+id/imageView5"
@@ -36,10 +30,39 @@
                 android:layout_height="100dp"
                 android:src="@drawable/ic_baseline_person"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/iv_reload_user_info"
+                app:layout_constraintHorizontal_bias="1.0"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.1" />
+                app:layout_constraintVertical_bias="0.101" />
+
+            <ImageView
+                android:id="@+id/iv_reload_user_info"
+                android:layout_width="50dp"
+                android:layout_height="0dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="20dp"
+                android:src="@drawable/ic_icon_refresh"
+                android:visibility="gone"
+                android:onClick="@{view -> viewModel.getUserInfo()}"
+                app:layout_constraintBottom_toBottomOf="@+id/imageView5"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.653"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/imageView5"
+                app:layout_constraintVertical_bias="1.0">
+
+            </ImageView>
+
+            <TextView
+                android:id="@+id/tv_error_message_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#F44336"
+                android:visibility="gone"
+                app:layout_constraintBottom_toTopOf="@+id/name_container"
+                app:layout_constraintStart_toStartOf="@+id/name_container"
+                tools:text="Hello" />
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/name_container"
@@ -58,9 +81,10 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:background="@null"
-                    android:textColor="@color/black"
                     android:enabled="false"
-                    android:hint="@string/name" />
+                    android:hint="@string/name"
+                    android:onTextChanged="@{viewModel.onNameTextChanged}"
+                    android:textColor="@color/black" />
 
                 <ProgressBar
                     android:id="@+id/progress_bar_name"
@@ -69,29 +93,57 @@
                     android:visibility="gone"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent">
-
-                </ProgressBar>
+                    app:layout_constraintTop_toTopOf="parent"/>
 
                 <ImageView
-                    android:id="@+id/iv_name"
-                    android:layout_width="25dp"
-                    android:layout_height="25dp"
+                    android:id="@+id/iv_error_name"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:src="@drawable/error"
+                    android:visibility="gone"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <ImageView
+                    android:id="@+id/iv_edit_name"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
                     android:src="@drawable/ic_baseline_edit_24"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="@+id/et_name"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <ImageView
+                    android:id="@+id/iv_change_name"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:src="@drawable/ic_icon_done"
+                    android:visibility="gone"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="@+id/et_name"
                     app:layout_constraintTop_toTopOf="parent" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
+            <TextView
+                android:id="@+id/tv_error_message_surname"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#F44336"
+                android:visibility="gone"
+                app:layout_constraintBottom_toTopOf="@+id/surname_container"
+                app:layout_constraintStart_toStartOf="@+id/surname_container"
+                tools:text="Hello" />
+
 
             <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/login_container"
+                android:id="@+id/surname_container"
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
+                android:layout_marginTop="40dp"
                 android:background="@drawable/shape_rounded_rectangle_for_edittext"
                 android:backgroundTint="@color/white"
-                android:layout_marginTop="40dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/name_container">
@@ -102,8 +154,10 @@
                     android:layout_height="match_parent"
                     android:background="@null"
                     android:enabled="false"
-                    android:textColor="@color/black"
                     android:hint="@string/family_name_hint"
+                    android:onTextChanged="@{viewModel.onSurnameTextChanged}"
+                    android:textColor="@color/black"
+                    android:layout_marginEnd="40dp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     tools:layout_editor_absoluteX="15dp" />
 
@@ -111,20 +165,38 @@
                     android:id="@+id/progress_bar_surname"
                     android:layout_width="30dp"
                     android:layout_height="30dp"
-                    android:visibility="visible"
+                    android:visibility="gone"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent">
-
-                </ProgressBar>
+                    app:layout_constraintTop_toTopOf="parent"/>
 
                 <ImageView
-                    android:id="@+id/iv_family_name"
-                    android:layout_width="25dp"
-                    android:layout_height="25dp"
+                    android:id="@+id/iv_error_surname"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:src="@drawable/error"
+                    android:visibility="gone"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <ImageView
+                    android:id="@+id/iv_edit_surname"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
                     android:src="@drawable/ic_baseline_edit_24"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="@+id/et_family_name"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <ImageView
+                    android:id="@+id/iv_change_surname"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:src="@drawable/ic_icon_done"
+                    android:visibility="gone"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
@@ -133,12 +205,12 @@
                 android:id="@+id/change_password_container"
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
+                android:layout_marginTop="40dp"
                 android:background="@drawable/shape_rounded_rectangle_for_edittext"
                 android:backgroundTint="@color/white"
-                android:layout_marginTop="40dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/login_container">
+                app:layout_constraintTop_toBottomOf="@+id/surname_container">
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -159,9 +231,9 @@
                 android:id="@+id/change_email_container"
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
+                android:layout_marginTop="40dp"
                 android:background="@drawable/shape_rounded_rectangle_for_edittext"
                 android:backgroundTint="@color/white"
-                android:layout_marginTop="40dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/change_password_container">
@@ -181,18 +253,16 @@
             <TextView
                 android:id="@+id/tv_log_out"
                 style="@style/TittleTextStyle"
-                android:textColor="#8799FF"
-                android:text="Выйти"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:text="Выйти"
+                android:textColor="#8799FF"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/change_email_container">
 
             </TextView>
-
-
 
 
         </androidx.constraintlayout.widget.ConstraintLayout>
@@ -214,11 +284,10 @@
             <include
                 android:id="@+id/bm_sheet_change_email"
                 layout="@layout/bottom_sheet_change_email"
-                app:text="@{2}"/>
+                app:text="@{2}" />
 
 
         </androidx.coordinatorlayout.widget.CoordinatorLayout>
-
 
 
     </FrameLayout>

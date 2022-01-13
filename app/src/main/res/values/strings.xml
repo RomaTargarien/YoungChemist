@@ -61,4 +61,6 @@
     <string name="enter_password">Введите пароль</string>
     <string name="enter_new_email">Введите новую почту</string>
     <string name="email_changing">Смена почты</string>
+    <string name="password_has_successfully_changed">Пароль успешно изменен</string>
+    <string name="email_has_successfully_changed">Логин успешно изменен</string>
 </resources>

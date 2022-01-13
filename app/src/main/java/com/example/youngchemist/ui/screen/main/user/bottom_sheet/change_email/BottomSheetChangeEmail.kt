@@ -6,6 +6,7 @@ import com.example.youngchemist.databinding.BottomSheetChangeEmailBinding
 import com.example.youngchemist.ui.screen.main.user.bottom_sheet.BottomSheetBaseBehavior
 import com.example.youngchemist.ui.screen.main.user.bottom_sheet.BottomSheetViewModelBase
 import com.example.youngchemist.ui.util.ResourceNetwork
+import com.example.youngchemist.ui.util.shake
 import com.example.youngchemist.ui.util.showKeyboard
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collect
@@ -17,6 +18,10 @@ class BottomSheetChangeEmail(private val bottomSheetChangeEmailBinding: BottomSh
 
     val isKeyBoardOpen: MutableStateFlow<Boolean> = MutableStateFlow(false)
     val isReathenticationSuccess: MutableStateFlow<Boolean> = MutableStateFlow(false)
+    private var onEmailHasChanged: ((String) -> Unit)? = null
+    override fun setOnDataHasChangedListener(listener: (String) -> Unit) {
+        onEmailHasChanged = listener
+    }
 
     init {
         bottomSheetChangeEmailBinding.lifecycleOwner!!.lifecycleScope.launch {
@@ -138,6 +143,7 @@ class BottomSheetChangeEmail(private val bottomSheetChangeEmailBinding: BottomSh
                     }
                     is ResourceNetwork.Error -> {
                         bottomSheetChangeEmailBinding.progressFlask.isVisible = false
+                        bottomSheetChangeEmailBinding.etPassword.shake().start()
                     }
                 }
             })
