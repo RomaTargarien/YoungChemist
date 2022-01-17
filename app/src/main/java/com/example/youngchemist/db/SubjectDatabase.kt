@@ -12,7 +12,7 @@ import com.example.youngchemist.model.user.UserProgress
 
 @Database(
     entities = [Subject::class, Lecture::class, PassedUserTest::class, Model3D::class, UserProgress::class],
-    version = 18
+    version = 19
 )
 @TypeConverters(Converters::class)
 abstract class SubjectDatabase : RoomDatabase() {

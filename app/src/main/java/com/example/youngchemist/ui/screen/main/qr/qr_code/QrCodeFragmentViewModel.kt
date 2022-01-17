@@ -18,6 +18,8 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.*
 import javax.inject.Inject
 
 @HiltViewModel
@@ -51,6 +53,7 @@ class QrCodeFragmentViewModel @Inject constructor(
                 }.collect { pair ->
                     if (pair.second) {
                         pair.first.userId = "76V1UE5VssV0W8mXenibeUpvQxm1"
+                        pair.first.addingDate = getCurrentTime()
                         databaseRepository.save3DModel(pair.first)
                         _wasSaved.postValue(true)
                     }
@@ -89,5 +92,11 @@ class QrCodeFragmentViewModel @Inject constructor(
         viewModelScope.launch {
             saveFlow.emit(true)
         }
+    }
+
+    private fun getCurrentTime(): String {
+        val dateFormat = SimpleDateFormat("yyyy.MM.dd", Locale.US)
+        val date = Calendar.getInstance().time
+        return dateFormat.format(date)
     }
 }

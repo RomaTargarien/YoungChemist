@@ -18,7 +18,9 @@ import androidx.transition.TransitionManager
 import com.example.youngchemist.R
 import com.example.youngchemist.databinding.FragmentSavedModelsBinding
 import com.example.youngchemist.model.user.Model3D
+import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
+import java.lang.IndexOutOfBoundsException
 
 
 @AndroidEntryPoint
@@ -26,7 +28,6 @@ class SavedModelsFragment : Fragment() {
 
     private val viewModel: SavedModelsFragmentViewModel by viewModels()
     private lateinit var binding: FragmentSavedModelsBinding
-    private var models3DUi = mutableListOf<Model3D>()
     private lateinit var model3DAdapter: Model3DAdapter
     private lateinit var bitmap: Bitmap
 
@@ -39,7 +40,9 @@ class SavedModelsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         model3DAdapter = Model3DAdapter()
+        binding.viewModel = viewModel
         enableSwipe()
+        viewModel.start()
         binding.rv3DModels.apply {
             layoutManager =
                 LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
@@ -48,20 +51,23 @@ class SavedModelsFragment : Fragment() {
         bitmap = BitmapFactory.decodeResource(resources, R.drawable.trash)
 
         viewModel.model3DState.observe(viewLifecycleOwner, {
-            models3DUi.addAll(it)
-            model3DAdapter.submitList(models3DUi)
-            animateTextNumberVisibility(models3DUi.size)
+            val list = it.first
+            val state = it.second
+            model3DAdapter.submitList(list)
+            when (state) {
+                is Query.Searching -> {
+                    binding.tvEmptySearch.isVisible = list.isEmpty()
+                }
+                is Query.All -> {
+                    binding.tvEmptySearch.isVisible = false
+                    animateTextNumberVisibility(list.size)
+                }
+            }
+
         })
 
         model3DAdapter.setOnClickListener {
             startActivity(createIntent(it.modelUri))
-        }
-
-        model3DAdapter.setOnDeleteListener {
-            viewModel.deleteModel3D(it)
-            models3DUi.remove(it)
-            model3DAdapter.submitList(models3DUi)
-            animateTextNumberVisibility(models3DUi.size)
         }
 
     }
@@ -80,11 +86,11 @@ class SavedModelsFragment : Fragment() {
                 override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                     val position = viewHolder.adapterPosition
                     if (direction == ItemTouchHelper.LEFT) {
-                        val deletedModel = models3DUi[position]
-                        viewModel.deleteModel3D(deletedModel)
-                        models3DUi.remove(deletedModel)
-                        model3DAdapter.submitList(models3DUi)
-                        animateTextNumberVisibility(models3DUi.size)
+                        val model = model3DAdapter.getItem(position)
+                        animateTextNumberVisibility(model3DAdapter.itemCount-1)
+                        undo(model)
+                        viewModel.deleteModel3D(model)
+
                     }
                 }
 
@@ -131,15 +137,18 @@ class SavedModelsFragment : Fragment() {
 
     private fun animateTextNumberVisibility(size: Int) {
         if (size == 0) {
-            binding.tvEmptyList.isVisible = true
             if (binding.tvAmountOffModels.isVisible) {
                 TransitionManager.beginDelayedTransition(binding.mainContainer)
                 binding.tvAmountOffModels.isVisible = false
+                binding.tvEmptyList.isVisible = true
+                binding.searchingContainer.isVisible = false
             }
         } else {
             if (!binding.tvAmountOffModels.isVisible) {
                 TransitionManager.beginDelayedTransition(binding.mainContainer)
                 binding.tvAmountOffModels.isVisible = true
+                binding.searchingContainer.isVisible = true
+                binding.tvEmptyList.isVisible = false
             }
             binding.tvAmountOffModels.text = size.toString()
         }
@@ -155,6 +164,20 @@ class SavedModelsFragment : Fragment() {
         intent.data = uri
         intent.setPackage(PACKAGE_NAME)
         return intent
+    }
+
+    private fun undo(model3D: Model3D) {
+        Snackbar.make(binding.mainContainer, "Удаление ${model3D.modelTitle}", Snackbar.LENGTH_LONG)
+            .setAction("Отменить") {
+                viewModel.undoDelete(model3D)
+            }
+            .show()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        Log.d("TAG","pause")
+        viewModel.cancel()
     }
 
     companion object {

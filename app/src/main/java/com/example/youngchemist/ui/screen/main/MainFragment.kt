@@ -8,6 +8,7 @@ import androidx.activity.addCallback
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.transition.TransitionManager
 import com.example.youngchemist.R
 import com.example.youngchemist.databinding.FragmentMainBinding
 import com.example.youngchemist.ui.screen.main.saved_models.SavedModelsFragment
@@ -36,7 +37,7 @@ class MainFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel
+        binding.viewModel = viewModel
         createBottomNavMenu()
         createBottomNavMenuItemSelectedListener()
         replaceFragment(getFragmentForTabId(id_subjects)!!)
@@ -91,6 +92,15 @@ class MainFragment : Fragment() {
             override fun onItemClick(itemIndex: Int, itemName: String?) {
                 getFragmentForTabId(itemIndex)?.run {
                     replaceFragment(this)
+                }
+                if (itemIndex == id_person) {
+                    TransitionManager.beginDelayedTransition(binding.toolbarContainer)
+                    binding.ivExit.isVisible = true
+                } else {
+                    if (binding.ivExit.isVisible) {
+                        TransitionManager.beginDelayedTransition(binding.toolbarContainer)
+                        binding.ivExit.isVisible = false
+                    }
                 }
                 lastSelectedItem = itemIndex
             }

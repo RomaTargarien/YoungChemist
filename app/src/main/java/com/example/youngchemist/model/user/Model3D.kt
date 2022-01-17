@@ -9,7 +9,8 @@ data class Model3D(
     var userId: String = "",
     var modelId: String = "",
     var modelUri: String = "",
-    var modelTitle: String = ""
+    var modelTitle: String = "",
+    var addingDate: String = "",
 ): UserInfo {
     @PrimaryKey(autoGenerate = true)
     var modelPrimaryKey: Int = 0

@@ -14,8 +14,9 @@ interface AuthRepository {
 
     suspend fun reauthenticate(password: String): ResourceNetwork<String>
 
-    suspend fun updateEmail(email: String,userId: String): ResourceNetwork<String>
+    suspend fun updateEmail(email: String): ResourceNetwork<String>
 
-    suspend fun updatePassword(password: String,userId: String): ResourceNetwork<String>
+    suspend fun updatePassword(password: String): ResourceNetwork<String>
 
+    suspend fun logOut(): ResourceNetwork<String>
 }

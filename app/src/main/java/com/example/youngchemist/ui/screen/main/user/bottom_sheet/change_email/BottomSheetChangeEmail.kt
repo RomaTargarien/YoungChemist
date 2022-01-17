@@ -1,7 +1,9 @@
 package com.example.youngchemist.ui.screen.main.user.bottom_sheet.change_email
 
+import android.content.Context
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
+import com.example.youngchemist.R
 import com.example.youngchemist.databinding.BottomSheetChangeEmailBinding
 import com.example.youngchemist.ui.screen.main.user.bottom_sheet.BottomSheetBaseBehavior
 import com.example.youngchemist.ui.screen.main.user.bottom_sheet.BottomSheetViewModelBase
@@ -13,8 +15,10 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 
-class BottomSheetChangeEmail(private val bottomSheetChangeEmailBinding: BottomSheetChangeEmailBinding) :
-    BottomSheetBaseBehavior() {
+class BottomSheetChangeEmail(
+    private val bottomSheetChangeEmailBinding: BottomSheetChangeEmailBinding,
+    private val context: Context
+) : BottomSheetBaseBehavior() {
 
     val isKeyBoardOpen: MutableStateFlow<Boolean> = MutableStateFlow(false)
     val isReathenticationSuccess: MutableStateFlow<Boolean> = MutableStateFlow(false)
@@ -49,6 +53,7 @@ class BottomSheetChangeEmail(private val bottomSheetChangeEmailBinding: BottomSh
         observePasswordChanges()
         observeEmailChanges()
         observeReathenticationResult()
+        observeChangeEmailState()
     }
 
     override fun removeObservers() {
@@ -122,10 +127,10 @@ class BottomSheetChangeEmail(private val bottomSheetChangeEmailBinding: BottomSh
             {
                 when (it) {
                     is ResourceNetwork.Loading -> {
-                        bottomSheetChangeEmailBinding.progressFlask.isVisible = true
+                        bottomSheetChangeEmailBinding.progressFlaskReathenticate.isVisible = true
                     }
                     is ResourceNetwork.Success -> {
-                        bottomSheetChangeEmailBinding.progressFlask.isVisible = false
+                        bottomSheetChangeEmailBinding.progressFlaskReathenticate.isVisible = false
                         bottomSheetChangeEmailBinding.lifecycleOwner!!.lifecycleScope.launch {
                             isReathenticationSuccess.emit(true)
                         }
@@ -137,16 +142,40 @@ class BottomSheetChangeEmail(private val bottomSheetChangeEmailBinding: BottomSh
                             bottomSheetChangeEmailBinding.newEmailContainer,
                             bottomSheetChangeEmailBinding.tvChange
                         )
-                        toggleContainerTransition(bottomSheetChangeEmailBinding.mainContainer,0)
+                        toggleContainerTransition(bottomSheetChangeEmailBinding.mainContainer, 0)
                         bottomSheetChangeEmailBinding.etNewEmail.requestFocus()
                         bottomSheetChangeEmailBinding.etNewEmail.showKeyboard()
                     }
                     is ResourceNetwork.Error -> {
-                        bottomSheetChangeEmailBinding.progressFlask.isVisible = false
+                        bottomSheetChangeEmailBinding.progressFlaskReathenticate.isVisible = false
                         bottomSheetChangeEmailBinding.etPassword.shake().start()
                     }
                 }
             })
+    }
+
+    private fun observeChangeEmailState() {
+        bottomSheetChangeEmailBinding.viewModel?.let {
+            it.emailChangeState.observe(bottomSheetChangeEmailBinding.lifecycleOwner!!, {
+                when (it) {
+                    is ResourceNetwork.Loading -> {
+                        bottomSheetChangeEmailBinding.progressFlaskEmailChange.isVisible =
+                            true
+                    }
+                    is ResourceNetwork.Success -> {
+                        bottomSheetChangeEmailBinding.progressFlaskEmailChange.isVisible =
+                            false
+                        onEmailHasChanged?.let { change ->
+                            change(context.getString(R.string.email_has_successfully_changed))
+                        }
+                    }
+                    is ResourceNetwork.Error -> {
+                        bottomSheetChangeEmailBinding.progressFlaskEmailChange.isVisible =
+                            false
+                    }
+                }
+            })
+        }
     }
 
     private fun jumpToInitialState() {
@@ -170,7 +199,8 @@ class BottomSheetChangeEmail(private val bottomSheetChangeEmailBinding: BottomSh
             disableViews(newEmailContainer, tvChange)
             enableViews(passwordContainer, tvNext)
             toggleContainerTransition(mainContainer, 100)
-            progressFlask.isVisible = false
+            progressFlaskEmailChange.isVisible = false
+            progressFlaskReathenticate.isVisible = false
         }
     }
 }

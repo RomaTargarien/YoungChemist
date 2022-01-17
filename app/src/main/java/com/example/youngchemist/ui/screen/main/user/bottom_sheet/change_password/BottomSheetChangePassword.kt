@@ -1,29 +1,25 @@
 package com.example.youngchemist.ui.screen.main.user.bottom_sheet.change_password
 
-import android.animation.LayoutTransition
-import android.view.ViewGroup
-import androidx.constraintlayout.widget.ConstraintLayout
+import android.content.Context
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
+import com.example.youngchemist.R
 import com.example.youngchemist.databinding.BottomSheetChangePasswordBinding
 import com.example.youngchemist.ui.screen.main.user.bottom_sheet.BottomSheetBaseBehavior
 import com.example.youngchemist.ui.screen.main.user.bottom_sheet.BottomSheetViewModelBase
 import com.example.youngchemist.ui.util.ResourceNetwork
+import com.example.youngchemist.ui.util.shake
 import com.example.youngchemist.ui.util.showKeyboard
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
-import android.animation.ObjectAnimator
-
-import android.animation.AnimatorSet
-import android.util.Log
-import com.example.youngchemist.model.user.Model3D
-import com.example.youngchemist.ui.util.shake
 
 
-class BottomSheetChangePassword(private val bottomSheetChangePasswordBinding: BottomSheetChangePasswordBinding) :
-    BottomSheetBaseBehavior() {
+class BottomSheetChangePassword(
+    private val bottomSheetChangePasswordBinding: BottomSheetChangePasswordBinding,
+    private val context: Context
+) : BottomSheetBaseBehavior() {
 
     val isKeyBoardOpen: MutableStateFlow<Boolean> = MutableStateFlow(false)
     val isReathenticationSuccess: MutableStateFlow<Boolean> = MutableStateFlow(false)
@@ -31,6 +27,7 @@ class BottomSheetChangePassword(private val bottomSheetChangePasswordBinding: Bo
     override fun setOnDataHasChangedListener(listener: (String) -> Unit) {
         onPasswordHasChanged = listener
     }
+
     init {
         bottomSheetChangePasswordBinding.lifecycleOwner!!.lifecycleScope.launch {
             combine(isKeyBoardOpen, isReathenticationSuccess) { isOpen, isSuccess ->
@@ -77,20 +74,22 @@ class BottomSheetChangePassword(private val bottomSheetChangePasswordBinding: Bo
 
     private fun observeChangePasswordState() {
         bottomSheetChangePasswordBinding.viewModel?.let {
-            it.changePasswordState.observe(bottomSheetChangePasswordBinding.lifecycleOwner!!,{
+            it.changePasswordState.observe(bottomSheetChangePasswordBinding.lifecycleOwner!!, {
                 when (it) {
                     is ResourceNetwork.Loading -> {
-                        bottomSheetChangePasswordBinding.progressFlaskPasswordChange.isVisible = true
+                        bottomSheetChangePasswordBinding.progressFlaskPasswordChange.isVisible =
+                            true
                     }
                     is ResourceNetwork.Success -> {
-                        bottomSheetChangePasswordBinding.progressFlaskPasswordChange.isVisible = false
-                        Log.d("TAG","success")
+                        bottomSheetChangePasswordBinding.progressFlaskPasswordChange.isVisible =
+                            false
                         onPasswordHasChanged?.let { change ->
-                            change("Password changed success")
+                            change(context.getString(R.string.password_has_successfully_changed))
                         }
                     }
                     is ResourceNetwork.Error -> {
-                        bottomSheetChangePasswordBinding.progressFlaskPasswordChange.isVisible = false
+                        bottomSheetChangePasswordBinding.progressFlaskPasswordChange.isVisible =
+                            false
                     }
                 }
             })
@@ -118,7 +117,8 @@ class BottomSheetChangePassword(private val bottomSheetChangePasswordBinding: Bo
             disableViews(newPasswordContainer, tvChange)
             enableViews(oldPasswordContainer, tvNext)
             toggleContainerTransition(mainContainer, 100)
-            progressFlask.isVisible = false
+            progressFlaskReathenticate.isVisible = false
+            progressFlaskPasswordChange.isVisible = false
         }
     }
 
@@ -192,10 +192,11 @@ class BottomSheetChangePassword(private val bottomSheetChangePasswordBinding: Bo
             {
                 when (it) {
                     is ResourceNetwork.Loading -> {
-                        bottomSheetChangePasswordBinding.progressFlask.isVisible = true
+                        bottomSheetChangePasswordBinding.progressFlaskReathenticate.isVisible = true
                     }
                     is ResourceNetwork.Success -> {
-                        bottomSheetChangePasswordBinding.progressFlask.isVisible = false
+                        bottomSheetChangePasswordBinding.progressFlaskReathenticate.isVisible =
+                            false
                         bottomSheetChangePasswordBinding.lifecycleOwner!!.lifecycleScope.launch {
                             isReathenticationSuccess.emit(true)
                         }
@@ -207,12 +208,13 @@ class BottomSheetChangePassword(private val bottomSheetChangePasswordBinding: Bo
                             bottomSheetChangePasswordBinding.newPasswordContainer,
                             bottomSheetChangePasswordBinding.tvChange
                         )
-                        toggleContainerTransition(bottomSheetChangePasswordBinding.mainContainer,0)
+                        toggleContainerTransition(bottomSheetChangePasswordBinding.mainContainer, 0)
                         bottomSheetChangePasswordBinding.etNewPassword.requestFocus()
                         bottomSheetChangePasswordBinding.etNewPassword.showKeyboard()
                     }
                     is ResourceNetwork.Error -> {
-                        bottomSheetChangePasswordBinding.progressFlask.isVisible = false
+                        bottomSheetChangePasswordBinding.progressFlaskReathenticate.isVisible =
+                            false
                         bottomSheetChangePasswordBinding.etOldPassword.shake().start()
                     }
                 }

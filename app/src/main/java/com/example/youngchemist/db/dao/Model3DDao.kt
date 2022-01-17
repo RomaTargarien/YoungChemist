@@ -19,4 +19,7 @@ interface Model3DDao {
     @Query("SELECT * FROM saved3DModels WHERE userId LIKE :currentUserId AND modelId LIKE :modelId")
     fun getModel(currentUserId: String,modelId: String): List<Model3D>
 
+    @Query("SELECT * FROM saved3DModels WHERE userId LIKE :currentUserId AND modelTitle LIKE :modelName")
+    fun getAllModelsFlow(currentUserId: String,modelName: String): Flow<List<Model3D>>
+
 }

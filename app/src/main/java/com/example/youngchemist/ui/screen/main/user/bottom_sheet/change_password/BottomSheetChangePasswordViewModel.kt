@@ -29,8 +29,8 @@ class BottomSheetChangePasswordViewModel(
     private val _isNewPasswordShown: MutableLiveData<Boolean> = MutableLiveData(false)
     val isNewPasswordShown: LiveData<Boolean> = _isNewPasswordShown
 
-    val oldPasswordState: MutableStateFlow<String> = MutableStateFlow("")
-    val newPasswordState: MutableStateFlow<String> = MutableStateFlow("")
+    val oldPasswordFlow: MutableStateFlow<String> = MutableStateFlow("")
+    val newPasswordFlow: MutableStateFlow<String> = MutableStateFlow("")
 
     private var oldPasswordJob: Job? = null
     private var newPasswordJob: Job? = null
@@ -47,7 +47,6 @@ class BottomSheetChangePasswordViewModel(
     private val _buttonChangeState: MutableLiveData<Boolean> = MutableLiveData(false)
     val buttonChangeState: LiveData<Boolean> = _buttonChangeState
 
-    private val newPasswordFlow: MutableStateFlow<String?> = MutableStateFlow(null)
     private val _changePasswordState: MutableLiveData<ResourceNetwork<String>> = MutableLiveData<ResourceNetwork<String>>()
     val changePasswordState: LiveData<ResourceNetwork<String>> = _changePasswordState
 
@@ -55,17 +54,15 @@ class BottomSheetChangePasswordViewModel(
     fun reauthenticate() {
         CoroutineScope(EmptyCoroutineContext).launch {
             _reauthenticateResult.postValue(ResourceNetwork.Loading())
-            val result = authRepository.reauthenticate(oldPasswordState.value)
+            val result = authRepository.reauthenticate(oldPasswordFlow.value)
             _reauthenticateResult.postValue(result)
         }
     }
 
     fun changePassword() {
         CoroutineScope(EmptyCoroutineContext).launch {
-            newPasswordFlow.value?.let {
-                //val result = authRepository.updatePassword(it,TEST_USER)
-                _changePasswordState.postValue(ResourceNetwork.Success(""))
-            }
+            val result = authRepository.updatePassword(newPasswordFlow.value)
+            _changePasswordState.postValue(result)
         }
     }
 
@@ -88,12 +85,11 @@ class BottomSheetChangePasswordViewModel(
         oldPasswordJob = CoroutineScope(EmptyCoroutineContext).launch(Dispatchers.Default) {
             flow {
                 delay(1000)
-                newPasswordFlow.emit(s.toString())
                 emit(passwordValidation.validate(s.toString()))
             }.collect {
                 if (it is Resource.Success) {
                     _buttonNextState.postValue(true)
-                    oldPasswordState.emit(s.toString())
+                    oldPasswordFlow.emit(s.toString())
                 } else {
                     _errorMessageOldPasswordBehavior.postValue(it.message)
                 }
@@ -112,7 +108,7 @@ class BottomSheetChangePasswordViewModel(
             }.collect {
                 if (it is Resource.Success) {
                     _buttonChangeState.postValue(true)
-                    newPasswordState.emit(s.toString())
+                    newPasswordFlow.emit(s.toString())
                 } else {
                     _errorMessageNewPasswordBehavior.postValue(it.message)
                 }

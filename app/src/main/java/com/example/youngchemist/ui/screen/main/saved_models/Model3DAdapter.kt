@@ -25,17 +25,15 @@ class Model3DAdapter : RecyclerView.Adapter<Model3DAdapter.Model3DViewHoler>() {
         models.addAll(modelsList)
     }
 
+    fun getItem(position: Int) = models[position]
+
     inner class Model3DViewHoler(val binding: Item3dBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(item: Model3D) {
             binding.tvTitle.text = item.modelTitle
+            binding.tvDateOffAdding.text = item.addingDate
             binding.cvModel.setOnClickListener {
                 onClick?.let { click ->
-                    click(item)
-                }
-            }
-            binding.ivDelete.setOnClickListener{
-                onDeleteClick?.let { click ->
                     click(item)
                 }
             }

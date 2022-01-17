@@ -40,4 +40,5 @@ interface DatabaseRepository {
 
     suspend fun getPassedUserTest(userId: String, testId: String): PassedUserTest?
 
+    suspend fun getAllModelsFlow(currentUserId: String,modelName: String): Flow<List<Model3D>>
 }

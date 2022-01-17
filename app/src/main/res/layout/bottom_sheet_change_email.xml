@@ -110,7 +110,7 @@
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <com.airbnb.lottie.LottieAnimationView
-                android:id="@+id/progress_flask"
+                android:id="@+id/progress_flask_reathenticate"
                 android:layout_width="70dp"
                 android:layout_height="70dp"
                 android:visibility="gone"
@@ -120,9 +120,7 @@
                 app:layout_constraintTop_toBottomOf="@+id/password_container"
                 app:lottie_autoPlay="true"
                 app:lottie_fileName="progress_flask.json"
-                app:lottie_loop="true">
-
-            </com.airbnb.lottie.LottieAnimationView>
+                app:lottie_loop="true"/>
 
             <TextView
                 android:id="@+id/tv_next"
@@ -182,13 +180,26 @@
                 android:layout_marginTop="10dp"
                 android:layout_marginEnd="5dp"
                 android:text="@string/change"
+                android:onClick="@{view -> viewModel.changeEmail()}"
                 android:textColor="#2196F3"
                 android:textSize="20sp"
                 app:layout_constraintEnd_toEndOf="@+id/new_email_container"
                 app:layout_constraintTop_toBottomOf="@+id/new_email_container" />
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
+            <com.airbnb.lottie.LottieAnimationView
+                android:id="@+id/progress_flask_email_change"
+                android:layout_width="70dp"
+                android:layout_height="70dp"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/new_email_container"
+                app:lottie_autoPlay="true"
+                app:lottie_fileName="progress_flask.json"
+                app:lottie_loop="true"/>
 
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

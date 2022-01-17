@@ -1,7 +1,6 @@
 package com.example.youngchemist.ui.screen.main.user
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -248,15 +247,16 @@ class UserFragment : Fragment() {
         bottomSheetChangePasswordBehavior.state = BottomSheetBehavior.STATE_HIDDEN
         binding.changePasswordContainer.setOnClickListener {
             bottomSheetChangePasswordBehavior.state = BottomSheetBehavior.STATE_EXPANDED
-            bottomSheet = BottomSheetChangePassword(passwordChangeBinding).apply {
-                init(viewModel.createChangePasswordViewModel())
-                subscribeToObservers()
-                setOnDataHasChangedListener {
-                    bottomSheetChangePasswordBehavior.state = BottomSheetBehavior.STATE_HIDDEN
-                    Snackbar.make(binding.container,it, Snackbar.LENGTH_SHORT)
-                        .show()
+            bottomSheet =
+                BottomSheetChangePassword(passwordChangeBinding, this.requireContext()).apply {
+                    init(viewModel.createChangePasswordViewModel())
+                    subscribeToObservers()
+                    setOnDataHasChangedListener {
+                        bottomSheetChangePasswordBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+                        Snackbar.make(binding.container, it, Snackbar.LENGTH_SHORT)
+                            .show()
+                    }
                 }
-            }
         }
         passwordChangeBinding.ivClose.setOnClickListener {
             bottomSheetChangePasswordBehavior.state = BottomSheetBehavior.STATE_HIDDEN
@@ -266,18 +266,18 @@ class UserFragment : Fragment() {
     }
 
     private fun initializeBottomSheetChangeEmail() {
-        val bottomSheetEmail = binding.bmSheetChangeEmail.bottomSheetContainer
+        val bottomSheetEmail = emailChangeBinding.bottomSheetContainer
         val bottomSheetEmailBehavior = BottomSheetBehavior.from(bottomSheetEmail)
         bottomSheetEmailBehavior.skipCollapsed = true
         bottomSheetEmailBehavior.state = BottomSheetBehavior.STATE_HIDDEN
         binding.changeEmailContainer.setOnClickListener {
             bottomSheetEmailBehavior.state = BottomSheetBehavior.STATE_EXPANDED
-            bottomSheet = BottomSheetChangeEmail(emailChangeBinding).apply {
+            bottomSheet = BottomSheetChangeEmail(emailChangeBinding, this.requireContext()).apply {
                 init(viewModel.createChangeEmailViewModel())
                 subscribeToObservers()
                 setOnDataHasChangedListener {
                     bottomSheetEmailBehavior.state = BottomSheetBehavior.STATE_HIDDEN
-                    Snackbar.make(binding.container,it, Snackbar.LENGTH_SHORT)
+                    Snackbar.make(binding.container, it, Snackbar.LENGTH_SHORT)
                         .show()
                 }
             }

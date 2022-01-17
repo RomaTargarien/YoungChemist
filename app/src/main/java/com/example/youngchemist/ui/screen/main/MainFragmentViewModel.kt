@@ -5,11 +5,13 @@ import android.util.Log
 import androidx.lifecycle.*
 import androidx.work.*
 import com.example.youngchemist.db.shared_pref.UserPreferences
+import com.example.youngchemist.repositories.AuthRepository
 import com.example.youngchemist.ui.base.workers.UserInfoDonloadingWorker
 import com.example.youngchemist.ui.base.workers.UserInfoUploadingWorker
 import com.example.youngchemist.ui.screen.Screens
 import com.example.youngchemist.ui.util.Constants.TEST_USER
 import com.example.youngchemist.ui.util.Resource
+import com.example.youngchemist.ui.util.ResourceNetwork
 import com.example.youngchemist.ui.util.UserState
 import com.github.terrakok.cicerone.Router
 import com.google.firebase.auth.ktx.auth
@@ -26,7 +28,8 @@ import javax.inject.Inject
 class MainFragmentViewModel @Inject constructor(
     private val workManager: WorkManager,
     private val userSharedPreferences: UserPreferences,
-    private val router: Router
+    private val router: Router,
+    private val authRepository: AuthRepository
 ): ViewModel() {
 
     private val _bottomSheetState: MutableLiveData<Float> = MutableLiveData()
@@ -92,6 +95,16 @@ class MainFragmentViewModel @Inject constructor(
             }
         }
     }
+
+    fun logOut() {
+        viewModelScope.launch {
+            val result = authRepository.logOut()
+            if (result is ResourceNetwork.Success) {
+                router.newRootScreen(Screens.authScreen())
+            }
+        }
+    }
+
     private fun saveUser(userId: String) {
         val setOfUsers = mutableSetOf<String>()
         setOfUsers.addAll(userSharedPreferences.loggedUsers)

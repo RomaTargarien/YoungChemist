@@ -63,4 +63,5 @@
     <string name="email_changing">Смена почты</string>
     <string name="password_has_successfully_changed">Пароль успешно изменен</string>
     <string name="email_has_successfully_changed">Логин успешно изменен</string>
+    <string name="exit">Выйти</string>
 </resources>

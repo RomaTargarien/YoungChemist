@@ -10,6 +10,7 @@ import com.example.youngchemist.repositories.DatabaseRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
@@ -108,4 +109,12 @@ class DatabaseRepositoryImpl @Inject constructor(
                 tests[0]
             } else null
         }
+
+    override suspend fun getAllModelsFlow(currentUserId: String,modelName: String) = withContext(Dispatchers.IO) {
+        var modelNameSearch = modelName
+        if (modelName.isEmpty()) {
+            modelNameSearch = "%"
+        }
+        model3DDao.getAllModelsFlow(currentUserId,modelNameSearch)
+    }
 }

@@ -42,9 +42,8 @@ object AuthModule {
     @Singleton
     fun provideAuthRepository(
         firebaseAuth: FirebaseAuth,
-        firestore: FirebaseFirestore,
-        @ApplicationContext context: Context,
-    ) = AuthRepositoryImpl(firebaseAuth, firestore, context) as AuthRepository
+        firestore: FirebaseFirestore
+    ) = AuthRepositoryImpl(firebaseAuth, firestore) as AuthRepository
 
     @Provides
     @Singleton

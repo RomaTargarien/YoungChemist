@@ -19,7 +19,8 @@ class BottomSheetChangeEmailViewModel(
     private val authRepository: AuthRepository
 ) : BottomSheetViewModelBase {
 
-    private val emailChangeState: MutableStateFlow<Unit?> = MutableStateFlow(null)
+    private val _emailChangeState: MutableLiveData<ResourceNetwork<String>> = MutableLiveData<ResourceNetwork<String>>()
+    val emailChangeState: LiveData<ResourceNetwork<String>> = _emailChangeState
 
     private val _reauthenticateResult: MutableLiveData<ResourceNetwork<String>> = MutableLiveData()
     val reauthenticateResult: LiveData<ResourceNetwork<String>> = _reauthenticateResult
@@ -55,7 +56,8 @@ class BottomSheetChangeEmailViewModel(
 
     fun changeEmail() {
         CoroutineScope(EmptyCoroutineContext).launch {
-
+            val result = authRepository.updateEmail(newEmailState.value)
+            _emailChangeState.postValue(result)
         }
     }
 
