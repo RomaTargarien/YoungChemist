@@ -124,7 +124,11 @@
 
         </androidx.core.widget.NestedScrollView>
 
-
+        <View
+            android:id="@+id/snackbar_anchor"
+            android:layout_width="match_parent"
+            android:layout_gravity="bottom"
+            android:layout_height="0dp"/>
 
     </FrameLayout>
 </layout>

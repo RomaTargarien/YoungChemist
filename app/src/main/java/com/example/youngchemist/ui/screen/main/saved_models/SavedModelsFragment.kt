@@ -18,9 +18,9 @@ import androidx.transition.TransitionManager
 import com.example.youngchemist.R
 import com.example.youngchemist.databinding.FragmentSavedModelsBinding
 import com.example.youngchemist.model.user.Model3D
-import com.google.android.material.snackbar.Snackbar
+import com.example.youngchemist.ui.custom.snack_bar.CustomSnackBar
+import com.example.youngchemist.ui.custom.snack_bar.CustomSnackBar.Companion.setOnClickListener
 import dagger.hilt.android.AndroidEntryPoint
-import java.lang.IndexOutOfBoundsException
 
 
 @AndroidEntryPoint
@@ -51,6 +51,8 @@ class SavedModelsFragment : Fragment() {
         bitmap = BitmapFactory.decodeResource(resources, R.drawable.trash)
 
         viewModel.model3DState.observe(viewLifecycleOwner, {
+            Log.d("TAG", it.first.toString())
+            Log.d("TAG", it.second.toString())
             val list = it.first
             val state = it.second
             model3DAdapter.submitList(list)
@@ -87,10 +89,8 @@ class SavedModelsFragment : Fragment() {
                     val position = viewHolder.adapterPosition
                     if (direction == ItemTouchHelper.LEFT) {
                         val model = model3DAdapter.getItem(position)
-                        animateTextNumberVisibility(model3DAdapter.itemCount-1)
                         undo(model)
                         viewModel.deleteModel3D(model)
-
                     }
                 }
 
@@ -124,7 +124,7 @@ class SavedModelsFragment : Fragment() {
                                 itemView.right.toFloat() - width,
                                 itemView.bottom.toFloat() - width
                             )
-                            val alpha = ((-dX/itemView.width.toFloat())*255).toInt()
+                            val alpha = ((-dX / itemView.width.toFloat()) * 255).toInt()
                             p.alpha = alpha
                             c.drawBitmap(bitmap, null, iconDest, p)
                         }
@@ -167,16 +167,19 @@ class SavedModelsFragment : Fragment() {
     }
 
     private fun undo(model3D: Model3D) {
-        Snackbar.make(binding.mainContainer, "Удаление ${model3D.modelTitle}", Snackbar.LENGTH_LONG)
-            .setAction("Отменить") {
+        CustomSnackBar.make(activity?.window?.decorView?.rootView as ViewGroup,model3D.modelTitle)
+            .setOnClickListener {
                 viewModel.undoDelete(model3D)
+                it.dismiss()
             }
+            .setAnchorView(binding.snackbarAnchor)
+            .setDuration(3000)
             .show()
     }
 
     override fun onPause() {
         super.onPause()
-        Log.d("TAG","pause")
+        Log.d("TAG", "pause")
         viewModel.cancel()
     }
 

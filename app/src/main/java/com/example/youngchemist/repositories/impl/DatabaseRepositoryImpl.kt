@@ -110,11 +110,7 @@ class DatabaseRepositoryImpl @Inject constructor(
             } else null
         }
 
-    override suspend fun getAllModelsFlow(currentUserId: String,modelName: String) = withContext(Dispatchers.IO) {
-        var modelNameSearch = modelName
-        if (modelName.isEmpty()) {
-            modelNameSearch = "%"
-        }
-        model3DDao.getAllModelsFlow(currentUserId,modelNameSearch)
+    override suspend fun getAllModelsFlow(currentUserId: String) = withContext(Dispatchers.IO) {
+        model3DDao.getAllModelsFlow(currentUserId)
     }
 }
