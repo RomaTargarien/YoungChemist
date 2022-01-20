@@ -5,14 +5,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.addCallback
-import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.transition.TransitionManager
 import com.example.youngchemist.R
 import com.example.youngchemist.databinding.FragmentMainBinding
 import com.example.youngchemist.ui.screen.main.saved_models.SavedModelsFragment
-import com.example.youngchemist.ui.screen.main.stat.StatisticsFragment
+import com.example.youngchemist.ui.screen.main.achievements.AchievementsFragment
 import com.example.youngchemist.ui.screen.main.subjects.SubjectsFragment
 import com.example.youngchemist.ui.screen.main.user.UserFragment
 import com.luseen.spacenavigation.SpaceItem
@@ -115,7 +114,7 @@ class MainFragment : Fragment() {
                 SubjectsFragment()
             }
             id_statistics -> {
-                StatisticsFragment()
+                AchievementsFragment()
             }
             id_saved_models -> {
                 SavedModelsFragment()
