@@ -4,6 +4,7 @@ import com.example.youngchemist.model.Lecture
 import com.example.youngchemist.model.Subject
 import com.example.youngchemist.model.user.Model3D
 import com.example.youngchemist.model.user.PassedUserTest
+import com.example.youngchemist.model.user.UserAchievement
 import com.example.youngchemist.model.user.UserProgress
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.flow.Flow
@@ -41,4 +42,8 @@ interface DatabaseRepository {
     suspend fun getPassedUserTest(userId: String, testId: String): PassedUserTest?
 
     suspend fun getAllModelsFlow(currentUserId: String): Flow<List<Model3D>>
+
+    suspend fun saveAchievement(userAchievement: UserAchievement)
+
+    suspend fun getAchievements(userId: String): Flow<List<UserAchievement>>
 }

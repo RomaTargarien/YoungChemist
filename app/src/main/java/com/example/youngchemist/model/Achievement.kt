@@ -11,10 +11,10 @@ data class Achievement(
     val testsAverageMark: Int? = null,
     val lecturesToRead: Int? = null,
     val modelsToSave: Int? = null,
-    val isRegistered: Boolean? = null
+    val registered: Boolean? = null
 ) {
-    fun convertToUserAchievement(): UserAchievement {
-        val userAchievement = UserAchievement(id, title, imageUrl)
+    fun convertToUserAchievement(userId: String): UserAchievement {
+        val userAchievement = UserAchievement(id,userId, title, imageUrl)
         testsToDone?.let {
             userAchievement.itemsToDone = it
         }
@@ -24,7 +24,7 @@ data class Achievement(
         modelsToSave?.let {
             userAchievement.itemsToDone = it
         }
-        isRegistered?.let {
+        registered?.let {
             userAchievement.itemsToDone = 1
         }
         return userAchievement

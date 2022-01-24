@@ -5,6 +5,7 @@ import com.example.youngchemist.model.Lecture
 import com.example.youngchemist.model.Subject
 import com.example.youngchemist.model.user.Model3D
 import com.example.youngchemist.model.user.PassedUserTest
+import com.example.youngchemist.model.user.UserAchievement
 import com.example.youngchemist.model.user.UserProgress
 import com.example.youngchemist.repositories.DatabaseRepository
 import kotlinx.coroutines.CoroutineScope
@@ -19,7 +20,8 @@ class DatabaseRepositoryImpl @Inject constructor(
     private val lecturesDao: LectureDao,
     private val testDao: TestDao,
     private val model3DDao: Model3DDao,
-    private val userProgressDao: UserProgressDao
+    private val userProgressDao: UserProgressDao,
+    private val achievementsDao: AchievementsDao
 ) : DatabaseRepository {
 
     override suspend fun getAllSubjects(): List<Subject> {
@@ -112,5 +114,15 @@ class DatabaseRepositoryImpl @Inject constructor(
 
     override suspend fun getAllModelsFlow(currentUserId: String) = withContext(Dispatchers.IO) {
         model3DDao.getAllModelsFlow(currentUserId)
+    }
+
+    override suspend fun getAchievements(userId: String) = withContext(Dispatchers.IO) {
+        achievementsDao.getAchievements(userId)
+    }
+
+    override suspend fun saveAchievement(userAchievement: UserAchievement) {
+        withContext(Dispatchers.IO) {
+            achievementsDao.insertAchievement(userAchievement)
+        }
     }
 }

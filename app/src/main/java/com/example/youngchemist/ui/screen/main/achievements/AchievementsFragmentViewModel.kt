@@ -1,6 +1,5 @@
 package com.example.youngchemist.ui.screen.main.achievements
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -16,7 +15,6 @@ import com.example.youngchemist.ui.util.Constants.TEST_USER
 import com.example.youngchemist.ui.util.ResourceNetwork
 import com.github.terrakok.cicerone.Router
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.channels.actor
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -31,8 +29,14 @@ class AchievementsFragmentViewModel @Inject constructor(
     private val _achievements: MutableStateFlow<List<Achievement>?> = MutableStateFlow(null)
     val achievements: StateFlow<List<Achievement>?> = _achievements
 
-    private val _userAchievements: MutableLiveData<List<UserAchievement>> = MutableLiveData()
-    val userAchievements: LiveData<List<UserAchievement>> = _userAchievements
+    private val _doneAchievements: MutableLiveData<List<UserAchievement>> = MutableLiveData()
+    val doneAchievements: LiveData<List<UserAchievement>> = _doneAchievements
+
+    private val _unDoneAchievements: MutableLiveData<List<UserAchievement>> = MutableLiveData()
+    val unDoneAchievements: LiveData<List<UserAchievement>> = _unDoneAchievements
+
+    private val userAchievementsFlow: MutableStateFlow<List<UserAchievement>?> =
+        MutableStateFlow(null)
 
 
     fun getAchievements() {
@@ -54,7 +58,7 @@ class AchievementsFragmentViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             val passedUserTests = databaseRepository.getAllPassedUserTests(TEST_USER)
-            val userModels = databaseRepository.getAllModelsFlow(TEST_USER)
+            val userModels = databaseRepository.getAllModelsFlow("76V1UE5VssV0W8mXenibeUpvQxm1")
             val userProgress = databaseRepository.getProgress(TEST_USER)
             combine(
                 passedUserTests,
@@ -68,61 +72,71 @@ class AchievementsFragmentViewModel @Inject constructor(
             }.collect { resultList ->
                 val userAchievementsList = mutableListOf<UserAchievement>()
                 resultList.achievementList!!.forEach { achievement ->
-                    val userAchievement = achievement.convertToUserAchievement()
-                    Log.d("TAG",achievement.toString())
-                    achievement.isRegistered?.let {
-                        Log.d("TAG","register")
-                        userAchievement.itemsDone = 1
+                    val userAchievement = achievement.convertToUserAchievement(TEST_USER)
+                    achievement.registered?.let {
+                        userAchievement.registrationAchievementProgress()
                     }
-
                     achievement.testsToDone?.let { testsToDone ->
-                        val testsDone = resultList.testList
-
-                        userAchievement.itemsDone =
-                            if (testsToDone > testsDone.size) testsDone.size else testsToDone
-
-                        achievement.testsMark?.let { mark ->
-                            resultList.testList.filterNot {
-                                it.mark <= mark
-                            }.also {
-                                userAchievement.itemsDone =
-                                    if (testsToDone > it.size) it.size else testsToDone
-                            }
-                        }
-
-                        achievement.testsAverageMark?.let { avarageMark ->
-                            if (testsToDone >= testsDone.size)
-                                resultList.testList.sumOf {
-                                    it.mark
-                                }.also {
-                                    val currentAvarageMark = it / testsDone.size
-                                }
-                        }
-
-                        achievement.modelsToSave?.let { modelsToSave ->
-                            val modelsSaved = resultList.modelsList
-                            userAchievement.itemsDone =
-                                if (modelsToSave > modelsSaved.size) modelsSaved.size else modelsToSave
-                        }
+                        userAchievement.testsAchievementProgress(achievement, resultList.testList)
                     }
-                    achievement.lecturesToRead?.let {
-
+                    achievement.modelsToSave?.let { modelsToSave ->
+                        userAchievement.modelsAchievementProgress(
+                            achievement,
+                            resultList.modelsList
+                        )
+                    }
+                    achievement.lecturesToRead?.let { lecturesToRead ->
+                        userAchievement.readenLecturesAchievementProgress(
+                            achievement,
+                            resultList.progressList
+                        )
                     }
                     userAchievementsList.add(userAchievement)
                 }
-                _userAchievements.postValue(userAchievementsList)
+                userAchievementsFlow.emit(userAchievementsList)
             }
         }
+
+        viewModelScope.launch {
+            databaseRepository.getAchievements(TEST_USER).combine(userAchievementsFlow) { a, b ->
+                Pair(a, b)
+            }
+                .debounce(100)
+                .collect {
+                    val savedAchievements = it.first
+                    val newAchievements = it.second
+                    val unDoneAchievements = mutableListOf<UserAchievement>()
+                    newAchievements?.let {
+                        it.forEach { newUserAchievement ->
+                            newUserAchievement.apply {
+                                if (!(this.id in savedAchievements.map { it.id })
+                                    && itemsDone >= itemsToDone) {
+                                    saveAchievement(this)
+                                } else {
+                                    if (!(this.id in savedAchievements.map { it.id })) {
+                                        unDoneAchievements.add(this)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    _doneAchievements.postValue(savedAchievements)
+                    _unDoneAchievements.postValue(unDoneAchievements)
+                }
+        }
     }
+
+    private fun saveAchievement(userAchievement: UserAchievement) {
+        viewModelScope.launch {
+            databaseRepository.saveAchievement(userAchievement)
+        }
+    }
+
 
     inner class ResultList(
         val testList: List<PassedUserTest>,
         val modelsList: List<Model3D>,
         val progressList: List<UserProgress>,
         val achievementList: List<Achievement>?
-    ) {
-        override fun toString(): String {
-            return testList.toString() + modelsList.toString() + progressList.toString() + achievementList.toString()
-        }
-    }
+    )
 }

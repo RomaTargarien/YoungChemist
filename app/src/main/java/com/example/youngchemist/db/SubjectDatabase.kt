@@ -8,11 +8,18 @@ import com.example.youngchemist.model.Lecture
 import com.example.youngchemist.model.Subject
 import com.example.youngchemist.model.user.Model3D
 import com.example.youngchemist.model.user.PassedUserTest
+import com.example.youngchemist.model.user.UserAchievement
 import com.example.youngchemist.model.user.UserProgress
 
 @Database(
-    entities = [Subject::class, Lecture::class, PassedUserTest::class, Model3D::class, UserProgress::class],
-    version = 19
+    entities = [
+        Subject::class,
+        Lecture::class,
+        PassedUserTest::class,
+        Model3D::class,
+        UserProgress::class,
+        UserAchievement::class],
+    version = 21
 )
 @TypeConverters(Converters::class)
 abstract class SubjectDatabase : RoomDatabase() {
@@ -21,4 +28,5 @@ abstract class SubjectDatabase : RoomDatabase() {
     abstract fun getTestDao(): TestDao
     abstract fun getModel3DDao(): Model3DDao
     abstract fun getUserProgressDao(): UserProgressDao
+    abstract fun getAchievementsDao(): AchievementsDao
 }

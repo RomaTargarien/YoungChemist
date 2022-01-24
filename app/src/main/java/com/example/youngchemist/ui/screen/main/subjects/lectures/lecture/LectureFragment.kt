@@ -122,7 +122,7 @@ class LectureFragment : Fragment() {
 
     override fun onPause() {
         super.onPause()
-        viewModel.saveProgress(lecture.userProgress,lastPage)
+        viewModel.saveProgress(lecture.userProgress,lastPage,lecture.data.size)
     }
 
     companion object {

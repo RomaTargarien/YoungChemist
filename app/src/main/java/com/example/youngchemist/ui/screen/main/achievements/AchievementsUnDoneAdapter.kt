@@ -8,7 +8,7 @@ import com.example.youngchemist.databinding.ItemAchievementBinding
 import com.example.youngchemist.model.user.UserAchievement
 import com.squareup.picasso.Picasso
 
-class AchievementsAdapter : RecyclerView.Adapter<AchievementsAdapter.AchievementsViewHolder>() {
+class AchievementsUnDoneAdapter : RecyclerView.Adapter<AchievementsUnDoneAdapter.AchievementsViewHolder>() {
 
     private val achievements: MutableList<UserAchievement> = mutableListOf()
 

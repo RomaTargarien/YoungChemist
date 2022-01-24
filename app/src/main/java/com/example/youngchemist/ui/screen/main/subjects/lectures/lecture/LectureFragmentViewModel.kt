@@ -4,10 +4,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.youngchemist.db.shared_pref.UserPreferences
 import com.example.youngchemist.model.user.UserProgress
 import com.example.youngchemist.repositories.DatabaseRepository
-import com.example.youngchemist.repositories.FireStoreRepository
 import com.github.terrakok.cicerone.Router
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -16,7 +14,6 @@ import javax.inject.Inject
 @HiltViewModel
 class LectureFragmentViewModel @Inject constructor(
     private val router: Router,
-    private val fireStoreRepository: FireStoreRepository,
     private val databaseRepository: DatabaseRepository
 ) : ViewModel() {
 
@@ -38,11 +35,12 @@ class LectureFragmentViewModel @Inject constructor(
         }
     }
 
-    fun saveProgress(userProgress: UserProgress?,lastPage: Int) {
+    fun saveProgress(userProgress: UserProgress?, lastPage: Int, lectureSize: Int) {
         viewModelScope.launch {
             userProgress?.let {
                 if (it.lastReadenPage < lastPage) {
                     it.lastReadenPage = lastPage
+                    it.isLectureReaden = lectureSize == lastPage
                     databaseRepository.saveProgress(it)
                 }
             }

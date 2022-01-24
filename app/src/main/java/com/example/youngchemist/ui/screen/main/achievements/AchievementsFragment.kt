@@ -25,14 +25,21 @@ class AchievementsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.viewModel = viewModel
-        val achievementsAdapter = AchievementsAdapter()
+        viewModel.getAchievements()
+        val achievementsUnDoneAdapter = AchievementsUnDoneAdapter()
+        val achievementsDoneAdapter = AchievementsDoneAdapter()
         binding.rvAchievementsAll.apply {
             layoutManager = LinearLayoutManager(requireContext(),LinearLayoutManager.VERTICAL,false)
-            adapter = achievementsAdapter
+            adapter = achievementsUnDoneAdapter
         }
-        viewModel.getAchievements()
-        viewModel.userAchievements.observe(viewLifecycleOwner,{
-            achievementsAdapter.submitList(it)
+        binding.rvDoneAchievements.apply {
+            adapter = achievementsDoneAdapter
+        }
+        viewModel.unDoneAchievements.observe(viewLifecycleOwner,{
+            achievementsUnDoneAdapter.submitList(it)
+        })
+        viewModel.doneAchievements.observe(viewLifecycleOwner,{
+            achievementsDoneAdapter.submitList(it)
         })
     }
 }

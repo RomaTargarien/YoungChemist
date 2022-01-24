@@ -36,14 +36,16 @@ object MainModule {
         lectureDao: LectureDao,
         testDao: TestDao,
         model3DDao: Model3DDao,
-        userProgressDao: UserProgressDao
+        userProgressDao: UserProgressDao,
+        achievementsDao: AchievementsDao
     ) =
         DatabaseRepositoryImpl(
             subjectDao,
             lectureDao,
             testDao,
             model3DDao,
-            userProgressDao
+            userProgressDao,
+            achievementsDao
         ) as DatabaseRepository
 
 
@@ -76,6 +78,10 @@ object MainModule {
     @Provides
     @Singleton
     fun provideUserProgressDao(db: SubjectDatabase) = db.getUserProgressDao()
+
+    @Provides
+    @Singleton
+    fun provideAchievementsDao(db: SubjectDatabase) = db.getAchievementsDao()
 
     @Provides
     @Singleton
