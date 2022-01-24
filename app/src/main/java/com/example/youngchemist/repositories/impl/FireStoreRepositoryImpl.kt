@@ -26,6 +26,7 @@ class FireStoreRepositoryImpl @Inject constructor(
 
     private val subjects = firestore.collection("subjects")
     private val testref = firestore.collection("tests")
+    private val achref = firestore.collection("achievements")
 
     override suspend fun getAllSubjects() = withContext(Dispatchers.IO) {
         safeCall {
@@ -169,6 +170,26 @@ class FireStoreRepositoryImpl @Inject constructor(
         safeCall {
             firestore.collection("users").document(user.uid).set(user, SetOptions.merge())
             ResourceNetwork.Success("")
+        }
+    }
+
+    override suspend fun saveAchivement(achievement: Achievement) = withContext(Dispatchers.IO) {
+        safeCall {
+            achref.document(achievement.id).set(achievement)
+            ResourceNetwork.Success("")
+        }
+    }
+
+    override suspend fun getAllAchivements() = withContext(Dispatchers.IO) {
+        safeCall {
+            val result = achref.get().await()
+            val achievements = mutableListOf<Achievement>()
+            result.documents.forEach { snapshot ->
+                snapshot.toObject(Achievement::class.java)?.let {
+                    achievements.add(it)
+                }
+            }
+            ResourceNetwork.Success(achievements.toList())
         }
     }
 }

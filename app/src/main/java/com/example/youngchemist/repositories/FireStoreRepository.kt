@@ -1,9 +1,6 @@
 package com.example.youngchemist.repositories
 
-import com.example.youngchemist.model.Lecture
-import com.example.youngchemist.model.Subject
-import com.example.youngchemist.model.Test
-import com.example.youngchemist.model.User
+import com.example.youngchemist.model.*
 import com.example.youngchemist.model.user.Model3D
 import com.example.youngchemist.model.user.PassedUserTest
 import com.example.youngchemist.model.user.UserProgress
@@ -37,4 +34,8 @@ interface FireStoreRepository {
     suspend fun saveUserProgress(userId: String,userProgress: List<UserProgress>): ResourceNetwork<String>
 
     suspend fun getUserModels3D(userId: String): ResourceNetwork<ArrayList<Model3D>>
+
+    suspend fun saveAchivement(achievement: Achievement): ResourceNetwork<String>
+
+    suspend fun getAllAchivements(): ResourceNetwork<List<Achievement>>
 }

@@ -5,14 +5,14 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.youngchemist.databinding.ItemAchievementBinding
-import com.example.youngchemist.model.Achievement
+import com.example.youngchemist.model.user.UserAchievement
 import com.squareup.picasso.Picasso
 
 class AchievementsAdapter : RecyclerView.Adapter<AchievementsAdapter.AchievementsViewHolder>() {
 
-    private val achievements: MutableList<Achievement> = mutableListOf()
+    private val achievements: MutableList<UserAchievement> = mutableListOf()
 
-    fun submitList(modelsList: List<Achievement>) {
+    fun submitList(modelsList: List<UserAchievement>) {
         val result: DiffUtil.DiffResult =
             DiffUtil.calculateDiff(AchievementsDiffCallback(achievements, modelsList))
         result.dispatchUpdatesTo(this)
@@ -22,9 +22,19 @@ class AchievementsAdapter : RecyclerView.Adapter<AchievementsAdapter.Achievement
 
     inner class AchievementsViewHolder(private val binding: ItemAchievementBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        fun bind(item: Achievement) {
-            Picasso.get().load(item.imageUrl).into(binding.ibLocation)
+        fun bind(item: UserAchievement) {
+            item.apply {
+                Picasso.get().load(imageUrl).into(binding.ivAchievement)
+                binding.tvTitle.text = title
+                binding.tvAchievementProgress.text = "$itemsDone/$itemsToDone"
+                binding.pbAchievement.progress = evaluateProgress(itemsDone,itemsToDone)
+            }
         }
+    }
+
+    private fun evaluateProgress(itemsDone: Int,itemsToDone: Int): Int {
+        val progress = itemsDone.toDouble()/itemsToDone.toDouble()
+        return (progress*100).toInt()
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AchievementsViewHolder {
@@ -44,8 +54,8 @@ class AchievementsAdapter : RecyclerView.Adapter<AchievementsAdapter.Achievement
     override fun getItemCount(): Int = achievements.size
 
     inner class AchievementsDiffCallback(
-        private val oldList: List<Achievement>,
-        private val newList: List<Achievement>
+        private val oldList: List<UserAchievement>,
+        private val newList: List<UserAchievement>
     ) : DiffUtil.Callback() {
 
         override fun getOldListSize(): Int {
