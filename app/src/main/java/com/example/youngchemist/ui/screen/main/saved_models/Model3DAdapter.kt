@@ -58,11 +58,6 @@ class Model3DAdapter : RecyclerView.Adapter<Model3DAdapter.Model3DViewHoler>() {
     fun setOnClickListener(listener: (Model3D) -> Unit) {
         onClick = listener
     }
-
-    private var onDeleteClick: ((Model3D) -> Unit)? = null
-    fun setOnDeleteListener(listener: (Model3D) -> Unit) {
-        onDeleteClick = listener
-    }
 }
 
 class DiffCallback(private val oldList: List<Model3D>,private val newList: List<Model3D>): DiffUtil.Callback() {

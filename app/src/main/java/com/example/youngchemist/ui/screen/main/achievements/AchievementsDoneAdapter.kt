@@ -4,6 +4,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import com.example.youngchemist.R
 import com.example.youngchemist.databinding.ItemDoneAchievementBinding
 import com.example.youngchemist.model.user.UserAchievement
 import com.squareup.picasso.Picasso
@@ -13,6 +14,14 @@ class AchievementsDoneAdapter() :
 
     private val achievements: MutableList<UserAchievement> = mutableListOf()
 
+    private val mapBinding: MutableMap<Int, ItemDoneAchievementBinding> = mutableMapOf()
+    private var previousSelectedPosition: Int? = null
+
+    private var onClick: ((String) -> Unit)? = null
+    fun setOnClickListener(listener: (String) -> Unit) {
+        onClick = listener
+    }
+
     fun submitList(modelsList: List<UserAchievement>) {
         val result: DiffUtil.DiffResult =
             DiffUtil.calculateDiff(AchievementsDiffCallback(achievements, modelsList))
@@ -21,11 +30,29 @@ class AchievementsDoneAdapter() :
         achievements.addAll(modelsList)
     }
 
-    inner class AchievementsViewHolder(private val binding: ItemDoneAchievementBinding) :
+    inner class AchievementsViewHolder(val binding: ItemDoneAchievementBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        fun bind(item: UserAchievement) {
+        fun bind(item: UserAchievement, position: Int) {
             item.apply {
                 Picasso.get().load(imageUrl).into(binding.ivDoneAchievement)
+            }
+            binding.ivDoneAchievement.setOnClickListener {
+                onClick?.let { click ->
+                    click(item.title)
+                }
+                if (position != previousSelectedPosition && previousSelectedPosition != null) {
+                    mapBinding[previousSelectedPosition]?.doneAchievementContainer?.transitionToState(
+                        R.id.start_done_achievement
+                    )
+                    previousSelectedPosition = null
+                }
+                if (position == previousSelectedPosition) {
+                    binding.doneAchievementContainer.transitionToState(R.id.start_done_achievement)
+                    previousSelectedPosition = null
+                } else {
+                    binding.doneAchievementContainer.transitionToState(R.id.end_done_achievement)
+                    previousSelectedPosition = position
+                }
             }
         }
     }
@@ -41,7 +68,14 @@ class AchievementsDoneAdapter() :
     }
 
     override fun onBindViewHolder(holder: AchievementsViewHolder, position: Int) {
-        holder.bind(achievements[position])
+        mapBinding[position] = holder.binding
+        mapBinding.filterValues { it == holder.binding }.keys
+            .toList()
+            .filter { it != position }
+            .forEach {
+                mapBinding.remove(it)
+            }
+        holder.bind(achievements[position],position)
     }
 
     override fun getItemCount(): Int = achievements.size

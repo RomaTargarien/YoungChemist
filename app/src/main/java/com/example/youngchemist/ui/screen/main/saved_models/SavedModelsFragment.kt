@@ -51,8 +51,6 @@ class SavedModelsFragment : Fragment() {
         bitmap = BitmapFactory.decodeResource(resources, R.drawable.trash)
 
         viewModel.model3DState.observe(viewLifecycleOwner, {
-            Log.d("TAG", it.first.toString())
-            Log.d("TAG", it.second.toString())
             val list = it.first
             val state = it.second
             model3DAdapter.submitList(list)

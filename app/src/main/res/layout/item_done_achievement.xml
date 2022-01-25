@@ -8,13 +8,9 @@
     </data>
 
     <androidx.constraintlayout.motion.widget.MotionLayout
-        android:id="@+id/constraintLayout7"
+        android:id="@+id/done_achievement_container"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="5dp"
-        android:layout_marginTop="5dp"
-        android:layout_marginEnd="5dp"
-        android:background="@drawable/shape_circle"
         android:elevation="10dp"
         app:layoutDescription="@xml/item_done_achievement_xml_constraintlayout7_scene">
 
