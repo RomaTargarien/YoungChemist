@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.youngchemist.R
 import com.example.youngchemist.databinding.ItemDoneAchievementBinding
 import com.example.youngchemist.model.user.UserAchievement
+import com.mikhaellopez.circularprogressbar.CircularProgressBar
 import com.squareup.picasso.Picasso
 
 class AchievementsDoneAdapter() :
@@ -17,8 +18,8 @@ class AchievementsDoneAdapter() :
     private val mapBinding: MutableMap<Int, ItemDoneAchievementBinding> = mutableMapOf()
     private var previousSelectedPosition: Int? = null
 
-    private var onClick: ((String) -> Unit)? = null
-    fun setOnClickListener(listener: (String) -> Unit) {
+    private var onClick: ((Pair<String,Boolean>) -> Unit)? = null
+    fun setOnClickListener(listener: (Pair<String,Boolean>) -> Unit) {
         onClick = listener
     }
 
@@ -37,22 +38,34 @@ class AchievementsDoneAdapter() :
                 Picasso.get().load(imageUrl).into(binding.ivDoneAchievement)
             }
             binding.ivDoneAchievement.setOnClickListener {
-                onClick?.let { click ->
-                    click(item.title)
-                }
                 if (position != previousSelectedPosition && previousSelectedPosition != null) {
-                    mapBinding[previousSelectedPosition]?.doneAchievementContainer?.transitionToState(
-                        R.id.start_done_achievement
-                    )
+                    achievementTitleBehavior(item.title,true)
+                    mapBinding[previousSelectedPosition]?.pbSelection?.apply {
+                        setProgressWithAnimation(0f,500)
+                        progressDirection = CircularProgressBar.ProgressDirection.TO_RIGHT
+                    }
                     previousSelectedPosition = null
                 }
                 if (position == previousSelectedPosition) {
-                    binding.doneAchievementContainer.transitionToState(R.id.start_done_achievement)
+                    achievementTitleBehavior(item.title,false)
+                    binding.pbSelection.apply {
+                        setProgressWithAnimation(0f,500)
+                        progressDirection = CircularProgressBar.ProgressDirection.TO_RIGHT
+                    }
                     previousSelectedPosition = null
                 } else {
-                    binding.doneAchievementContainer.transitionToState(R.id.end_done_achievement)
+                    binding.pbSelection.apply {
+                        setProgressWithAnimation(100f,500)
+                        progressDirection = CircularProgressBar.ProgressDirection.TO_LEFT
+                    }
+                    achievementTitleBehavior(item.title,true)
                     previousSelectedPosition = position
                 }
+            }
+        }
+        private fun achievementTitleBehavior(title: String,isVisible: Boolean) {
+            onClick?.let { click ->
+                click(Pair(title,isVisible))
             }
         }
     }

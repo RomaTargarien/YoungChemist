@@ -1,5 +1,6 @@
 package com.example.youngchemist.repositories.impl
 
+import android.util.Log
 import com.example.youngchemist.db.dao.*
 import com.example.youngchemist.model.Lecture
 import com.example.youngchemist.model.Subject

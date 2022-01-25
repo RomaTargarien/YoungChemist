@@ -4,12 +4,15 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="../../../../layout/custom_preview.xml" value="0.25" />
+        <entry key="..\:/android-studio-2020.3.1.15-windows/AndroidApps/Apps/YoungChemist/app/src/main/res/drawable/backgroung_backlight.xml" value="0.2703125" />
         <entry key="..\:/android-studio-2020.3.1.15-windows/AndroidApps/Apps/YoungChemist/app/src/main/res/drawable/lecture_progress.xml" value="0.2703125" />
+        <entry key="..\:/android-studio-2020.3.1.15-windows/AndroidApps/Apps/YoungChemist/app/src/main/res/drawable/main_background.xml" value="0.2703125" />
         <entry key="..\:/android-studio-2020.3.1.15-windows/AndroidApps/Apps/YoungChemist/app/src/main/res/drawable/shape_circle.xml" value="0.2703125" />
         <entry key="..\:/android-studio-2020.3.1.15-windows/AndroidApps/Apps/YoungChemist/app/src/main/res/drawable/shape_outlined_rectangle.xml" value="0.25462962962962965" />
         <entry key="..\:/android-studio-2020.3.1.15-windows/AndroidApps/Apps/YoungChemist/app/src/main/res/drawable/shape_rounded_rectangle_for_edittext.xml" value="0.2703125" />
         <entry key="..\:/android-studio-2020.3.1.15-windows/AndroidApps/Apps/YoungChemist/app/src/main/res/drawable/shape_rounded_rectangle_for_item_in_lecture_list.xml" value="0.2703125" />
         <entry key="..\:/android-studio-2020.3.1.15-windows/AndroidApps/Apps/YoungChemist/app/src/main/res/layout-v26/item_answer.xml" value="0.4" />
+        <entry key="..\:/android-studio-2020.3.1.15-windows/AndroidApps/Apps/YoungChemist/app/src/main/res/layout-v26/item_custom_snackbar.xml" value="0.22554347826086957" />
         <entry key="..\:/android-studio-2020.3.1.15-windows/AndroidApps/Apps/YoungChemist/app/src/main/res/layout/activity_main.xml" value="0.19882246376811594" />
         <entry key="..\:/android-studio-2020.3.1.15-windows/AndroidApps/Apps/YoungChemist/app/src/main/res/layout/bottom_sheet_page_pagination.xml" value="0.18297101449275363" />
         <entry key="..\:/android-studio-2020.3.1.15-windows/AndroidApps/Apps/YoungChemist/app/src/main/res/layout/bottom_sheet_test_navigation.xml" value="0.19882246376811594" />
@@ -26,7 +29,7 @@
         <entry key="..\:/android-studio-2020.3.1.15-windows/AndroidApps/Apps/YoungChemist/app/src/main/res/layout/item_3d.xml" value="0.20244565217391305" />
         <entry key="..\:/android-studio-2020.3.1.15-windows/AndroidApps/Apps/YoungChemist/app/src/main/res/layout/item_achievement.xml" value="0.264" />
         <entry key="..\:/android-studio-2020.3.1.15-windows/AndroidApps/Apps/YoungChemist/app/src/main/res/layout/item_answer.xml" value="0.264" />
-        <entry key="..\:/android-studio-2020.3.1.15-windows/AndroidApps/Apps/YoungChemist/app/src/main/res/layout/item_done_achievement.xml" value="0.4" />
+        <entry key="..\:/android-studio-2020.3.1.15-windows/AndroidApps/Apps/YoungChemist/app/src/main/res/layout/item_done_achievement.xml" value="0.72" />
         <entry key="..\:/android-studio-2020.3.1.15-windows/AndroidApps/Apps/YoungChemist/app/src/main/res/layout/item_lecture_in_list.xml" value="0.4" />
         <entry key="..\:/android-studio-2020.3.1.15-windows/AndroidApps/Apps/YoungChemist/app/src/main/res/layout/item_page.xml" value="0.1947463768115942" />
         <entry key="..\:/android-studio-2020.3.1.15-windows/AndroidApps/Apps/YoungChemist/app/src/main/res/layout/item_page_number.xml" value="0.8" />

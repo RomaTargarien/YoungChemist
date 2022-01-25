@@ -1,6 +1,12 @@
 package com.example.youngchemist.ui.screen.main
 
+import android.content.ComponentName
+import android.content.Context
+import android.content.Intent
+import android.content.ServiceConnection
 import android.os.Bundle
+import android.os.IBinder
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,6 +17,7 @@ import androidx.fragment.app.viewModels
 import androidx.transition.TransitionManager
 import com.example.youngchemist.R
 import com.example.youngchemist.databinding.FragmentMainBinding
+import com.example.youngchemist.service.AchievementService
 import com.example.youngchemist.ui.screen.main.saved_models.SavedModelsFragment
 import com.example.youngchemist.ui.screen.main.achievements.AchievementsFragment
 import com.example.youngchemist.ui.screen.main.subjects.SubjectsFragment
@@ -29,6 +36,23 @@ class MainFragment : Fragment() {
     private val viewModel: MainFragmentViewModel by viewModels()
     private var lastSelectedItem = 0
 
+    private lateinit var mService: AchievementService
+    private var mBound: Boolean = false
+
+    private val connection = object : ServiceConnection {
+
+        override fun onServiceConnected(className: ComponentName, service: IBinder) {
+            val binder = service as AchievementService.LocalBinder
+            mService = binder.getService()
+            Log.d("TAG",mService.toString())
+            mBound = true
+        }
+
+        override fun onServiceDisconnected(arg0: ComponentName) {
+            mBound = false
+        }
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -42,7 +66,10 @@ class MainFragment : Fragment() {
         createBottomNavMenuItemSelectedListener()
         replaceFragment(getFragmentForTabId(id_subjects)!!)
         checkArguments()
-
+        Intent(requireContext(), AchievementService::class.java).also { intent ->
+            activity?.startService(intent)
+            activity?.bindService(intent, connection, Context.BIND_AUTO_CREATE)
+        }
         viewModel.bottomSheetState.observe(viewLifecycleOwner,{
             val slideOffSet = (1 - (0.5+it/2)).toFloat()
             binding.bnvMain.animate().alpha(slideOffSet).setDuration(0).start()
@@ -56,12 +83,9 @@ class MainFragment : Fragment() {
                     binding.bnvMain.isEnabled = !isOpen
                 }
             })
-
-        
         requireActivity().onBackPressedDispatcher.addCallback {
             viewModel.exit()
         }
-
     }
 
     private fun createBottomNavMenu() {
@@ -134,6 +158,11 @@ class MainFragment : Fragment() {
             R.anim.nav_default_pop_enter_anim,
             R.anim.nav_default_pop_exit_anim
         ).replace(R.id.tab_content, fragment).commit()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        activity?.unbindService(connection)
     }
 
     companion object {
