@@ -18,12 +18,10 @@ import androidx.transition.TransitionManager
 import com.example.youngchemist.R
 import com.example.youngchemist.databinding.FragmentMainBinding
 import com.example.youngchemist.service.AchievementService
-import com.example.youngchemist.ui.screen.main.saved_models.SavedModelsFragment
 import com.example.youngchemist.ui.screen.main.achievements.AchievementsFragment
+import com.example.youngchemist.ui.screen.main.saved_models.SavedModelsFragment
 import com.example.youngchemist.ui.screen.main.subjects.SubjectsFragment
 import com.example.youngchemist.ui.screen.main.user.UserFragment
-import com.luseen.spacenavigation.SpaceItem
-import com.luseen.spacenavigation.SpaceOnClickListener
 import dagger.hilt.android.AndroidEntryPoint
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEventListener
@@ -34,9 +32,8 @@ class MainFragment : Fragment() {
 
     private lateinit var binding: FragmentMainBinding
     private val viewModel: MainFragmentViewModel by viewModels()
-    private var lastSelectedItem = 0
-
-    private lateinit var mService: AchievementService
+    private var lastSelectedItem: Int? = null
+    private var mService: AchievementService? = null
     private var mBound: Boolean = false
 
     private val connection = object : ServiceConnection {
@@ -44,7 +41,7 @@ class MainFragment : Fragment() {
         override fun onServiceConnected(className: ComponentName, service: IBinder) {
             val binder = service as AchievementService.LocalBinder
             mService = binder.getService()
-            Log.d("TAG",mService.toString())
+            showUnViewedAchievementNumber()
             mBound = true
         }
 
@@ -62,89 +59,88 @@ class MainFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.viewModel = viewModel
-        createBottomNavMenu()
-        createBottomNavMenuItemSelectedListener()
-        replaceFragment(getFragmentForTabId(id_subjects)!!)
-        checkArguments()
-        Intent(requireContext(), AchievementService::class.java).also { intent ->
-            activity?.startService(intent)
-            activity?.bindService(intent, connection, Context.BIND_AUTO_CREATE)
+        binding.bottomNavMenu.background = null
+        binding.bottomNavMenu.menu.getItem(2).isEnabled = false
+        binding.bottomNavMenu.setOnItemSelectedListener { menuItem ->
+            getFragmentForTabId(menuItem.itemId)?.run {
+                lastSelectedItem = menuItem.itemId
+                if (menuItem.itemId == R.id.user) {
+                    TransitionManager.beginDelayedTransition(binding.toolbarContainer)
+                    binding.ivExit.isVisible = true
+                } else {
+                    TransitionManager.beginDelayedTransition(binding.toolbarContainer)
+                    binding.ivExit.isVisible = false
+                }
+                replaceFragment(this); true
+            }
+            true
         }
-        viewModel.bottomSheetState.observe(viewLifecycleOwner,{
-            val slideOffSet = (1 - (0.5+it/2)).toFloat()
-            binding.bnvMain.animate().alpha(slideOffSet).setDuration(0).start()
-        })
-
+        binding.bottomNavMenu.selectedItemId =
+            (arguments?.getSerializable(LAST_ITEM) as Int?).also { arguments?.clear() }
+                ?: R.id.subjects
+        binding.fabQrCode.setOnClickListener {
+            viewModel.navigateToScanFragemnt(lastSelectedItem ?: R.id.subjects)
+        }
+        if (mService == null) {
+            bindToService()
+        } else {
+            showUnViewedAchievementNumber()
+        }
+        bindToService()
         KeyboardVisibilityEvent.setEventListener(
             requireActivity(),
             object : KeyboardVisibilityEventListener {
                 override fun onVisibilityChanged(isOpen: Boolean) {
-                    binding.bnvMain.isVisible = !isOpen
-                    binding.bnvMain.isEnabled = !isOpen
+                    binding.bottomAppBar.isVisible = !isOpen
                 }
             })
+
+        viewModel.bottomSheetState.observe(viewLifecycleOwner,{
+            val slideOffSet = (1 - (0.5+it/2)).toFloat()
+            binding.bottomNavMenu.visibility = if (it.equals(1f)) View.GONE else View.VISIBLE
+            binding.fabQrCode.visibility = if (it.equals(1f)) View.GONE else View.VISIBLE
+            binding.bottomAppBar.animate().alpha(slideOffSet).setDuration(0).start()
+            binding.fabQrCode.animate().alpha(slideOffSet).setDuration(0).start()
+        })
+
         requireActivity().onBackPressedDispatcher.addCallback {
             viewModel.exit()
         }
     }
 
-    private fun createBottomNavMenu() {
-        binding.bnvMain.addSpaceItem(SpaceItem("Subject", R.drawable.ic_baseline_burger))
-        binding.bnvMain.addSpaceItem(SpaceItem("Stat", R.drawable.ic_baseline_bar_chart))
-        binding.bnvMain.addSpaceItem(SpaceItem("Saved", R.drawable.ic_baseline_favorite))
-        binding.bnvMain.addSpaceItem(SpaceItem("Person", R.drawable.ic_baseline_person))
-        binding.bnvMain.setSpaceBackgroundColor(resources.getColor(R.color.violet))
-        binding.bnvMain.showIconOnly()
-        binding.bnvMain.setCentreButtonIconColorFilterEnabled(true)
-    }
-
-    private fun checkArguments() {
-        arguments?.let {
-            binding.bnvMain.changeCurrentItem(it.getInt(LAST_ITEM))
-            getFragmentForTabId(it.getInt(LAST_ITEM))?.run {
-               replaceFragment(this)
-           }
-        }
-        arguments?.clear()
-    }
-
-    private fun createBottomNavMenuItemSelectedListener() {
-        binding.bnvMain.setSpaceOnClickListener(object : SpaceOnClickListener {
-            override fun onCentreButtonClick() {
-                viewModel.navigateToScanFragemnt(lastSelectedItem)
-            }
-            override fun onItemClick(itemIndex: Int, itemName: String?) {
-                getFragmentForTabId(itemIndex)?.run {
-                    replaceFragment(this)
+    private fun showUnViewedAchievementNumber() {
+        mService?.doneAchievements?.observe(viewLifecycleOwner, {
+            it.count {
+                !it.wasViewed
+            }.also {
+                when (it) {
+                    0 -> binding.bottomNavMenu.getBadge(R.id.achievements)
+                        ?.apply { isVisible = false; clearNumber() }
+                    else -> binding.bottomNavMenu.getOrCreateBadge(R.id.achievements)
+                        .apply { isVisible = true; number = it }
                 }
-                if (itemIndex == id_person) {
-                    TransitionManager.beginDelayedTransition(binding.toolbarContainer)
-                    binding.ivExit.isVisible = true
-                } else {
-                    if (binding.ivExit.isVisible) {
-                        TransitionManager.beginDelayedTransition(binding.toolbarContainer)
-                        binding.ivExit.isVisible = false
-                    }
-                }
-                lastSelectedItem = itemIndex
             }
-
-            override fun onItemReselected(itemIndex: Int, itemName: String?) {}
         })
+    }
+
+    private fun bindToService() {
+        Intent(requireContext(), AchievementService::class.java).also { intent ->
+            activity?.bindService(intent, connection, Context.BIND_AUTO_CREATE)
+        }
     }
 
     private fun getFragmentForTabId(tabId: Int, qrCodeRawValue: String? = null): Fragment? {
         return when (tabId) {
-            id_subjects -> {
+            R.id.subjects -> {
                 SubjectsFragment()
             }
-            id_statistics -> {
+            R.id.achievements -> {
                 AchievementsFragment()
             }
-            id_saved_models -> {
+            R.id.savedModels -> {
                 SavedModelsFragment()
             }
-            id_person -> {
+            R.id.user -> {
                 UserFragment()
             }
             else -> null
@@ -167,16 +163,12 @@ class MainFragment : Fragment() {
 
     companion object {
         private const val LAST_ITEM = "last_item"
-        private const val id_subjects = 0
-        private const val id_statistics = 1
-        private const val id_saved_models = 2
-        private const val id_person = 3
 
         @JvmStatic
-        fun newInstance(lastSelectedItemPosition: Int) =
+        fun newInstance(lastSelectedItemPosition: Int?) =
             MainFragment().apply {
                 arguments = Bundle().apply {
-                    putInt(LAST_ITEM, lastSelectedItemPosition)
+                    putSerializable(LAST_ITEM, lastSelectedItemPosition)
                 }
             }
     }

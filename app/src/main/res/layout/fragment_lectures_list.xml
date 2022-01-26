@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
+
         <variable
             name="viewModel"
             type="com.example.youngchemist.ui.screen.main.subjects.lectures.lectures_list.LecturesListViewModel" />
@@ -17,107 +18,104 @@
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:background="@drawable/main_background"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:background="@drawable/main_background">
 
 
-
-
-
-        <androidx.core.widget.NestedScrollView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <androidx.constraintlayout.widget.ConstraintLayout
+            <androidx.core.widget.NestedScrollView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
-                <ImageView
-                    android:id="@+id/iv_subject"
-                    android:layout_width="140dp"
-                    android:layout_height="140dp"
-                    android:layout_marginTop="70dp"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/rv_lectures"
+                <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:nestedScrollingEnabled="false"
-                    app:layout_constraintTop_toBottomOf="@+id/iv_subject">
+                    android:layout_height="match_parent">
 
-                </androidx.recyclerview.widget.RecyclerView>
+                    <ImageView
+                        android:id="@+id/iv_subject"
+                        android:layout_width="140dp"
+                        android:layout_height="140dp"
+                        android:layout_marginTop="70dp"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
 
-                <com.mikhaellopez.circularprogressbar.CircularProgressBar
-                    android:id="@+id/pb_read_lectures"
-                    android:layout_width="100dp"
-                    android:layout_height="100dp"
-                    android:layout_marginStart="20dp"
-                    android:layout_marginEnd="20dp"
-                    app:layout_constraintBottom_toBottomOf="@+id/iv_subject"
-                    app:layout_constraintEnd_toStartOf="@+id/iv_subject"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="@+id/iv_subject"/>
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/rv_lectures"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:nestedScrollingEnabled="false"
+                        app:layout_constraintTop_toBottomOf="@+id/iv_subject">
 
-                <TextView
-                    android:id="@+id/tv_read_lectures"
-                    style="@style/SubTitleTextStyle"
-                    android:layout_width="wrap_content"
-                    tools:text="4"
-                    android:textSize="30sp"
-                    android:layout_height="wrap_content"
-                    app:layout_constraintBottom_toBottomOf="@+id/pb_read_lectures"
-                    app:layout_constraintEnd_toEndOf="@+id/pb_read_lectures"
-                    app:layout_constraintStart_toStartOf="@+id/pb_read_lectures"
-                    app:layout_constraintTop_toTopOf="@+id/pb_read_lectures">
+                    </androidx.recyclerview.widget.RecyclerView>
 
-                </TextView>
+                    <com.mikhaellopez.circularprogressbar.CircularProgressBar
+                        android:id="@+id/pb_read_lectures"
+                        android:layout_width="100dp"
+                        android:layout_height="100dp"
+                        android:layout_marginStart="20dp"
+                        android:layout_marginEnd="20dp"
+                        app:layout_constraintBottom_toBottomOf="@+id/iv_subject"
+                        app:layout_constraintEnd_toStartOf="@+id/iv_subject"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="@+id/iv_subject" />
 
-                <TextView
-                    android:id="@+id/tv_tests_done"
-                    style="@style/SubTitleTextStyle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    tools:text="2"
-                    android:textSize="30sp"
-                    app:layout_constraintBottom_toBottomOf="@+id/pb_done_tests"
-                    app:layout_constraintEnd_toEndOf="@+id/pb_done_tests"
-                    app:layout_constraintStart_toStartOf="@+id/pb_done_tests"
-                    app:layout_constraintTop_toTopOf="@+id/pb_done_tests">
+                    <TextView
+                        android:id="@+id/tv_read_lectures"
+                        style="@style/SubTitleTextStyle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="30sp"
+                        app:layout_constraintBottom_toBottomOf="@+id/pb_read_lectures"
+                        app:layout_constraintEnd_toEndOf="@+id/pb_read_lectures"
+                        app:layout_constraintStart_toStartOf="@+id/pb_read_lectures"
+                        app:layout_constraintTop_toTopOf="@+id/pb_read_lectures"
+                        tools:text="4">
 
-                </TextView>
+                    </TextView>
 
-                <com.mikhaellopez.circularprogressbar.CircularProgressBar
-                    android:id="@+id/pb_done_tests"
-                    android:layout_width="100dp"
-                    android:layout_height="100dp"
-                    app:layout_constraintBottom_toBottomOf="@+id/iv_subject"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    android:layout_marginStart="20dp"
-                    android:layout_marginEnd="20dp"
-                    app:layout_constraintStart_toEndOf="@+id/iv_subject"
-                    app:layout_constraintTop_toTopOf="@+id/iv_subject" />
+                    <TextView
+                        android:id="@+id/tv_tests_done"
+                        style="@style/SubTitleTextStyle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="30sp"
+                        app:layout_constraintBottom_toBottomOf="@+id/pb_done_tests"
+                        app:layout_constraintEnd_toEndOf="@+id/pb_done_tests"
+                        app:layout_constraintStart_toStartOf="@+id/pb_done_tests"
+                        app:layout_constraintTop_toTopOf="@+id/pb_done_tests"
+                        tools:text="2">
 
-                <com.airbnb.lottie.LottieAnimationView
-                    android:id="@+id/progress_flask"
-                    android:layout_width="100dp"
-                    android:layout_height="100dp"
-                    android:visibility="visible"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/iv_subject"
-                    app:lottie_autoPlay="true"
-                    app:lottie_fileName="progress_flask.json"
-                    app:lottie_loop="true">
+                    </TextView>
 
-                </com.airbnb.lottie.LottieAnimationView>
+                    <com.mikhaellopez.circularprogressbar.CircularProgressBar
+                        android:id="@+id/pb_done_tests"
+                        android:layout_width="100dp"
+                        android:layout_height="100dp"
+                        android:layout_marginStart="20dp"
+                        android:layout_marginEnd="20dp"
+                        app:layout_constraintBottom_toBottomOf="@+id/iv_subject"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@+id/iv_subject"
+                        app:layout_constraintTop_toTopOf="@+id/iv_subject" />
+
+                    <com.airbnb.lottie.LottieAnimationView
+                        android:id="@+id/progress_flask"
+                        android:layout_width="100dp"
+                        android:layout_height="100dp"
+                        android:visibility="visible"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/iv_subject"
+                        app:lottie_autoPlay="true"
+                        app:lottie_fileName="progress_flask.json"
+                        app:lottie_loop="true">
+
+                    </com.airbnb.lottie.LottieAnimationView>
 
 
-            </androidx.constraintlayout.widget.ConstraintLayout>
-        </androidx.core.widget.NestedScrollView>
+                </androidx.constraintlayout.widget.ConstraintLayout>
+            </androidx.core.widget.NestedScrollView>
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/appBar"
@@ -128,13 +126,31 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
 
+                <TextView
+                    android:id="@+id/tv_achievement_un_viewed_count"
+                    android:layout_width="15dp"
+                    android:visibility="gone"
+                    android:layout_height="15dp"
+                    android:layout_marginStart="24dp"
+                    android:layout_marginTop="5dp"
+                    android:background="@drawable/shape_circle"
+                    android:backgroundTint="@color/red"
+                    android:gravity="center"
+                    android:textColor="@color/white"
+                    android:textSize="10sp"
+                    app:layout_constraintStart_toStartOf="@+id/iv_exit"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:text="10">
+
+                </TextView>
+
 
                 <ImageView
                     android:id="@+id/iv_exit"
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
-                    android:onClick="@{view -> viewModel.exit()}"
+                    android:layout_width="35dp"
+                    android:layout_height="35dp"
                     android:layout_marginStart="20dp"
+                    android:onClick="@{view -> viewModel.exit()}"
                     android:src="@drawable/ic_baseline_arrow_left"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
@@ -142,23 +158,21 @@
 
                 <TextView
                     android:id="@+id/tv_subject_title"
+                    style="@style/TittleTextStyle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    style="@style/TittleTextStyle"
                     android:textColor="@color/white"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    tools:text="Посуда"/>
+                    tools:text="Посуда" />
 
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
 
         </androidx.constraintlayout.widget.ConstraintLayout>
-
-
 
 
     </FrameLayout>

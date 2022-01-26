@@ -110,7 +110,7 @@ class RegisterFragmentViewModel @Inject constructor(
 
     fun enter() {
         userPreferences.userState = UserState.REGISTER
-        router.newRootScreen(Screens.mainScreen(0))
+        router.newRootScreen(Screens.mainScreen(null))
     }
 
     init {

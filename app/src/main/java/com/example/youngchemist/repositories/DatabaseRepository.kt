@@ -1,5 +1,6 @@
 package com.example.youngchemist.repositories
 
+import androidx.room.PrimaryKey
 import com.example.youngchemist.model.Lecture
 import com.example.youngchemist.model.Subject
 import com.example.youngchemist.model.user.Model3D
@@ -46,4 +47,6 @@ interface DatabaseRepository {
     suspend fun saveAchievement(userAchievement: UserAchievement)
 
     suspend fun getAchievements(userId: String): Flow<List<UserAchievement>>
+
+    suspend fun getAchievementByPrimaryKey(primaryKey: Int): UserAchievement
 }

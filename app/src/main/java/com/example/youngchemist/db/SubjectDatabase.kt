@@ -19,7 +19,7 @@ import com.example.youngchemist.model.user.UserProgress
         Model3D::class,
         UserProgress::class,
         UserAchievement::class],
-    version = 21
+    version = 23
 )
 @TypeConverters(Converters::class)
 abstract class SubjectDatabase : RoomDatabase() {

@@ -48,7 +48,7 @@ class MainFragmentViewModel @Inject constructor(
             }
             UserState.LOGIN -> {
                 if (!(TEST_USER in userSharedPreferences.loggedUsers)) {
-                    Log.d("TAG","downloaded")
+                    //Log.d("TAG","downloaded")
                     downloadUserInfo(TEST_USER)
                 } else {
                     viewModelScope.launch {
@@ -77,7 +77,7 @@ class MainFragmentViewModel @Inject constructor(
     private fun downloadUserInfo(userId: String) {
         val data = Data.Builder().putString(KEY_USER_ID,userId).build()
         val workRequest = OneTimeWorkRequestBuilder<UserInfoDonloadingWorker>().setInputData(data).build()
-        Log.d("TAG","ID " + workRequest.id.toString())
+        //Log.d("TAG","ID " + workRequest.id.toString())
         workManager.enqueue(workRequest)
         viewModelScope.launch {
             workManager.getWorkInfoByIdLiveData(workRequest.id).asFlow().collect {

@@ -1,12 +1,18 @@
 package com.example.youngchemist.ui.screen
 
+import android.content.ComponentName
+import android.content.Context
+import android.content.Intent
+import android.content.ServiceConnection
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.IBinder
 import android.util.Log
 import androidx.activity.viewModels
 import com.example.youngchemist.R
 import com.example.youngchemist.R.id.activity_container
+import com.example.youngchemist.service.AchievementService
 import com.example.youngchemist.ui.base.MainNavigator
 import com.github.terrakok.cicerone.NavigatorHolder
 import dagger.hilt.android.AndroidEntryPoint
@@ -18,6 +24,22 @@ class MainActivity : AppCompatActivity() {
     private val viewModel: MainActivityViewModel by viewModels()
     private val navigator = MainNavigator(this, activity_container)
 
+    private lateinit var mService: AchievementService
+    private var mBound: Boolean = false
+
+    private val connection = object : ServiceConnection {
+
+        override fun onServiceConnected(className: ComponentName, service: IBinder) {
+            val binder = service as AchievementService.LocalBinder
+            mService = binder.getService()
+            mBound = true
+        }
+
+        override fun onServiceDisconnected(arg0: ComponentName) {
+            mBound = false
+        }
+    }
+
     @Inject
     lateinit var navigatorHolder: NavigatorHolder
 
@@ -25,6 +47,9 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         supportActionBar?.hide()
+//        Intent(this, AchievementService::class.java).also { intent ->
+//            bindService(intent, connection, Context.BIND_AUTO_CREATE)
+//        }
         navigationBarColor()
         window.statusBarColor = resources.getColor(R.color.black)
         viewModel.onActivityCreated()
@@ -37,6 +62,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onPause() {
         navigatorHolder.removeNavigator()
+        //unbindService(connection)
         super.onPause()
     }
 

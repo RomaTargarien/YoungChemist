@@ -81,7 +81,7 @@ class LoginFragmnetViewModel @Inject constructor(
 
     fun enter() {
         userPreferences.userState = UserState.LOGIN
-        router.newRootScreen(Screens.mainScreen(0))
+        router.newRootScreen(Screens.mainScreen(null))
     }
 
     fun exit() {

@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.youngchemist.R
 import com.example.youngchemist.databinding.ItemDoneAchievementBinding
 import com.example.youngchemist.model.user.UserAchievement
+import com.example.youngchemist.ui.util.BitmapUtils
 import com.mikhaellopez.circularprogressbar.CircularProgressBar
 import com.squareup.picasso.Picasso
 
@@ -34,8 +35,13 @@ class AchievementsDoneAdapter() :
     inner class AchievementsViewHolder(val binding: ItemDoneAchievementBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(item: UserAchievement, position: Int) {
-            item.apply {
-                Picasso.get().load(imageUrl).into(binding.ivDoneAchievement)
+            if (item.iconByteArray.isNotEmpty()) {
+                val bitmap = BitmapUtils.convertCompressedByteArrayToBitmap(item.iconByteArray)
+                binding.ivDoneAchievement.setImageBitmap(bitmap)
+            } else {
+                item.apply {
+                    Picasso.get().load(imageUrl).into(binding.ivDoneAchievement)
+                }
             }
             binding.ivDoneAchievement.setOnClickListener {
                 if (position != previousSelectedPosition && previousSelectedPosition != null) {

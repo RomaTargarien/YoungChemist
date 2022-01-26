@@ -13,17 +13,18 @@
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="@drawable/main_background"
         tools:context=".ui.screen.main.achievements.AchievementsFragment">
 
         <androidx.core.widget.NestedScrollView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginBottom="50dp">
+            android:layout_marginBottom="10dp">
 
             <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/main_container"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@drawable/main_background"
                 android:paddingLeft="25dp"
                 android:paddingRight="25dp">
 
@@ -55,35 +56,36 @@
 
 
                 <TextView
-                    android:id="@+id/textView12"
+                    android:id="@+id/tv_readen_lectures_count"
                     style="@style/TittleTextStyle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="5dp"
-                    android:text="8"
+                    tools:text="8"
                     android:textSize="20sp"
                     app:layout_constraintEnd_toEndOf="@+id/container_lecture_icon"
                     app:layout_constraintStart_toStartOf="@+id/container_lecture_icon"
                     app:layout_constraintTop_toBottomOf="@+id/container_lecture_icon" />
 
                 <TextView
-                    android:id="@+id/textView13"
+                    android:id="@+id/tv_saved_models_count"
                     style="@style/TittleTextStyle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="5dp"
-                    android:text="11"
+                    tools:text="11"
                     android:textSize="22sp"
                     app:layout_constraintEnd_toEndOf="@+id/container_3d_icon"
                     app:layout_constraintStart_toStartOf="@+id/container_3d_icon"
                     app:layout_constraintTop_toBottomOf="@+id/container_3d_icon" />
 
                 <TextView
+                    android:id="@+id/tv_passed_tests_count"
                     style="@style/TittleTextStyle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="5dp"
-                    android:text="3"
+                    tools:text="3"
                     android:textSize="20sp"
                     app:layout_constraintEnd_toEndOf="@+id/container_test_icon"
                     app:layout_constraintStart_toStartOf="@+id/container_test_icon"
@@ -162,7 +164,23 @@
                     android:textSize="20sp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/textView13" />
+                    app:layout_constraintTop_toBottomOf="@+id/tv_saved_models_count" />
+
+                <TextView
+                    android:id="@+id/tv_done_achievement_number"
+                    style="@style/TittleTextStyle"
+                    android:textColor="@color/red"
+                    android:textSize="20sp"
+                    android:visibility="gone"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintBottom_toBottomOf="@+id/textView15"
+                    app:layout_constraintEnd_toEndOf="@+id/done_achievements_container"
+                    android:layout_marginEnd="10dp"
+                    app:layout_constraintTop_toTopOf="@+id/textView15"
+                    tools:text="+3">
+
+                </TextView>
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:id="@+id/done_achievements_container"
@@ -186,9 +204,7 @@
                         app:layout_constraintTop_toTopOf="parent"
                         tools:itemCount="2"
                         app:layout_constraintBottom_toBottomOf="@+id/view_separate_line"
-                        tools:listitem="@layout/item_done_achievement">
-
-                    </androidx.recyclerview.widget.RecyclerView>
+                        tools:listitem="@layout/item_done_achievement"/>
 
                     <View
                         android:id="@+id/view_separate_line"
@@ -233,7 +249,10 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
-                    app:layout_constraintTop_toBottomOf="@+id/textView16" />
+                    android:layout_marginBottom="80dp"
+                    android:nestedScrollingEnabled="false"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/textView16"/>
 
             </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.core.widget.NestedScrollView>

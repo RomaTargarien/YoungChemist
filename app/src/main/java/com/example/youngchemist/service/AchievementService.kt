@@ -2,6 +2,8 @@ package com.example.youngchemist.service
 
 import android.app.Service
 import android.content.Intent
+import android.content.ServiceConnection
+import android.graphics.BitmapFactory
 import android.os.Binder
 import android.os.IBinder
 import android.util.Log
@@ -15,14 +17,16 @@ import com.example.youngchemist.model.user.UserAchievement
 import com.example.youngchemist.model.user.UserProgress
 import com.example.youngchemist.repositories.DatabaseRepository
 import com.example.youngchemist.repositories.FireStoreRepository
+import com.example.youngchemist.ui.util.BitmapUtils
 import com.example.youngchemist.ui.util.Constants
 import com.example.youngchemist.ui.util.ResourceNetwork
+import com.example.youngchemist.ui.util.safeCall
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
+import java.io.InputStream
+import java.net.HttpURLConnection
+import java.net.URL
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 
@@ -56,11 +60,13 @@ class AchievementService: Service(), CoroutineScope {
 
     override fun onBind(intent: Intent): IBinder {
         observeAchivementsProgress()
+        Log.d("TAG","bind")
         return binder
     }
 
     override fun onCreate() {
         super.onCreate()
+        Log.d("TAG","service onCreate")
         getAchievements()
     }
 
@@ -68,6 +74,12 @@ class AchievementService: Service(), CoroutineScope {
         launch {
             databaseRepository.saveAchievement(userAchievement)
         }
+    }
+
+    override fun onUnbind(intent: Intent?): Boolean {
+        Log.d("TAG","unbind")
+        return super.onUnbind(intent)
+
     }
 
     override fun onDestroy() {
@@ -107,6 +119,7 @@ class AchievementService: Service(), CoroutineScope {
             }.filterNot {
                 it.achievementList == null
             }.collect { resultList ->
+                Log.d("TAG","resultList")
                 val userAchievementsList = mutableListOf<UserAchievement>()
                 resultList.achievementList!!.forEach { achievement ->
                     val userAchievement = achievement.convertToUserAchievement(Constants.TEST_USER)
@@ -146,8 +159,7 @@ class AchievementService: Service(), CoroutineScope {
                     newAchievements?.let {
                         it.forEach { newUserAchievement ->
                             newUserAchievement.apply {
-                                if (!(this.id in savedAchievements.map { it.id })
-                                    && itemsDone >= itemsToDone) {
+                                if (!(this.id in savedAchievements.map { it.id }) && itemsDone >= itemsToDone) {
                                     saveAchievement(this)
                                 } else {
                                     if (!(this.id in savedAchievements.map { it.id })) {

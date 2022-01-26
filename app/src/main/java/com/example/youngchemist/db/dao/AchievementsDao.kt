@@ -1,9 +1,6 @@
 package com.example.youngchemist.db.dao
 
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
+import androidx.room.*
 import com.example.youngchemist.model.user.UserAchievement
 import kotlinx.coroutines.flow.Flow
 
@@ -15,4 +12,7 @@ interface AchievementsDao {
 
     @Query("SELECT * FROM achievements WHERE userId LIKE :userId")
     fun getAchievements(userId: String): Flow<List<UserAchievement>>
+
+    @Query("SELECT * FROM achievements WHERE achievementPrimaryKey LIKE :primaryKey")
+    fun getAchievementByPrimaryKey(primaryKey: Int): UserAchievement
 }

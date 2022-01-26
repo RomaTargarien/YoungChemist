@@ -33,7 +33,6 @@ import java.nio.ByteBuffer
 import java.util.*
 import javax.inject.Inject
 
-var array: ByteArray? = null
 @HiltViewModel
 class SubjectsFragmentViewModel @Inject constructor(
     private val router: Router,
@@ -63,7 +62,7 @@ class SubjectsFragmentViewModel @Inject constructor(
         getAllSubjects()
         viewModelScope.launch {
             userPreferences.userStateFlow.filterNotNull().collect {
-                Log.d("TAG",it.toString())
+                //Log.d("TAG",it.toString())
                 _userState.postValue(it)
             }
         }
@@ -123,7 +122,7 @@ class SubjectsFragmentViewModel @Inject constructor(
                                 subject.iconByteArray = BitmapUtils.convertBitmapToByteArray(it)
                             }
                         }
-                        Log.d("TAG",subjectsList.toString())
+                        //Log.d("TAG",subjectsList.toString())
                         _subjectsState.postValue(ResourceNetwork.Success(subjectsList))
                         databaseRepository.insertNewSubjects(subjectsList)
                     }
@@ -150,6 +149,6 @@ class SubjectsFragmentViewModel @Inject constructor(
 
     override fun onCleared() {
         super.onCleared()
-        Log.d("TAG","onCleared")
+        //Log.d("TAG","onCleared")
     }
 }

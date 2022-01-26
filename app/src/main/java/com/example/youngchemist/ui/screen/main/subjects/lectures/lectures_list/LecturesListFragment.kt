@@ -1,6 +1,11 @@
 package com.example.youngchemist.ui.screen.main.subjects.lectures.lectures_list
 
+import android.content.ComponentName
+import android.content.Context
+import android.content.Intent
+import android.content.ServiceConnection
 import android.os.Bundle
+import android.os.IBinder
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -13,6 +18,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.youngchemist.R
 import com.example.youngchemist.databinding.FragmentLecturesListBinding
 import com.example.youngchemist.model.Subject
+import com.example.youngchemist.service.AchievementService
 import com.example.youngchemist.ui.screen.main.subjects.lectures.test.tests.dialogs.TestNoSaveDialogFragment
 import com.example.youngchemist.ui.util.BitmapUtils
 import com.example.youngchemist.ui.util.ResourceNetwork
@@ -27,6 +33,21 @@ class LecturesListFragment : Fragment() {
     private var param1: Subject? = null
     private val viewModel: LecturesListViewModel by viewModels()
     private val adapter = LecturesListAdapter()
+    private var mService: AchievementService? = null
+    private var mBound: Boolean = false
+    private val connection = object : ServiceConnection {
+
+        override fun onServiceConnected(className: ComponentName, service: IBinder) {
+            val binder = service as AchievementService.LocalBinder
+            mService = binder.getService()
+            showUnViewedAchievementNumber()
+            mBound = true
+        }
+
+        override fun onServiceDisconnected(arg0: ComponentName) {
+            mBound = false
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -67,6 +88,12 @@ class LecturesListFragment : Fragment() {
         adapter.setOnLectureIsUnlockedListener {
             it.userProgress?.let { viewModel.saveProgress(it) }
             viewModel.navigateToLectureScreen(it)
+        }
+
+        if (mService == null) {
+            bindToService()
+        } else {
+            showUnViewedAchievementNumber()
         }
 
         viewModel.lecturesUi.observe(viewLifecycleOwner, {
@@ -115,6 +142,28 @@ class LecturesListFragment : Fragment() {
                 }
             }
         })
+    }
+
+    private fun showUnViewedAchievementNumber() {
+        mService?.doneAchievements?.observe(viewLifecycleOwner, {
+            it.count {
+                !it.wasViewed
+            }.also {
+                when (it) {
+                    0 -> binding.tvAchievementUnViewedCount.isVisible = false
+                    else -> binding.tvAchievementUnViewedCount.apply {
+                        isVisible = true
+                        text = it.toString()
+                    }
+                }
+            }
+        })
+    }
+
+    private fun bindToService() {
+        Intent(requireContext(), AchievementService::class.java).also { intent ->
+            activity?.bindService(intent, connection, Context.BIND_AUTO_CREATE)
+        }
     }
 
     companion object {

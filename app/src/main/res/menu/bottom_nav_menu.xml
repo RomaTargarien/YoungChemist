@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/subjects"
+        android:title="Subjects"
+        android:icon="@drawable/ic_baseline_burger"/>
+
+    <item
+        android:id="@+id/achievements"
+        android:title="Achievements"
+        android:icon="@drawable/ic_baseline_star_24"/>
+
+    <item
+        android:id="@+id/placeHolder"
+        android:title=""/>
+
+    <item
+        android:id="@+id/savedModels"
+        android:title="Saved models"
+        android:icon="@drawable/ic_baseline_favorite"/>
+
+    <item
+        android:id="@+id/user"
+        android:title="User"
+        android:icon="@drawable/ic_baseline_person"/>
+</menu>

@@ -30,7 +30,7 @@ object Screens {
         RegisterFragment()
     }
 
-    fun mainScreen(lastSelectedItemPosition: Int) = FragmentScreen {
+    fun mainScreen(lastSelectedItemPosition: Int?) = FragmentScreen {
         MainFragment.newInstance(lastSelectedItemPosition)
     }
 

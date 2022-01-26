@@ -12,7 +12,8 @@ data class UserAchievement(
     var imageUrl: String = "",
     var itemsDone: Int = 0,
     var itemsToDone: Int = 0,
-
+    var wasViewed: Boolean = false,
+    var iconByteArray: ByteArray = byteArrayOf()
 ) {
     @PrimaryKey(autoGenerate = true)
     var achievementPrimaryKey: Int = 0

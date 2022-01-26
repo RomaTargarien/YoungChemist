@@ -126,4 +126,8 @@ class DatabaseRepositoryImpl @Inject constructor(
             achievementsDao.insertAchievement(userAchievement)
         }
     }
+
+    override suspend fun getAchievementByPrimaryKey(primaryKey: Int) = withContext(Dispatchers.IO) {
+        achievementsDao.getAchievementByPrimaryKey(primaryKey)
+    }
 }

@@ -45,7 +45,6 @@ class LecturesListViewModel @Inject constructor(
             val progressList = databaseRepository.getProgress(TEST_USER)
             val passedUserTests = databaseRepository.getAllPassedUserTests(TEST_USER)
             var data = result.await()
-
             if (data.isEmpty()) {
                 fireStoreRepository.getAllLectures(collectionId).let {
                     if (it is ResourceNetwork.Success) {
