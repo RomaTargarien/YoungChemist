@@ -25,38 +25,34 @@ class DatabaseRepositoryImpl @Inject constructor(
     private val achievementsDao: AchievementsDao
 ) : DatabaseRepository {
 
-    override suspend fun getAllSubjects(): List<Subject> {
+    //Subjects database
+    override suspend fun getSubjects(): Flow<List<Subject>> {
         return withContext(Dispatchers.IO) {
-            subjectsDao.getAllSubjects()
+            subjectsDao.getSubjects()
         }
     }
 
-    override suspend fun insertNewSubjects(subjects: List<Subject>) {
+    override suspend fun saveSubject(subject: Subject) {
         withContext(Dispatchers.IO) {
-            subjectsDao.insertNewSubjects(subjects)
+            subjectsDao.insertSubject(subject)
         }
     }
 
-    override suspend fun deleteAllSubjects() {
-        withContext(Dispatchers.IO) {
-            subjectsDao.delete()
-        }
-    }
-
-    override fun getAllLectures(collectionId: String) = CoroutineScope(Dispatchers.IO).async {
-        lecturesDao.getAllLectures(collectionId)
+    override suspend fun getSubjectByPrimaryKey(primaryKey: Int) = withContext(Dispatchers.IO) {
+        subjectsDao.getSubjectByPrimaryKey(primaryKey)
     }
 
 
-    override suspend fun insertNewLectures(lectures: List<Lecture>) {
-        withContext(Dispatchers.IO) {
-            lecturesDao.insertNewLectures(lectures)
-        }
+
+    //Lectures database
+    override suspend fun getLectures(collectionId: String) = withContext(Dispatchers.IO) {
+        lecturesDao.getLectures(collectionId)
     }
 
-    override suspend fun deleteAlllectures() {
-        withContext(Dispatchers.IO) {
 
+    override suspend fun saveLecture(lecture: Lecture) {
+        withContext(Dispatchers.IO) {
+            lecturesDao.insertLecture(lecture)
         }
     }
 
@@ -130,4 +126,6 @@ class DatabaseRepositoryImpl @Inject constructor(
     override suspend fun getAchievementByPrimaryKey(primaryKey: Int) = withContext(Dispatchers.IO) {
         achievementsDao.getAchievementByPrimaryKey(primaryKey)
     }
+
+
 }

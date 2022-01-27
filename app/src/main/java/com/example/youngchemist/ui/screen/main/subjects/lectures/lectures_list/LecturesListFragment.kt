@@ -6,7 +6,6 @@ import android.content.Intent
 import android.content.ServiceConnection
 import android.os.Bundle
 import android.os.IBinder
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -18,41 +17,41 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.youngchemist.R
 import com.example.youngchemist.databinding.FragmentLecturesListBinding
 import com.example.youngchemist.model.Subject
+import com.example.youngchemist.model.Test
 import com.example.youngchemist.service.AchievementService
+import com.example.youngchemist.ui.screen.main.subjects.lectures.lectures_list.dialogs.StartTestDialogFragment
 import com.example.youngchemist.ui.screen.main.subjects.lectures.test.tests.dialogs.TestNoSaveDialogFragment
 import com.example.youngchemist.ui.util.BitmapUtils
 import com.example.youngchemist.ui.util.ResourceNetwork
+import com.example.youngchemist.ui.util.closeKeyBoard
+import com.squareup.picasso.Picasso
 import dagger.hilt.android.AndroidEntryPoint
 
-private const val SUBJECT = "param1"
 
 @AndroidEntryPoint
 class LecturesListFragment : Fragment() {
 
     private lateinit var binding: FragmentLecturesListBinding
-    private var param1: Subject? = null
     private val viewModel: LecturesListViewModel by viewModels()
-    private val adapter = LecturesListAdapter()
+    private var subject: Subject? = null
     private var mService: AchievementService? = null
-    private var mBound: Boolean = false
     private val connection = object : ServiceConnection {
 
         override fun onServiceConnected(className: ComponentName, service: IBinder) {
             val binder = service as AchievementService.LocalBinder
             mService = binder.getService()
             showUnViewedAchievementNumber()
-            mBound = true
         }
 
-        override fun onServiceDisconnected(arg0: ComponentName) {
-            mBound = false
-        }
+        override fun onServiceDisconnected(arg0: ComponentName) {}
     }
+
+    private lateinit var lecturesListAdapter: LecturesListAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
-            param1 = it.getParcelable(SUBJECT)
+            subject = it.getParcelable(SUBJECT_PARAM)
         }
     }
 
@@ -65,83 +64,97 @@ class LecturesListFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.viewModel = viewModel
-        binding.rvLectures.layoutManager =
-            LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
-        binding.rvLectures.adapter = adapter
-        param1?.let {
-            viewModel.getData(it.collectionId)
+        subject?.let {
+            viewModel.getLectures(it.collectionId)
+            loadImage(it)
         }
+        initializeRecyclerView()
+        setOnClickListeners()
+        checkServiceConnection()
+        observeUserProgressCounts()
+        viewModel.lecturesUiState.observe(viewLifecycleOwner, {
+            when (it) {
+                is ResourceNetwork.Success -> {
+                    binding.progressFlask.isVisible = false
+                    it.data?.let {
+                        lecturesListAdapter.submitList(it)
+                    }
+                }
+                is ResourceNetwork.Error -> {
+                    binding.progressFlask.isVisible = false
+                }
+                is ResourceNetwork.Loading -> {
+                    binding.progressFlask.isVisible = true
+                }
+            }
+        })
         requireActivity().onBackPressedDispatcher.addCallback {
             viewModel.exit()
         }
-        param1?.let {
-            val bitmap = BitmapUtils.convertCompressedByteArrayToBitmap(it.iconByteArray)
-            binding.ivSubject.setImageBitmap(bitmap)
-            binding.tvSubjectTitle.text = it.title
-        }
-        adapter.setOnClickListener {
-            viewModel.navigateToLectureScreen(it)
-        }
-        adapter.setOnBeginTestListener {
-            viewModel.navigateToTestScreen(it)
-        }
-        adapter.setOnLectureIsUnlockedListener {
-            it.userProgress?.let { viewModel.saveProgress(it) }
-            viewModel.navigateToLectureScreen(it)
-        }
+    }
 
+    private fun showStartTestDialogFragment(test: Test) {
+        val startTestDialogFragment = StartTestDialogFragment(viewModel,test)
+        startTestDialogFragment.show(requireActivity().supportFragmentManager, "dialog")
+    }
+
+    private fun checkServiceConnection() {
         if (mService == null) {
             bindToService()
         } else {
             showUnViewedAchievementNumber()
         }
+    }
 
-        viewModel.lecturesUi.observe(viewLifecycleOwner, {
-            var allAmountOfTests = 0
-            var doneTest = 0
-            val allAmountsOfLectures = it.size
-            var readLectures = 0
-            adapter.submitList(it)
-            it.forEach { lecture ->
-                lecture.test?.let {
-                    allAmountOfTests++
-                    if (!lecture.isTestEnabled) {
-                        doneTest++
-                    }
-                }
-                lecture.userProgress?.let {
-                    if (it.lastReadenPage.equals(lecture.data.size)) {
-                        readLectures++
-                    }
-                }
-            }
+    private fun initializeRecyclerView() {
+        lecturesListAdapter = LecturesListAdapter()
+        binding.rvLectures.apply {
+            layoutManager =
+                LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
+            adapter = lecturesListAdapter
+        }
+    }
+
+    private fun observeUserProgressCounts() {
+        viewModel.passedTestsCount.observe(viewLifecycleOwner, {
             binding.pbDoneTests.apply {
-                progressMax = allAmountOfTests.toFloat()
-                setProgressWithAnimation(doneTest.toFloat(), 1800)
-                progressBarColor = resources.getColor(R.color.teal_200)
+                progressMax = it.first.toFloat()
+                setProgressWithAnimation(it.second.toFloat(), 1800)
+                binding.tvTestsDone.text = it.second.toString()
             }
+        })
+        viewModel.readenLecturesCount.observe(viewLifecycleOwner, {
             binding.pbReadLectures.apply {
-                progressMax = allAmountsOfLectures.toFloat()
-                setProgressWithAnimation(readLectures.toFloat(), 1800)
-                progressBarColor = resources.getColor(R.color.teal_200)
+                progressMax = it.first.toFloat()
+                setProgressWithAnimation(it.second.toFloat(), 1800)
             }
-            binding.tvReadLectures.text = readLectures.toString()
-            binding.tvTestsDone.text = doneTest.toString()
+            binding.tvReadLectures.text = it.second.toString()
         })
+    }
 
-        viewModel.lecturesListState.observe(viewLifecycleOwner, {
-            when (it) {
-                is ResourceNetwork.Loading -> {
-                    binding.progressFlask.isVisible = true
-                }
-                is ResourceNetwork.Success -> {
-                    binding.progressFlask.isVisible = false
-                }
-                is ResourceNetwork.Error -> {
+    private fun setOnClickListeners() {
+        lecturesListAdapter.setOnClickListener {
+            viewModel.navigateToLectureScreen(it)
+        }
+        lecturesListAdapter.setOnBeginTestListener {
+            showStartTestDialogFragment(it)
+        }
+        lecturesListAdapter.setOnLectureIsUnlockedListener {
+            closeKeyBoard()
+            viewModel.navigateToLectureScreen(it)
+        }
+    }
 
-                }
-            }
-        })
+    private fun loadImage(item: Subject) {
+        if (item.iconByteArray.isEmpty()) {
+            Picasso.get()
+                .load(item.icon_url)
+                .placeholder(R.drawable.ic_icon_happy_flask)
+                .into(binding.ivSubject)
+        } else {
+            val bitmap = BitmapUtils.convertCompressedByteArrayToBitmap(item.iconByteArray)
+            binding.ivSubject.setImageBitmap(bitmap)
+        }
     }
 
     private fun showUnViewedAchievementNumber() {
@@ -167,11 +180,13 @@ class LecturesListFragment : Fragment() {
     }
 
     companion object {
+        private const val SUBJECT_PARAM = "subject"
+
         @JvmStatic
         fun newInstance(subject: Subject) =
             LecturesListFragment().apply {
                 arguments = Bundle().apply {
-                    putParcelable(SUBJECT, subject)
+                    putParcelable(SUBJECT_PARAM, subject)
                 }
             }
     }

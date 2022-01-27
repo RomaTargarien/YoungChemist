@@ -2,33 +2,32 @@ package com.example.youngchemist.ui.screen.main.subjects
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import com.example.youngchemist.R
 import com.example.youngchemist.databinding.ItemSubjectBinding
 import com.example.youngchemist.model.Subject
 import com.example.youngchemist.ui.util.BitmapUtils
+import com.squareup.picasso.Picasso
 
 class SubjectsAdapter : RecyclerView.Adapter<SubjectsAdapter.SubjectViewHolder>() {
 
     var isClickable: Boolean = false
 
-    private val differCallBack = object : DiffUtil.ItemCallback<Subject>() {
-        override fun areItemsTheSame(oldItem: Subject, newItem: Subject): Boolean {
-            return oldItem.hashCode() == newItem.hashCode()
-        }
+    private val subjects: MutableList<Subject> = mutableListOf()
 
-        override fun areContentsTheSame(oldItem: Subject, newItem: Subject): Boolean {
-            return oldItem.icon_url == newItem.icon_url
-        }
-
+    private var onClick: ((Subject) -> Unit)? = null
+    fun setOnClickListener(listener: (Subject) -> Unit) {
+        onClick = listener
     }
 
-    private val differ = AsyncListDiffer(this, differCallBack)
-
-    var subjects: List<Subject>
-        get() = differ.currentList
-        set(value) = differ.submitList(value)
+    fun submitList(subjectsList: List<Subject>) {
+        val result: DiffUtil.DiffResult =
+            DiffUtil.calculateDiff(DiffCallback(subjects, subjectsList))
+        result.dispatchUpdatesTo(this)
+        subjects.clear()
+        subjects.addAll(subjectsList)
+    }
 
     inner class SubjectViewHolder(val binding: ItemSubjectBinding) :
         RecyclerView.ViewHolder(binding.root) {
@@ -39,12 +38,25 @@ class SubjectsAdapter : RecyclerView.Adapter<SubjectsAdapter.SubjectViewHolder>(
                 binding.containerItem.alpha = 1f
             }
             binding.title.setText(item.title)
-            val bitmap = BitmapUtils.convertCompressedByteArrayToBitmap(item.iconByteArray)
-            binding.ivSubject.setImageBitmap(bitmap)
+            loadImage(item)
             binding.ivSubject.setOnClickListener {
                 onClick?.let { click ->
-                    if (isClickable) {click(item)}
+                    if (isClickable) {
+                        click(item)
+                    }
                 }
+            }
+        }
+
+        private fun loadImage(item: Subject) {
+            if (item.iconByteArray.isEmpty()) {
+                Picasso.get()
+                    .load(item.icon_url)
+                    .placeholder(R.drawable.ic_icon_happy_flask)
+                    .into(binding.ivSubject)
+            } else {
+                val bitmap = BitmapUtils.convertCompressedByteArrayToBitmap(item.iconByteArray)
+                binding.ivSubject.setImageBitmap(bitmap)
             }
         }
     }
@@ -63,12 +75,27 @@ class SubjectsAdapter : RecyclerView.Adapter<SubjectsAdapter.SubjectViewHolder>(
         holder.bind(subjects[position])
     }
 
-    private var onClick: ((Subject) -> Unit)? = null
-
-    fun setOnClickListener(listener: (Subject) -> Unit) {
-        onClick = listener
-    }
-
-
     override fun getItemCount() = subjects.size
+
+    inner class DiffCallback(
+        private val oldList: List<Subject>,
+        private val newList: List<Subject>
+    ) : DiffUtil.Callback() {
+
+        override fun getOldListSize(): Int {
+            return oldList.size
+        }
+
+        override fun getNewListSize(): Int {
+            return newList.size
+        }
+
+        override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+            return oldList[oldItemPosition].hashCode() == newList[newItemPosition].hashCode()
+        }
+
+        override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+            return oldList[oldItemPosition].subjectId == newList[newItemPosition].subjectId
+        }
+    }
 }

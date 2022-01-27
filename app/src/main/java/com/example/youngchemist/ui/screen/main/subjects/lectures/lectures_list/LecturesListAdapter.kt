@@ -3,6 +3,7 @@ package com.example.youngchemist.ui.screen.main.subjects.lectures.lectures_list
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
+import android.content.Context
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -17,9 +18,17 @@ import com.example.youngchemist.databinding.ItemLectureInListBinding
 import com.example.youngchemist.model.Test
 import com.example.youngchemist.model.ui.LectureUi
 import com.example.youngchemist.model.user.UserProgress
-import com.example.youngchemist.ui.util.animateProgress
-import com.example.youngchemist.ui.util.bounce
 import kotlin.math.roundToInt
+import android.os.VibrationEffect
+
+import android.os.Build
+
+import androidx.core.content.ContextCompat.getSystemService
+
+import android.os.Vibrator
+import androidx.core.content.ContextCompat
+import com.example.youngchemist.ui.util.*
+
 
 class LecturesListAdapter : RecyclerView.Adapter<LecturesListAdapter.LectureViewHolder>() {
 
@@ -28,11 +37,11 @@ class LecturesListAdapter : RecyclerView.Adapter<LecturesListAdapter.LectureView
     private val mapBinding: MutableMap<Int, ItemLectureInListBinding> = mutableMapOf()
     private var previousSelectedPosition: Int? = null
 
-    fun submitList(modelsList: List<LectureUi>) {
-        val result: DiffUtil.DiffResult = DiffUtil.calculateDiff(DiffCallback(lectures, modelsList))
+    fun submitList(lecturesList: List<LectureUi>) {
+        val result: DiffUtil.DiffResult = DiffUtil.calculateDiff(DiffCallback(lectures, lecturesList))
         result.dispatchUpdatesTo(this)
         lectures.clear()
-        lectures.addAll(modelsList)
+        lectures.addAll(lecturesList)
         notifyDataSetChanged()
     }
 
@@ -51,7 +60,6 @@ class LecturesListAdapter : RecyclerView.Adapter<LecturesListAdapter.LectureView
                 toggleUserProgressState(it,item)
             }
             setOnClickListeners(item,position)
-
         }
 
         private fun toggleTestState(isTestEnabled: Boolean) {
@@ -89,6 +97,7 @@ class LecturesListAdapter : RecyclerView.Adapter<LecturesListAdapter.LectureView
                             click(lectureUi)
                         }
                     } else {
+                        Vibration.makeSmallVibration(itemView.context)
                         binding.ivLectureAvailable.bounce().start()
                     }
                 }
@@ -128,6 +137,7 @@ class LecturesListAdapter : RecyclerView.Adapter<LecturesListAdapter.LectureView
                         click(lectureUi)
                     }
                 } else {
+                    Vibration.makeSmallVibration(itemView.context)
                     binding.ivEnterKey.bounce().start()
                 }
             }
@@ -173,25 +183,26 @@ class LecturesListAdapter : RecyclerView.Adapter<LecturesListAdapter.LectureView
     fun setOnLectureIsUnlockedListener(listener: (LectureUi) -> Unit) {
         onLectureIsUnlockedClicked = listener
     }
+
+    inner class DiffCallback(private val oldList: List<LectureUi>, private val newList: List<LectureUi>) :
+        DiffUtil.Callback() {
+
+        override fun getOldListSize(): Int {
+            return oldList.size
+        }
+
+        override fun getNewListSize(): Int {
+            return newList.size
+        }
+
+        override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+            return oldList[oldItemPosition].hashCode() == newList[newItemPosition].hashCode()
+        }
+
+        override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+            return (oldList[oldItemPosition].lectureId == newList[newItemPosition].lectureId)
+                    && (oldList[oldItemPosition].userProgress?.lastReadenPage == newList[newItemPosition].userProgress?.lastReadenPage)
+        }
+    }
 }
 
-class DiffCallback(private val oldList: List<LectureUi>, private val newList: List<LectureUi>) :
-    DiffUtil.Callback() {
-
-    override fun getOldListSize(): Int {
-        return oldList.size
-    }
-
-    override fun getNewListSize(): Int {
-        return newList.size
-    }
-
-    override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-        return oldList[oldItemPosition].hashCode() == newList[newItemPosition].hashCode()
-    }
-
-    override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-        return (oldList[oldItemPosition].lectureId == newList[newItemPosition].lectureId)
-                && (oldList[oldItemPosition].userProgress?.lastReadenPage == newList[newItemPosition].userProgress?.lastReadenPage)
-    }
-}

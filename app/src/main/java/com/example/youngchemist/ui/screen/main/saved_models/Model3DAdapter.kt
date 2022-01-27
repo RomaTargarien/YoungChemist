@@ -58,23 +58,24 @@ class Model3DAdapter : RecyclerView.Adapter<Model3DAdapter.Model3DViewHoler>() {
     fun setOnClickListener(listener: (Model3D) -> Unit) {
         onClick = listener
     }
+
+    inner class DiffCallback(private val oldList: List<Model3D>,private val newList: List<Model3D>): DiffUtil.Callback() {
+
+        override fun getOldListSize(): Int {
+            return oldList.size
+        }
+
+        override fun getNewListSize(): Int {
+            return newList.size
+        }
+
+        override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+            return oldList[oldItemPosition].hashCode() == newList[newItemPosition].hashCode()
+        }
+
+        override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+            return oldList[oldItemPosition].modelId == newList[newItemPosition].modelId
+        }
+    }
 }
 
-class DiffCallback(private val oldList: List<Model3D>,private val newList: List<Model3D>): DiffUtil.Callback() {
-
-    override fun getOldListSize(): Int {
-        return oldList.size
-    }
-
-    override fun getNewListSize(): Int {
-        return newList.size
-    }
-
-    override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-        return oldList[oldItemPosition].hashCode() == newList[newItemPosition].hashCode()
-    }
-
-    override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-        return oldList[oldItemPosition].modelId == newList[newItemPosition].modelId
-    }
-}

@@ -11,6 +11,8 @@ import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
+import androidx.transition.TransitionManager
 import androidx.viewpager2.widget.ViewPager2
 import com.example.youngchemist.R
 import com.example.youngchemist.databinding.FragmentLectureBinding
@@ -19,6 +21,11 @@ import com.example.youngchemist.ui.listeners.OnPageNumberChangedListener
 import com.example.youngchemist.ui.listeners.OnUriGetting
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 @SuppressLint("SetJavaScriptEnabled")
@@ -27,8 +34,10 @@ class LectureFragment : Fragment() {
     private lateinit var binding: FragmentLectureBinding
     private val viewModel: LectureFragmentViewModel by viewModels()
     private lateinit var lecture: LectureUi
-
     private var lastPage = 1
+
+    private val _isTheLastPageFlow: MutableStateFlow<Boolean> = MutableStateFlow(false)
+    private val isTheLastPageFlow: StateFlow<Boolean> = _isTheLastPageFlow
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -67,7 +76,7 @@ class LectureFragment : Fragment() {
             }
         })
         val pagesPaginationAdapter = PagesPaginationAdapter()
-
+        observeButtonBeginTestVisibility()
         binding.bmSheet.rvPagesPagination.setOnEventListener(object : OnPageNumberChangedListener {
             override fun onPageNumberChanged(page: Int) {
                 binding.vpLecturePages.currentItem = page
@@ -78,6 +87,7 @@ class LectureFragment : Fragment() {
         binding.bmSheet.rvPagesPagination.setViewsToChangeColor(listOf(R.id.list_item_page_number_background))
         pagesPaginationAdapter.setItems(lecture.data)
 
+        binding.bnBeginTest
 
         pagesPaginationAdapter.setOnClickListener {
             binding.vpLecturePages.currentItem = it
@@ -90,7 +100,9 @@ class LectureFragment : Fragment() {
                 }
                 binding.bmSheet.rvPagesPagination.smoothScrollToPosition(position)
                 binding.tvPageNumber.text = "${position+1}/$size"
-                binding.bnBeginTest.isVisible = (position+1) == size
+                lifecycleScope.launch {
+                    _isTheLastPageFlow.emit((position+1) == size)
+                }
             }
         })
 
@@ -109,7 +121,19 @@ class LectureFragment : Fragment() {
                 binding.bmSheet.ivRightArrowUp.animate().rotation(-slideOffset*180).setDuration(0).start()
             }
         })
+    }
+
+    private fun observeButtonBeginTestVisibility() {
+        lifecycleScope.launch {
+            combine(viewModel.hasTheTestBeenDoneFlow,isTheLastPageFlow) { hasTestBeenDone,isLastPage ->
+                Pair(hasTestBeenDone,isLastPage)
+            }.collect {
+                val isVisible = !it.first && it.second
+                TransitionManager.beginDelayedTransition(binding.beginTestContainer)
+                binding.bnBeginTest.isVisible = isVisible
+            }
         }
+    }
 
     private fun start3DModelActivity(uri: Uri) {
         Log.d("TAG",uri.toString())

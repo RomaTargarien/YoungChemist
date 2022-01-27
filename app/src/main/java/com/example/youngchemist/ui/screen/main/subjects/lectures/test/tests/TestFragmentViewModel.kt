@@ -205,28 +205,4 @@ class TestFragmentViewModel @Inject constructor(
         private const val KEY_USER_ID = "key.user"
         private const val KEY_TEST_ID = "key.test"
     }
-
-//    private fun isOnline(context: Context): Boolean {
-//        val connectivityManager =
-//            context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-//        val capabilities =
-//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-//                connectivityManager.getNetworkCapabilities(connectivityManager.activeNetwork)
-//            } else {
-//                null
-//            }
-//        if (capabilities != null) {
-//            if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)) {
-//                Log.d("TAG", "NetworkCapabilities.TRANSPORT_CELLULAR")
-//                return true
-//            } else if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) {
-//                Log.d("TAG", "NetworkCapabilities.TRANSPORT_WIFI")
-//                return true
-//            } else if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET)) {
-//                Log.d("TAG", "NetworkCapabilities.TRANSPORT_ETHERNET")
-//                return true
-//            }
-//        }
-//        return false
-//    }
 }

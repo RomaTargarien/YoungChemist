@@ -7,29 +7,19 @@ import androidx.lifecycle.viewModelScope
 import androidx.work.Data
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
-import com.example.youngchemist.model.Achievement
-import com.example.youngchemist.model.user.Model3D
-import com.example.youngchemist.model.user.PassedUserTest
 import com.example.youngchemist.model.user.UserAchievement
-import com.example.youngchemist.model.user.UserProgress
 import com.example.youngchemist.repositories.DatabaseRepository
-import com.example.youngchemist.repositories.FireStoreRepository
 import com.example.youngchemist.ui.base.workers.ImageUrlDecoderWorker
-import com.example.youngchemist.ui.base.workers.UserInfoDonloadingWorker
-import com.example.youngchemist.ui.screen.main.MainFragmentViewModel
-import com.example.youngchemist.ui.util.Constants
+import com.example.youngchemist.ui.util.Constants.ACHIEVEMENT_DATABASE
 import com.example.youngchemist.ui.util.Constants.TEST_USER
-import com.example.youngchemist.ui.util.ResourceNetwork
-import com.github.terrakok.cicerone.Router
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class AchievementsFragmentViewModel @Inject constructor(
-    private val router: Router,
-    private val fireStoreRepository: FireStoreRepository,
     private val workManager: WorkManager,
     private val databaseRepository: DatabaseRepository
 ) : ViewModel() {
@@ -44,14 +34,35 @@ class AchievementsFragmentViewModel @Inject constructor(
     val savedModelsCount: LiveData<Int> = _savedModelsCount
 
 
-
     fun achievementWasViewed(achievement: UserAchievement) {
         viewModelScope.launch {
             achievement.wasViewed = true
             databaseRepository.saveAchievement(achievement)
-            val data = Data.Builder().putInt(KEY_ACHIEVEMENT_PRIMARY_KEY,achievement.achievementPrimaryKey).build()
-            val workRequest = OneTimeWorkRequestBuilder<ImageUrlDecoderWorker>().setInputData(data).build()
-            workManager.enqueue(workRequest)
+        }
+    }
+
+    init {
+        viewModelScope.launch(Dispatchers.Default) {
+            databaseRepository.getAchievements(TEST_USER).collect {
+                it.forEach { userAchievement ->
+                    decodeSubjectItemImageUrl(userAchievement)
+                }
+            }
+        }
+    }
+
+    private fun decodeSubjectItemImageUrl(achievement: UserAchievement) {
+        achievement.apply {
+            if (this.iconByteArray.isEmpty()) {
+                val data = Data.Builder()
+                    .putInt(KEY_DATABASE_TYPE, ACHIEVEMENT_DATABASE)
+                    .putInt(KEY_PRIMARY_KEY, this.achievementPrimaryKey)
+                    .build()
+                val workRequest = OneTimeWorkRequestBuilder<ImageUrlDecoderWorker>()
+                    .setInputData(data)
+                    .build()
+                workManager.enqueue(workRequest)
+            }
         }
     }
 
@@ -68,12 +79,14 @@ class AchievementsFragmentViewModel @Inject constructor(
         }
         viewModelScope.launch {
             databaseRepository.getProgress(TEST_USER).collect {
-                it.count { it.isLectureReaden }.also { _readenLecturesCount.postValue(it) }
+                it.count { userProgress -> userProgress.isLectureReaden }
+                    .also { count -> _readenLecturesCount.postValue(count) }
             }
         }
     }
 
     companion object {
-        private const val KEY_ACHIEVEMENT_PRIMARY_KEY = "key.achievement.primary.key"
+        private const val KEY_PRIMARY_KEY = "key.achievement.primary.key"
+        private const val KEY_DATABASE_TYPE = "key.database.type"
     }
 }

@@ -29,7 +29,7 @@ object BitmapUtils {
         }
     }
 
-    fun convertCompressedByteArrayToBitmap(src: ByteArray): Bitmap {
+    fun convertCompressedByteArrayToBitmap(src: ByteArray): Bitmap? {
         return BitmapFactory.decodeByteArray(src, 0, src.size)
     }
 }

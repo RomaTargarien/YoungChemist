@@ -51,5 +51,4 @@ class PagesPaginationAdapter :
     fun setOnClickListener(listener: (Int) -> Unit) {
         onClick = listener
     }
-
 }

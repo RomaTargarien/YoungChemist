@@ -1,4 +1,4 @@
-package com.example.youngchemist.ui.screen.main.subjects.lectures.test
+package com.example.youngchemist.ui.base.decorators
 
 import android.graphics.Rect
 import android.view.View

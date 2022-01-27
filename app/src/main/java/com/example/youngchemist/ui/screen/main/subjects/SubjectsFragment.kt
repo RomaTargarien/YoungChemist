@@ -5,22 +5,16 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.GridLayoutManager
+import com.example.youngchemist.R
 import com.example.youngchemist.databinding.FragmentSubjectsBinding
+import com.example.youngchemist.ui.util.Resource
 import com.example.youngchemist.ui.util.ResourceNetwork
 import dagger.hilt.android.AndroidEntryPoint
-import android.graphics.BitmapFactory
-
-import android.graphics.Bitmap
-import android.util.Log
-import android.view.inputmethod.InputMethodManager
-import androidx.core.view.isVisible
-import com.example.youngchemist.R
-import com.example.youngchemist.ui.util.Resource
-import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent
-import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEventListener
 
 
 @AndroidEntryPoint
@@ -87,7 +81,7 @@ class SubjectsFragment : Fragment() {
                 is ResourceNetwork.Success -> {
                     binding.progressFlask.isVisible = false
                     it.data?.let {
-                        adapter.subjects = it
+                        adapter.submitList(it)
                     }
                 }
                 is ResourceNetwork.Error -> {
@@ -103,6 +97,4 @@ class SubjectsFragment : Fragment() {
         val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0)
     }
-
-
 }

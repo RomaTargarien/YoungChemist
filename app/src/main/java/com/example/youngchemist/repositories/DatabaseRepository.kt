@@ -12,20 +12,26 @@ import kotlinx.coroutines.flow.Flow
 
 interface DatabaseRepository {
 
-    suspend fun getAllSubjects(): List<Subject>
+    //Subjects database
+    suspend fun getSubjects(): Flow<List<Subject>>
 
-    suspend fun insertNewSubjects(subjects: List<Subject>)
+    suspend fun getSubjectByPrimaryKey(primaryKey: Int): Subject
 
-    suspend fun deleteAllSubjects()
+    suspend fun saveSubject(subject: Subject)
 
-    fun getAllLectures(collectionId: String): Deferred<List<Lecture>>
+    //Lectures database
+    suspend fun getLectures(collectionId: String): Flow<List<Lecture>>
 
-    suspend fun insertNewLectures(lectures: List<Lecture>)
+    suspend fun saveLecture(lecture: Lecture)
 
-    suspend fun deleteAlllectures()
-
+    //PassedUserTests database
     suspend fun savePassedUserTest(passedUserTest: PassedUserTest)
 
+    suspend fun getAllPassedUserTests(userId: String): Flow<List<PassedUserTest>>
+
+    suspend fun getPassedUserTest(userId: String, testId: String): PassedUserTest?
+
+    //3DModels database
     suspend fun save3DModel(model3D: Model3D)
 
     suspend fun getAll3DModels(userId: String = "%"): List<Model3D>
@@ -34,19 +40,19 @@ interface DatabaseRepository {
 
     suspend fun getModel(currentUserId: String, modelId: String): Model3D?
 
+    suspend fun getAllModelsFlow(currentUserId: String): Flow<List<Model3D>>
+
+    //UserProgress database
     suspend fun saveProgress(userProgress: UserProgress)
 
     suspend fun getProgress(userId: String = "%"): Flow<List<UserProgress>>
 
-    suspend fun getAllPassedUserTests(userId: String): Flow<List<PassedUserTest>>
-
-    suspend fun getPassedUserTest(userId: String, testId: String): PassedUserTest?
-
-    suspend fun getAllModelsFlow(currentUserId: String): Flow<List<Model3D>>
-
+    //Achivemenets database
     suspend fun saveAchievement(userAchievement: UserAchievement)
 
     suspend fun getAchievements(userId: String): Flow<List<UserAchievement>>
 
     suspend fun getAchievementByPrimaryKey(primaryKey: Int): UserAchievement
+
+
 }

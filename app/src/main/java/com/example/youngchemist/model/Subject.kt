@@ -8,10 +8,12 @@ import kotlinx.android.parcel.Parcelize
 @Entity(tableName = "subjects")
 @Parcelize
 data class Subject(
-    @PrimaryKey
     val subjectId: String = "",
     val title: String = "",
     val icon_url: String = "",
     val collectionId: String = "",
     var iconByteArray: ByteArray = byteArrayOf()
-): Parcelable
+): Parcelable {
+    @PrimaryKey(autoGenerate = true)
+    var subjectPrimaryKey: Int = 0
+}

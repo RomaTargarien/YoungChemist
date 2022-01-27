@@ -13,7 +13,7 @@ import coil.load
 import com.example.youngchemist.databinding.FragmentTestBinding
 import com.example.youngchemist.model.Task
 import com.example.youngchemist.model.ui.AnswerUi
-import com.example.youngchemist.ui.screen.main.subjects.lectures.test.HorizontalItemDecoration
+import com.example.youngchemist.ui.base.decorators.HorizontalItemDecoration
 import com.example.youngchemist.ui.screen.main.subjects.lectures.test.TestAnswerAdapter
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collect

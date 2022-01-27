@@ -151,16 +151,18 @@ class AchievementService: Service(), CoroutineScope {
             databaseRepository.getAchievements(Constants.TEST_USER).combine(userAchievementsFlow) { a, b ->
                 Pair(a, b)
             }
-                .debounce(100)
                 .collect {
                     val savedAchievements = it.first
                     val newAchievements = it.second
                     val unDoneAchievements = mutableListOf<UserAchievement>()
+                    val doneAchievements = mutableListOf<UserAchievement>().apply {
+                        addAll(savedAchievements)
+                    }
                     newAchievements?.let {
                         it.forEach { newUserAchievement ->
                             newUserAchievement.apply {
                                 if (!(this.id in savedAchievements.map { it.id }) && itemsDone >= itemsToDone) {
-                                    saveAchievement(this)
+                                    doneAchievements.add(this)
                                 } else {
                                     if (!(this.id in savedAchievements.map { it.id })) {
                                         unDoneAchievements.add(this)
@@ -169,7 +171,7 @@ class AchievementService: Service(), CoroutineScope {
                             }
                         }
                     }
-                    _doneAchievements.postValue(savedAchievements)
+                    _doneAchievements.postValue(doneAchievements)
                     _unDoneAchievements.postValue(unDoneAchievements)
                 }
         }
@@ -181,7 +183,6 @@ class AchievementService: Service(), CoroutineScope {
         val progressList: List<UserProgress>,
         val achievementList: List<Achievement>?
     )
-
 
     inner class LocalBinder : Binder() {
         fun getService(): AchievementService = this@AchievementService

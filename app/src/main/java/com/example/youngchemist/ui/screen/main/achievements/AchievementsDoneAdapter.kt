@@ -40,35 +40,42 @@ class AchievementsDoneAdapter() :
                 binding.ivDoneAchievement.setImageBitmap(bitmap)
             } else {
                 item.apply {
-                    Picasso.get().load(imageUrl).into(binding.ivDoneAchievement)
+                    Picasso.get().load(imageUrl).placeholder(R.drawable.ic_icon_happy_flask)
+                        .into(binding.ivDoneAchievement)
                 }
             }
             binding.ivDoneAchievement.setOnClickListener {
-                if (position != previousSelectedPosition && previousSelectedPosition != null) {
-                    achievementTitleBehavior(item.title,true)
-                    mapBinding[previousSelectedPosition]?.pbSelection?.apply {
-                        setProgressWithAnimation(0f,500)
-                        progressDirection = CircularProgressBar.ProgressDirection.TO_RIGHT
-                    }
-                    previousSelectedPosition = null
-                }
-                if (position == previousSelectedPosition) {
-                    achievementTitleBehavior(item.title,false)
-                    binding.pbSelection.apply {
-                        setProgressWithAnimation(0f,500)
-                        progressDirection = CircularProgressBar.ProgressDirection.TO_RIGHT
-                    }
-                    previousSelectedPosition = null
-                } else {
-                    binding.pbSelection.apply {
-                        setProgressWithAnimation(100f,500)
-                        progressDirection = CircularProgressBar.ProgressDirection.TO_LEFT
-                    }
-                    achievementTitleBehavior(item.title,true)
-                    previousSelectedPosition = position
-                }
+                clickListener(position, item)
             }
         }
+
+        private fun clickListener(position: Int,item: UserAchievement) {
+            if (position != previousSelectedPosition && previousSelectedPosition != null) {
+                achievementTitleBehavior(item.title,true)
+                mapBinding[previousSelectedPosition]?.pbSelection?.apply {
+                    setProgressWithAnimation(0f,500)
+                    progressDirection = CircularProgressBar.ProgressDirection.TO_RIGHT
+                }
+                previousSelectedPosition = null
+            }
+            if (position == previousSelectedPosition) {
+                achievementTitleBehavior(item.title,false)
+                binding.pbSelection.apply {
+                    setProgressWithAnimation(0f,500)
+                    progressDirection = CircularProgressBar.ProgressDirection.TO_RIGHT
+                }
+                previousSelectedPosition = null
+            } else {
+                binding.pbSelection.apply {
+                    setProgressWithAnimation(100f,500)
+                    progressDirection = CircularProgressBar.ProgressDirection.TO_LEFT
+                }
+                achievementTitleBehavior(item.title,true)
+                previousSelectedPosition = position
+            }
+        }
+
+
         private fun achievementTitleBehavior(title: String,isVisible: Boolean) {
             onClick?.let { click ->
                 click(Pair(title,isVisible))

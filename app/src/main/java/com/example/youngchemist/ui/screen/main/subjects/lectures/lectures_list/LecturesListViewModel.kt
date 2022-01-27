@@ -1,10 +1,9 @@
 package com.example.youngchemist.ui.screen.main.subjects.lectures.lectures_list
 
-import android.util.Log
-import androidx.lifecycle.*
-import androidx.work.WorkManager
-import com.example.youngchemist.db.shared_pref.UserPreferences
-import com.example.youngchemist.model.Lecture
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.youngchemist.model.Test
 import com.example.youngchemist.model.ui.LectureUi
 import com.example.youngchemist.model.user.PassedUserTest
@@ -14,11 +13,12 @@ import com.example.youngchemist.repositories.FireStoreRepository
 import com.example.youngchemist.ui.screen.Screens
 import com.example.youngchemist.ui.util.Constants.TEST_USER
 import com.example.youngchemist.ui.util.ResourceNetwork
-import com.example.youngchemist.ui.util.getLecturesId
-import com.example.youngchemist.ui.util.getLocalLecturesId
 import com.github.terrakok.cicerone.Router
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.filterNot
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -29,78 +29,102 @@ class LecturesListViewModel @Inject constructor(
     private val databaseRepository: DatabaseRepository
 ) : ViewModel() {
 
-    private val _lecturesListState: MutableLiveData<ResourceNetwork<List<Lecture>>> =
+    private val _lecturesUiState: MutableLiveData<ResourceNetwork<List<LectureUi>>> =
         MutableLiveData()
-    val lecturesListState: LiveData<ResourceNetwork<List<Lecture>>> = _lecturesListState
+    val lecturesUiState: LiveData<ResourceNetwork<List<LectureUi>>> = _lecturesUiState
 
-    private val _lecturesUi: MutableLiveData<List<LectureUi>> = MutableLiveData()
-    val lecturesUi: LiveData<List<LectureUi>> = _lecturesUi
+    private val _passedTestsCount: MutableLiveData<Pair<Int, Int>> = MutableLiveData()
+    val passedTestsCount: LiveData<Pair<Int, Int>> = _passedTestsCount
 
+    private val _readenLecturesCount: MutableLiveData<Pair<Int, Int>> = MutableLiveData()
+    val readenLecturesCount: LiveData<Pair<Int, Int>> = _readenLecturesCount
 
-    fun getData(collectionId: String) {
+    fun exit() {
+        router.exit()
+    }
+
+    fun navigateToLectureScreen(lecture: LectureUi) {
+        router.navigateTo(Screens.lectureScreen(lecture))
+    }
+
+    fun navigateToTestScreen(test: Test) {
+        router.navigateTo(Screens.rootTestScreen(test))
+    }
+
+    fun getLectures(collectionId: String) {
         viewModelScope.launch {
-            val lecturesUi = mutableListOf<LectureUi>()
-            _lecturesListState.postValue(ResourceNetwork.Loading())
-            val result = databaseRepository.getAllLectures(collectionId)
+            _lecturesUiState.postValue(ResourceNetwork.Loading())
             val progressList = databaseRepository.getProgress(TEST_USER)
             val passedUserTests = databaseRepository.getAllPassedUserTests(TEST_USER)
-            var data = result.await()
-            if (data.isEmpty()) {
-                fireStoreRepository.getAllLectures(collectionId).let {
-                    if (it is ResourceNetwork.Success) {
-                        it.data?.let {
-                            data = it
-                            databaseRepository.insertNewLectures(it)
-                        }
-                        _lecturesListState.postValue(it)
-                    }
-                    if (it is ResourceNetwork.Error) {
-                        _lecturesListState.postValue(it)
-                    }
+            val lectures = databaseRepository.getLectures(collectionId)
+            combine(lectures, passedUserTests, progressList) { lecture, tests, progress ->
+                Triple(lecture, tests, progress)
+            }.onEach {
+                if (it.first.isEmpty()) {
+                    loadRemoteLectures(collectionId)
                 }
-            } else {
-                _lecturesListState.postValue(ResourceNetwork.Success(emptyList()))
-            }
-            data.forEach {
-                lecturesUi.add(it.convertToLectureUi())
-            }
-            _lecturesUi.postValue(lecturesUi)
-            launch {
-                progressList.collect { userProgress ->
-                    lecturesUi.forEach {
-                        addUserProgress(it,userProgress)
-                    }
-                    _lecturesUi.postValue(lecturesUi)
+            }.filterNot {
+                it.first.isEmpty()
+            }.collect {
+                val savedLectures = it.first
+                val passedTests = it.second
+                val userProgress = it.third
+                val lecturesUi = savedLectures.map { it.convertToLectureUi() }
+                lecturesUi.forEach {
+                    addUserProgress(it, userProgress)
+                    addUserPassedTests(it, passedTests)
                 }
-            }
-            launch {
-                passedUserTests.collect { passedTests ->
-                    lecturesUi.forEach {
-                        addUserPassedTests(it,passedTests)
-                    }
-                    _lecturesUi.postValue(lecturesUi)
-                }
+                userProgressCounts(lecturesUi)
+                _lecturesUiState.postValue(ResourceNetwork.Success(lecturesUi))
             }
         }
     }
 
-
-
-    private fun addUserProgress(lectureUi: LectureUi,userProgressList: List<UserProgress>) {
+    private fun loadRemoteLectures(collectionId: String) {
         viewModelScope.launch {
-            if (!(lectureUi.lectureId in userProgressList.getLocalLecturesId())) {
-                val userProgress = UserProgress(TEST_USER,lectureUi.lectureId,0)
-                lectureUi.userProgress = userProgress
-                databaseRepository.saveProgress(userProgress)
-            } else {
-                lectureUi.userProgress = userProgressList.find { userProgress ->
-                    userProgress.lectureId.equals(lectureUi.lectureId)
+            val result = fireStoreRepository.getAllLectures(collectionId)
+            when (result) {
+                is ResourceNetwork.Success -> {
+                    result.data?.forEach {
+                        databaseRepository.saveLecture(it)
+                    }
+                }
+                is ResourceNetwork.Error -> {
+                    _lecturesUiState.postValue(ResourceNetwork.Error(result.message))
                 }
             }
         }
     }
 
-    fun saveProgress(userProgress: UserProgress) {
+    private fun userProgressCounts(lecturesUi: List<LectureUi>) {
+        val allAmountOfTests = lecturesUi.count { it.test != null }
+        val doneTests = lecturesUi.count { it.test != null && !it.isTestEnabled }
+        val allAmountsOfLectures = lecturesUi.size
+        var readLectures = 0
+        lecturesUi.forEach {
+            it.userProgress?.let {
+                if (it.isLectureReaden) {
+                    readLectures++
+                }
+            }
+        }
+        _passedTestsCount.postValue(Pair(allAmountOfTests, doneTests))
+        _readenLecturesCount.postValue(Pair(allAmountsOfLectures, readLectures))
+    }
+
+    private fun addUserProgress(lectureUi: LectureUi, userProgressList: List<UserProgress>) {
+        userProgressList.find { userProgress ->
+            userProgress.lectureId == lectureUi.lectureId
+        }.also {
+            if (it == null) {
+                saveProgress(UserProgress(TEST_USER, lectureUi.lectureId, 0))
+            } else {
+                lectureUi.userProgress = it
+            }
+        }
+    }
+
+    private fun saveProgress(userProgress: UserProgress) {
         viewModelScope.launch {
             databaseRepository.saveProgress(userProgress)
         }
@@ -117,17 +141,5 @@ class LecturesListViewModel @Inject constructor(
                 lectureUi.mark = it.mark
             }
         }
-    }
-
-    fun exit() {
-        router.exit()
-    }
-
-    fun navigateToLectureScreen(lecture: LectureUi) {
-        router.navigateTo(Screens.lectureScreen(lecture))
-    }
-
-    fun navigateToTestScreen(test: Test) {
-        router.navigateTo(Screens.rootTestScreen(test))
     }
 }
