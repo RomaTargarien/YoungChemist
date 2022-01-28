@@ -3,7 +3,6 @@ package com.example.youngchemist.ui.custom.snack_bar
 import android.content.Context
 import android.util.AttributeSet
 import android.view.View
-import androidx.annotation.ContentView
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.example.youngchemist.R
 import com.google.android.material.snackbar.ContentViewCallback

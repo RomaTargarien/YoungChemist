@@ -1,27 +1,23 @@
 package com.example.youngchemist.ui.screen.main
 
-import android.content.SharedPreferences
 import android.util.Log
 import androidx.lifecycle.*
-import androidx.work.*
+import androidx.work.Data
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
 import com.example.youngchemist.db.shared_pref.UserPreferences
 import com.example.youngchemist.repositories.AuthRepository
 import com.example.youngchemist.ui.base.workers.UserInfoDonloadingWorker
-import com.example.youngchemist.ui.base.workers.UserInfoUploadingWorker
 import com.example.youngchemist.ui.screen.Screens
 import com.example.youngchemist.ui.util.Constants.TEST_USER
 import com.example.youngchemist.ui.util.Resource
 import com.example.youngchemist.ui.util.ResourceNetwork
 import com.example.youngchemist.ui.util.UserState
 import com.github.terrakok.cicerone.Router
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.ktx.Firebase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 @HiltViewModel

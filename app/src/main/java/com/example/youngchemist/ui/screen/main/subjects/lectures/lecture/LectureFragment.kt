@@ -1,10 +1,7 @@
 package com.example.youngchemist.ui.screen.main.subjects.lectures.lecture
 
 import android.annotation.SuppressLint
-import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,9 +13,12 @@ import androidx.transition.TransitionManager
 import androidx.viewpager2.widget.ViewPager2
 import com.example.youngchemist.R
 import com.example.youngchemist.databinding.FragmentLectureBinding
+import com.example.youngchemist.model.Test
 import com.example.youngchemist.model.ui.LectureUi
+import com.example.youngchemist.ui.base.intent_3d.Intent3DCreator
 import com.example.youngchemist.ui.listeners.OnPageNumberChangedListener
 import com.example.youngchemist.ui.listeners.OnUriGetting
+import com.example.youngchemist.ui.screen.main.subjects.lectures.lecture_base.StartTestDialogFragment
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -34,16 +34,14 @@ class LectureFragment : Fragment() {
     private lateinit var binding: FragmentLectureBinding
     private val viewModel: LectureFragmentViewModel by viewModels()
     private lateinit var lecture: LectureUi
-    private var lastPage = 1
-
     private val _isTheLastPageFlow: MutableStateFlow<Boolean> = MutableStateFlow(false)
     private val isTheLastPageFlow: StateFlow<Boolean> = _isTheLastPageFlow
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
-            (it.getParcelable(LECTURE_PARAM) as LectureUi?)?.let {
-                lecture = it
+            (it.getParcelable(LECTURE_PARAM) as LectureUi?)?.let { lectureParam ->
+                lecture = lectureParam
             }
         }
     }
@@ -57,76 +55,96 @@ class LectureFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.viewModel = viewModel
+        binding.bmSheet.viewModel = viewModel
+        lecture.test?.let { viewModel.getTest(it) }
+        initializeLecturePagesViewPager()
+        initializeBottomSheetPagination()
+        initializeBottomSheetRecyclerView()
+        observeButtonBeginTestVisibility()
+        binding.bnBeginTest.setOnClickListener {
+            lecture.test?.let { showStartTestDialogFragment(it) }
+        }
+    }
+
+    private fun initializeLecturePagesViewPager() {
         val adapter = PageAdapter()
         adapter.pages = lecture.data
         binding.vpLecturePages.adapter = adapter
         val size = lecture.data.size
         adapter.setOnEventListener(object : OnUriGetting {
             override fun onUriGetted(uri: String) {
-                Log.d("TAG",uri)
-                val intentUri = Uri.parse("https://arvr.google.com/scene-viewer/1.0")
-                    .buildUpon()
-                    .appendQueryParameter(
-                        "file",
-                        uri
-                    )
-                    .appendQueryParameter("mode","3d_only")
-                    .build()
-                start3DModelActivity(intentUri)
+                startActivity(Intent3DCreator.create3DIntent(uri))
             }
         })
+        binding.vpLecturePages.registerOnPageChangeCallback(object :
+            ViewPager2.OnPageChangeCallback() {
+            override fun onPageSelected(position: Int) {
+                viewModel.onPageChanged(position)
+                binding.bmSheet.rvPagesPagination.smoothScrollToPosition(position)
+                binding.tvPageNumber.text = resources.getString(
+                    R.string.page_lecture_number_from_all_pages,
+                    (position + 1).toString(),
+                    size.toString()
+                )
+                lifecycleScope.launch {
+                    _isTheLastPageFlow.emit((position + 1) == size)
+                }
+            }
+        })
+    }
+
+    private fun initializeBottomSheetRecyclerView() {
         val pagesPaginationAdapter = PagesPaginationAdapter()
-        observeButtonBeginTestVisibility()
         binding.bmSheet.rvPagesPagination.setOnEventListener(object : OnPageNumberChangedListener {
             override fun onPageNumberChanged(page: Int) {
                 binding.vpLecturePages.currentItem = page
             }
         })
         binding.bmSheet.rvPagesPagination.initialize(pagesPaginationAdapter)
-
         binding.bmSheet.rvPagesPagination.setViewsToChangeColor(listOf(R.id.list_item_page_number_background))
         pagesPaginationAdapter.setItems(lecture.data)
-
-        binding.bnBeginTest
-
         pagesPaginationAdapter.setOnClickListener {
             binding.vpLecturePages.currentItem = it
         }
-        binding.bmSheet.viewModel = viewModel
-        binding.vpLecturePages.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
-            override fun onPageSelected(position: Int) {
-                if (lastPage < position+1) {
-                    lastPage = position+1
-                }
-                binding.bmSheet.rvPagesPagination.smoothScrollToPosition(position)
-                binding.tvPageNumber.text = "${position+1}/$size"
-                lifecycleScope.launch {
-                    _isTheLastPageFlow.emit((position+1) == size)
-                }
-            }
-        })
+    }
 
+    private fun initializeBottomSheetPagination() {
         val bottomSheet = binding.bmSheet.bottomSheetContainer
         val bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet)
-        viewModel.isPaginationVisible.observe(viewLifecycleOwner,{
-            bottomSheetBehavior.state = if (it) BottomSheetBehavior.STATE_EXPANDED else BottomSheetBehavior.STATE_COLLAPSED
+        viewModel.isPaginationVisible.observe(viewLifecycleOwner, {
+            bottomSheetBehavior.state =
+                if (it) BottomSheetBehavior.STATE_EXPANDED else BottomSheetBehavior.STATE_COLLAPSED
         })
-        bottomSheetBehavior.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
-            override fun onStateChanged(bottomSheet: View, newState: Int) {
-
-            }
+        bottomSheetBehavior.addBottomSheetCallback(object :
+            BottomSheetBehavior.BottomSheetCallback() {
+            override fun onStateChanged(bottomSheet: View, newState: Int) {}
 
             override fun onSlide(bottomSheet: View, slideOffset: Float) {
-                binding.bmSheet.ivLeftArrowUp.animate().rotation(slideOffset*180).setDuration(0).start()
-                binding.bmSheet.ivRightArrowUp.animate().rotation(-slideOffset*180).setDuration(0).start()
+                binding.bmSheet.ivLeftArrowUp.animate().rotation(slideOffset * 180).setDuration(0)
+                    .start()
+                binding.bmSheet.ivRightArrowUp.animate().rotation(-slideOffset * 180).setDuration(0)
+                    .start()
+            }
+        })
+        binding.bmSheet.rvPagesPagination.setOnEventListener(object : OnPageNumberChangedListener {
+            override fun onPageNumberChanged(page: Int) {
+                binding.vpLecturePages.currentItem = page
             }
         })
     }
 
+    private fun showStartTestDialogFragment(test: Test) {
+        val startTestDialogFragment = StartTestDialogFragment(viewModel, test)
+        startTestDialogFragment.show(requireActivity().supportFragmentManager, "dialog")
+    }
+
     private fun observeButtonBeginTestVisibility() {
         lifecycleScope.launch {
-            combine(viewModel.hasTheTestBeenDoneFlow,isTheLastPageFlow) { hasTestBeenDone,isLastPage ->
-                Pair(hasTestBeenDone,isLastPage)
+            combine(
+                viewModel.hasTheTestBeenDoneFlow,
+                isTheLastPageFlow
+            ) { hasTestBeenDone, isLastPage ->
+                Pair(hasTestBeenDone, isLastPage)
             }.collect {
                 val isVisible = !it.first && it.second
                 TransitionManager.beginDelayedTransition(binding.beginTestContainer)
@@ -135,18 +153,9 @@ class LectureFragment : Fragment() {
         }
     }
 
-    private fun start3DModelActivity(uri: Uri) {
-        Log.d("TAG",uri.toString())
-        val intent = Intent(Intent.ACTION_VIEW)
-        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-        intent.setData(uri)
-        intent.setPackage("com.google.ar.core")
-        startActivity(intent)
-    }
-
     override fun onPause() {
         super.onPause()
-        viewModel.saveProgress(lecture.userProgress,lastPage,lecture.data.size)
+        viewModel.saveProgress(lecture.userProgress, lecture.data.size)
     }
 
     companion object {

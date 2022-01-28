@@ -30,6 +30,7 @@
     <string name="password_must_be_equals">Пароли должны совпадать</string>
     <string name="go_to_your_email_for_password_changing">Перейдите на свою почту для смены пароля</string>
     <string name="page_number_from_all_pages">%1s вопрос из %1s</string>
+    <string name="page_lecture_number_from_all_pages">%1s/%1s</string>
 
     <!-- Firebase Auth Exceptions localized -->
     <string name="ERROR_EMAIL_ALREADY_IN_USE">К сожалению, этот логин уже занят. Попробуйте зарегестрироваться с другим логином</string>

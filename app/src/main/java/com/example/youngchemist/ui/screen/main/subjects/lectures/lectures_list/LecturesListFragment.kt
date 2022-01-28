@@ -19,8 +19,7 @@ import com.example.youngchemist.databinding.FragmentLecturesListBinding
 import com.example.youngchemist.model.Subject
 import com.example.youngchemist.model.Test
 import com.example.youngchemist.service.AchievementService
-import com.example.youngchemist.ui.screen.main.subjects.lectures.lectures_list.dialogs.StartTestDialogFragment
-import com.example.youngchemist.ui.screen.main.subjects.lectures.test.tests.dialogs.TestNoSaveDialogFragment
+import com.example.youngchemist.ui.screen.main.subjects.lectures.lecture_base.StartTestDialogFragment
 import com.example.youngchemist.ui.util.BitmapUtils
 import com.example.youngchemist.ui.util.ResourceNetwork
 import com.example.youngchemist.ui.util.closeKeyBoard

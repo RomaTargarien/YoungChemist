@@ -2,15 +2,14 @@ package com.example.youngchemist.ui.screen.main.subjects.lectures.lectures_list
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.youngchemist.model.Test
 import com.example.youngchemist.model.ui.LectureUi
 import com.example.youngchemist.model.user.PassedUserTest
 import com.example.youngchemist.model.user.UserProgress
 import com.example.youngchemist.repositories.DatabaseRepository
 import com.example.youngchemist.repositories.FireStoreRepository
 import com.example.youngchemist.ui.screen.Screens
+import com.example.youngchemist.ui.screen.main.subjects.lectures.lecture_base.BaseLaunchTestViewModel
 import com.example.youngchemist.ui.util.Constants.TEST_USER
 import com.example.youngchemist.ui.util.ResourceNetwork
 import com.github.terrakok.cicerone.Router
@@ -27,7 +26,7 @@ class LecturesListViewModel @Inject constructor(
     private val router: Router,
     private val fireStoreRepository: FireStoreRepository,
     private val databaseRepository: DatabaseRepository
-) : ViewModel() {
+) : BaseLaunchTestViewModel(router) {
 
     private val _lecturesUiState: MutableLiveData<ResourceNetwork<List<LectureUi>>> =
         MutableLiveData()
@@ -45,10 +44,6 @@ class LecturesListViewModel @Inject constructor(
 
     fun navigateToLectureScreen(lecture: LectureUi) {
         router.navigateTo(Screens.lectureScreen(lecture))
-    }
-
-    fun navigateToTestScreen(test: Test) {
-        router.navigateTo(Screens.rootTestScreen(test))
     }
 
     fun getLectures(collectionId: String) {
@@ -70,9 +65,11 @@ class LecturesListViewModel @Inject constructor(
                 val passedTests = it.second
                 val userProgress = it.third
                 val lecturesUi = savedLectures.map { it.convertToLectureUi() }
-                lecturesUi.forEach {
-                    addUserProgress(it, userProgress)
-                    addUserPassedTests(it, passedTests)
+                lecturesUi.forEach { lectureUi ->
+                    lectureUi.addUserPassedTests(passedTests)
+                    lectureUi.addUserProgress(userProgress).also {
+                        if (!it) { initializeNewProgressProgress(lectureUi.lectureId) }
+                    }
                 }
                 userProgressCounts(lecturesUi)
                 _lecturesUiState.postValue(ResourceNetwork.Success(lecturesUi))
@@ -112,34 +109,10 @@ class LecturesListViewModel @Inject constructor(
         _readenLecturesCount.postValue(Pair(allAmountsOfLectures, readLectures))
     }
 
-    private fun addUserProgress(lectureUi: LectureUi, userProgressList: List<UserProgress>) {
-        userProgressList.find { userProgress ->
-            userProgress.lectureId == lectureUi.lectureId
-        }.also {
-            if (it == null) {
-                saveProgress(UserProgress(TEST_USER, lectureUi.lectureId, 0))
-            } else {
-                lectureUi.userProgress = it
-            }
-        }
-    }
-
-    private fun saveProgress(userProgress: UserProgress) {
+    private fun initializeNewProgressProgress(lectureId: String) {
         viewModelScope.launch {
+            val userProgress = UserProgress(TEST_USER, lectureId, 0)
             databaseRepository.saveProgress(userProgress)
-        }
-    }
-
-    private fun addUserPassedTests(lectureUi: LectureUi,userPassedTests: List<PassedUserTest>) {
-        lectureUi.test?.let { test ->
-            lectureUi.isTestEnabled = true
-            val passedUserTest = userPassedTests.find { passedUserTest ->
-                test.testId.equals(passedUserTest.testUid)
-            }
-            passedUserTest?.let {
-                lectureUi.isTestEnabled = false
-                lectureUi.mark = it.mark
-            }
         }
     }
 }
