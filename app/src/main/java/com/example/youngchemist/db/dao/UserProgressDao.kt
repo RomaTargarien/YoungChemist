@@ -16,4 +16,7 @@ interface UserProgressDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun writeProgress(userProgress: UserProgress)
 
+    @Query("SELECT * FROM userProgress")
+    fun getAllUserProgress(): List<UserProgress>
+
 }

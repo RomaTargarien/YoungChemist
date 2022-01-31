@@ -1,6 +1,5 @@
 package com.example.youngchemist.repositories.impl
 
-import android.util.Log
 import com.example.youngchemist.db.dao.*
 import com.example.youngchemist.model.Lecture
 import com.example.youngchemist.model.Subject
@@ -9,9 +8,7 @@ import com.example.youngchemist.model.user.PassedUserTest
 import com.example.youngchemist.model.user.UserAchievement
 import com.example.youngchemist.model.user.UserProgress
 import com.example.youngchemist.repositories.DatabaseRepository
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -43,7 +40,6 @@ class DatabaseRepositoryImpl @Inject constructor(
     }
 
 
-
     //Lectures database
     override suspend fun getLectures(collectionId: String) = withContext(Dispatchers.IO) {
         lecturesDao.getLectures(collectionId)
@@ -68,11 +64,10 @@ class DatabaseRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getAll3DModels(userId: String): List<Model3D> {
+    override suspend fun getAll3DModels(): List<Model3D> {
         return withContext(Dispatchers.IO) {
-            model3DDao.getAllModels(userId)
+            model3DDao.getAllModels()
         }
-
     }
 
     override suspend fun deleteModel(model3D: Model3D) = withContext(Dispatchers.IO) {
@@ -127,5 +122,11 @@ class DatabaseRepositoryImpl @Inject constructor(
         achievementsDao.getAchievementByPrimaryKey(primaryKey)
     }
 
+    override suspend fun getAllProgress() = withContext(Dispatchers.IO) {
+        userProgressDao.getAllUserProgress()
+    }
 
+    override suspend fun getAllAchievements() = withContext(Dispatchers.IO) {
+        achievementsDao.getAllAchievements()
+    }
 }

@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.youngchemist.model.user.Model3D
 import com.example.youngchemist.repositories.DatabaseRepository
+import com.example.youngchemist.ui.util.Constants.TEST_USER
 import com.example.youngchemist.ui.util.evaluateTime
 import com.github.terrakok.cicerone.Router
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -24,7 +25,6 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SavedModelsFragmentViewModel @Inject constructor(
-    private val router: Router,
     private val databaseRepository: DatabaseRepository
 ) : ViewModel() {
 
@@ -37,11 +37,11 @@ class SavedModelsFragmentViewModel @Inject constructor(
 
     init {
         val modelsList = mutableListOf<Model3D>()
-        for (i in 0..5) {
+        for (i in 0..2) {
             val uid = UUID.randomUUID().toString()
             val modelTitle = Random().nextInt(100)
             val model3D = Model3D(
-                "76V1UE5VssV0W8mXenibeUpvQxm1",
+                TEST_USER,
                 uid,
                 "44",
                 modelTitle.toString(),
@@ -57,7 +57,7 @@ class SavedModelsFragmentViewModel @Inject constructor(
         viewModelScope.launch {
             combine(
                 currentSearchingFlow,
-                databaseRepository.getAllModelsFlow("76V1UE5VssV0W8mXenibeUpvQxm1")
+                databaseRepository.getAllModelsFlow(TEST_USER)
             ) { title, list ->
                 Log.d("TAG", title)
                 val list2 = list.filter {

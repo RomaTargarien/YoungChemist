@@ -9,20 +9,19 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import com.example.youngchemist.db.shared_pref.UserPreferences
 import com.example.youngchemist.model.Subject
+import com.example.youngchemist.model.User
 import com.example.youngchemist.repositories.DatabaseRepository
 import com.example.youngchemist.repositories.FireStoreRepository
 import com.example.youngchemist.ui.base.workers.ImageUrlDecoderWorker
 import com.example.youngchemist.ui.screen.Screens
+import com.example.youngchemist.ui.util.Constants
 import com.example.youngchemist.ui.util.Constants.SUBJECT_DATABASE
 import com.example.youngchemist.ui.util.Resource
 import com.example.youngchemist.ui.util.ResourceNetwork
 import com.github.terrakok.cicerone.Router
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.filterNot
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -41,8 +40,13 @@ class SubjectsFragmentViewModel @Inject constructor(
     private val _userState: MutableLiveData<Resource<String>> = MutableLiveData()
     val userState: LiveData<Resource<String>> = _userState
 
+    private val _userName: MutableLiveData<ResourceNetwork<String>> = MutableLiveData()
+    val userName: LiveData<ResourceNetwork<String>> = _userName
+
+
     init {
         getAllSubjects()
+        getUserName()
         viewModelScope.launch {
             userPreferences.userStateFlow.filterNotNull().collect {
                 _userState.postValue(it)
@@ -104,6 +108,16 @@ class SubjectsFragmentViewModel @Inject constructor(
                 is ResourceNetwork.Error -> {
                     _subjectsState.postValue(ResourceNetwork.Error(result.message))
                 }
+            }
+        }
+    }
+
+    private fun getUserName() {
+        viewModelScope.launch {
+            _userName.postValue(ResourceNetwork.Loading())
+            val result = fireStoreRepository.getUser(Constants.TEST_USER).await()
+            if (result is ResourceNetwork.Success) {
+                result.data?.let { _userName.postValue(ResourceNetwork.Success(it.name)) }
             }
         }
     }

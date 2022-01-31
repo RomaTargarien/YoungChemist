@@ -1,6 +1,5 @@
 package com.example.youngchemist.ui.screen.auth.login
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -19,7 +18,10 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -75,7 +77,7 @@ class LoginFragmnetViewModel @Inject constructor(
         router.navigateTo(Screens.registerScreen())
     }
 
-    fun navigateToRestorePasswordScreen(){
+    fun navigateToRestorePasswordScreen() {
         router.navigateTo(Screens.restorePasswordScreen())
     }
 
@@ -91,7 +93,7 @@ class LoginFragmnetViewModel @Inject constructor(
     fun login() {
         viewModelScope.launch {
             _loginState.postValue(Event(ResourceNetwork.Loading()))
-            val loginResult = authRepository.login(loginText,passwordText)
+            val loginResult = authRepository.login(loginText, passwordText)
             _loginState.postValue(Event(loginResult))
         }
     }
@@ -129,7 +131,7 @@ class LoginFragmnetViewModel @Inject constructor(
 
     private fun observe() {
         viewModelScope.launch {
-            combine(stateLogin,statePassword) { login, password ->
+            combine(stateLogin, statePassword) { login, password ->
                 Pair(login, password)
             }.collect { result ->
                 val loginResult = result.first
@@ -161,12 +163,11 @@ class LoginFragmnetViewModel @Inject constructor(
 
     fun showMessage(message: String?) {
         viewModelScope.launch(Dispatchers.Default) {
-            _isErrorMessageVisible.postValue(Pair(message,true))
+            _isErrorMessageVisible.postValue(Pair(message, true))
             delay(3000)
-            _isErrorMessageVisible.postValue(Pair(message,false))
+            _isErrorMessageVisible.postValue(Pair(message, false))
         }
     }
-
 
 
     override fun onCleared() {

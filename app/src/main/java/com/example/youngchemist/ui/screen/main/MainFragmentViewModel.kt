@@ -2,12 +2,11 @@ package com.example.youngchemist.ui.screen.main
 
 import android.util.Log
 import androidx.lifecycle.*
-import androidx.work.Data
-import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.WorkManager
+import androidx.work.*
 import com.example.youngchemist.db.shared_pref.UserPreferences
 import com.example.youngchemist.repositories.AuthRepository
-import com.example.youngchemist.ui.base.workers.UserInfoDonloadingWorker
+import com.example.youngchemist.ui.base.workers.UserInfoDownloadingWorker
+import com.example.youngchemist.ui.base.workers.UserInfoUploadingWorker
 import com.example.youngchemist.ui.screen.Screens
 import com.example.youngchemist.ui.util.Constants.TEST_USER
 import com.example.youngchemist.ui.util.Resource
@@ -18,6 +17,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 @HiltViewModel
@@ -26,7 +26,7 @@ class MainFragmentViewModel @Inject constructor(
     private val userSharedPreferences: UserPreferences,
     private val router: Router,
     private val authRepository: AuthRepository
-): ViewModel() {
+) : ViewModel() {
 
     private val _bottomSheetState: MutableLiveData<Float> = MutableLiveData()
     val bottomSheetState: LiveData<Float> = _bottomSheetState
@@ -44,7 +44,6 @@ class MainFragmentViewModel @Inject constructor(
             }
             UserState.LOGIN -> {
                 if (!(TEST_USER in userSharedPreferences.loggedUsers)) {
-                    //Log.d("TAG","downloaded")
                     downloadUserInfo(TEST_USER)
                 } else {
                     viewModelScope.launch {
@@ -59,7 +58,14 @@ class MainFragmentViewModel @Inject constructor(
                 _bottomSheetState.postValue(it)
             }
         }
-        //workManager.enqueue(OneTimeWorkRequestBuilder<UserInfoUploadingWorker>().build())
+        val constraints = Constraints.Builder()
+                .setRequiredNetworkType(NetworkType.CONNECTED)
+                .build()
+
+        val work = PeriodicWorkRequestBuilder<UserInfoUploadingWorker>(15, TimeUnit.MINUTES)
+            .setConstraints(constraints)
+            .build()
+        workManager.enqueue(work)
     }
 
     fun exit() {
@@ -71,8 +77,9 @@ class MainFragmentViewModel @Inject constructor(
     }
 
     private fun downloadUserInfo(userId: String) {
-        val data = Data.Builder().putString(KEY_USER_ID,userId).build()
-        val workRequest = OneTimeWorkRequestBuilder<UserInfoDonloadingWorker>().setInputData(data).build()
+        val data = Data.Builder().putString(KEY_USER_ID, userId).build()
+        val workRequest =
+            OneTimeWorkRequestBuilder<UserInfoDownloadingWorker>().setInputData(data).build()
         //Log.d("TAG","ID " + workRequest.id.toString())
         workManager.enqueue(workRequest)
         viewModelScope.launch {
@@ -110,7 +117,7 @@ class MainFragmentViewModel @Inject constructor(
 
     override fun onCleared() {
         super.onCleared()
-        Log.d("TAG","onCleared main")
+        Log.d("TAG", "onCleared main")
     }
 
     companion object {

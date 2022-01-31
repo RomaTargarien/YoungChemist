@@ -9,6 +9,7 @@ import com.example.youngchemist.db.shared_pref.UserPreferences
 import com.example.youngchemist.model.UserInfo
 import com.example.youngchemist.model.user.Model3D
 import com.example.youngchemist.model.user.PassedUserTest
+import com.example.youngchemist.model.user.UserAchievement
 import com.example.youngchemist.model.user.UserProgress
 import com.example.youngchemist.repositories.DatabaseRepository
 import com.example.youngchemist.repositories.FireStoreRepository
@@ -16,16 +17,15 @@ import com.example.youngchemist.ui.util.ResourceNetwork
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.*
-import javax.inject.Inject
 
 @HiltWorker
-class UserInfoDonloadingWorker @AssistedInject constructor(
+class UserInfoDownloadingWorker @AssistedInject constructor(
     @Assisted private val context: Context,
     @Assisted workerParameters: WorkerParameters,
     private val fireStoreRepository: FireStoreRepository,
     private val databaseRepository: DatabaseRepository,
     private val userPreferences: UserPreferences
-): CoroutineWorker(context,workerParameters) {
+) : CoroutineWorker(context, workerParameters) {
 
     override suspend fun doWork(): Result {
         return withContext(Dispatchers.IO) {
@@ -37,18 +37,21 @@ class UserInfoDonloadingWorker @AssistedInject constructor(
                         val resultTests = saveData(it.passedUserTests)
                         val resultUserProgress = saveData(it.userProgress)
                         val resultModels = saveData(it.saved3DModels)
+                        val resultAchievements = saveData(it.doneAchievements)
                         resultTests.await()
                         resultUserProgress.await()
                         resultModels.await()
+                        resultAchievements.await()
                     }
                     saveUser(userId)
                     return@withContext Result.success()
                 }
                 is ResourceNetwork.Error -> {
-                    Log.d("TAG",result.message.toString())
+                    Log.d("TAG", result.message.toString())
                     return@withContext Result.retry()
                 }
-                else -> {}
+                else -> {
+                }
             }
             return@withContext Result.failure()
         }
@@ -62,8 +65,6 @@ class UserInfoDonloadingWorker @AssistedInject constructor(
     }
 
     private fun saveData(data: List<UserInfo>) = CoroutineScope(Dispatchers.Default).async {
-        //delay(15000)
-        Log.d("TAG","saving data")
         if (data.isNotEmpty()) {
             when (data[0]) {
                 is PassedUserTest -> {
@@ -79,6 +80,11 @@ class UserInfoDonloadingWorker @AssistedInject constructor(
                 is UserProgress -> {
                     for (item in data) {
                         databaseRepository.saveProgress(item as UserProgress)
+                    }
+                }
+                is UserAchievement -> {
+                    for (item in data) {
+                        databaseRepository.saveAchievement(item as UserAchievement)
                     }
                 }
             }

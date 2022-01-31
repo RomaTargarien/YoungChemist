@@ -8,7 +8,6 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.example.youngchemist.repositories.DatabaseRepository
 import com.example.youngchemist.ui.util.BitmapUtils
-import com.example.youngchemist.ui.util.Constants.ACHIEVEMENT_DATABASE
 import com.example.youngchemist.ui.util.Constants.SUBJECT_DATABASE
 import com.example.youngchemist.ui.util.ResourceNetwork
 import com.example.youngchemist.ui.util.safeCall
@@ -25,7 +24,7 @@ class ImageUrlDecoderWorker @AssistedInject constructor(
     @Assisted private val context: Context,
     @Assisted workerParameters: WorkerParameters,
     private val databaseRepository: DatabaseRepository
-): CoroutineWorker(context,workerParameters) {
+) : CoroutineWorker(context, workerParameters) {
 
     override suspend fun doWork(): Result {
         return withContext(Dispatchers.IO) {
@@ -40,24 +39,6 @@ class ImageUrlDecoderWorker @AssistedInject constructor(
                             result.data?.let {
                                 subject.iconByteArray = BitmapUtils.convertBitmapToByteArray(it)
                                 databaseRepository.saveSubject(subject)
-                                return@withContext Result.success()
-                            }
-                        }
-                        is ResourceNetwork.Error -> {
-                            Log.d("TAG", result.message.toString())
-                            return@withContext Result.retry()
-                        }
-                    }
-                }
-                ACHIEVEMENT_DATABASE -> {
-                    val achievement = databaseRepository.getAchievementByPrimaryKey(primaryKey)
-                    Log.d("TAG",achievement.toString())
-                    val result = getBitmapFromURL(achievement.imageUrl)
-                    when (result) {
-                        is ResourceNetwork.Success -> {
-                            result.data?.let {
-                                achievement.iconByteArray = BitmapUtils.convertBitmapToByteArray(it)
-                                databaseRepository.saveAchievement(achievement)
                                 return@withContext Result.success()
                             }
                         }

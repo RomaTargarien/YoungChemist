@@ -9,6 +9,7 @@ import com.example.youngchemist.model.user.Model3D
 import com.example.youngchemist.repositories.DatabaseRepository
 import com.example.youngchemist.repositories.FireStoreRepository
 import com.example.youngchemist.ui.screen.Screens
+import com.example.youngchemist.ui.util.Constants.TEST_USER
 import com.example.youngchemist.ui.util.ResourceNetwork
 import com.github.terrakok.cicerone.Router
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -52,7 +53,7 @@ class QrCodeFragmentViewModel @Inject constructor(
                     Pair(model, save)
                 }.collect { pair ->
                     if (pair.second) {
-                        pair.first.userId = "76V1UE5VssV0W8mXenibeUpvQxm1"
+                        pair.first.userId = TEST_USER
                         pair.first.addingDate = getCurrentTime()
                         databaseRepository.save3DModel(pair.first)
                         _wasSaved.postValue(true)
@@ -72,7 +73,7 @@ class QrCodeFragmentViewModel @Inject constructor(
     fun get3DModel(modelId: String) {
         viewModelScope.launch {
             _model3DState.postValue(ResourceNetwork.Loading())
-            val model = databaseRepository.getModel("76V1UE5VssV0W8mXenibeUpvQxm1",modelId)
+            val model = databaseRepository.getModel(TEST_USER,modelId)
             if (model != null) {
                 _model3DState.postValue(ResourceNetwork.Success(model))
                 _wasSaved.postValue(true)

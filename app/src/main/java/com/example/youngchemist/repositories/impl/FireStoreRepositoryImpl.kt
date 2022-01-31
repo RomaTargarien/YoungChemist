@@ -1,10 +1,10 @@
 package com.example.youngchemist.repositories.impl
 
-import android.net.Uri
 import android.util.Log
 import com.example.youngchemist.model.*
 import com.example.youngchemist.model.user.Model3D
 import com.example.youngchemist.model.user.PassedUserTest
+import com.example.youngchemist.model.user.UserAchievement
 import com.example.youngchemist.model.user.UserProgress
 import com.example.youngchemist.repositories.FireStoreRepository
 import com.example.youngchemist.ui.util.ResourceNetwork
@@ -108,20 +108,6 @@ class FireStoreRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun updateReadenLectures(lectureId: String) = withContext(Dispatchers.IO) {
-        safeCall {
-//            val result =
-//                firestore.collection("users").document("76V1UE5VssV0W8mXenibeUpvQxm1").get().await()
-//            val user = result.toObject(User::class.java)
-//            user?.readenLectures?.add(lectureId)
-//            firestore.collection("users").document("76V1UE5VssV0W8mXenibeUpvQxm1").set(
-//                user!!,
-//                SetOptions.merge()
-//            )
-            ResourceNetwork.Success("")
-        }
-    }
-
     override suspend fun saveLecture(lecture: Lecture) = withContext(Dispatchers.IO) {
         safeCall {
             firestore.collection("vessels").document(lecture.lectureId).set(lecture).await()
@@ -129,18 +115,19 @@ class FireStoreRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun save3DModels(userId: String,models3D: List<Model3D>) = withContext(Dispatchers.IO) {
-        safeCall {
-            val result = firestore.collection("users").document(userId).get().await()
-            val user = result.toObject(User::class.java)
-            user?.saved3DModels = ArrayList(models3D)
-            firestore.collection("users").document(userId).set(
-                user!!,
-                SetOptions.merge()
-            )
-            ResourceNetwork.Success("")
+    override suspend fun save3DModels(userId: String, models3D: List<Model3D>) =
+        withContext(Dispatchers.IO) {
+            safeCall {
+                val result = firestore.collection("users").document(userId).get().await()
+                val user = result.toObject(User::class.java)
+                user?.saved3DModels = ArrayList(models3D)
+                firestore.collection("users").document(userId).set(
+                    user!!,
+                    SetOptions.merge()
+                )
+                ResourceNetwork.Success("")
+            }
         }
-    }
 
     override suspend fun saveUserProgress(
         userId: String,
@@ -150,6 +137,22 @@ class FireStoreRepositoryImpl @Inject constructor(
             val result = firestore.collection("users").document(userId).get().await()
             val user = result.toObject(User::class.java)
             user?.userProgress = ArrayList(userProgress)
+            firestore.collection("users").document(userId).set(
+                user!!,
+                SetOptions.merge()
+            )
+            ResourceNetwork.Success("")
+        }
+    }
+
+    override suspend fun saveUserDoneAchievements(
+        userId: String,
+        doneAchievements: List<UserAchievement>
+    ) = withContext(Dispatchers.IO) {
+        safeCall {
+            val result = firestore.collection("users").document(userId).get().await()
+            val user = result.toObject(User::class.java)
+            user?.doneAchievements = ArrayList(doneAchievements)
             firestore.collection("users").document(userId).set(
                 user!!,
                 SetOptions.merge()

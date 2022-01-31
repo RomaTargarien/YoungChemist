@@ -2,7 +2,6 @@ package com.example.youngchemist.ui.base
 
 import android.animation.ObjectAnimator
 import android.content.Context
-import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.Animation
@@ -10,7 +9,6 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
-import androidx.core.view.doOnLayout
 import androidx.core.view.isVisible
 import com.example.youngchemist.R
 import com.example.youngchemist.ui.util.hideMessage
@@ -27,7 +25,7 @@ class AnimationHelper(
     private val ooopsTextView: TextView? = null
 ) {
 
-    fun showMessage(message: String,itIsErrorMessage: Boolean = true) {
+    fun showMessage(message: String, itIsErrorMessage: Boolean = true) {
         if (!itIsErrorMessage) {
             resultImage?.setImageResource(R.drawable.ic_icon_happy_flask)
             ooopsTextView?.isVisible = false
@@ -37,14 +35,17 @@ class AnimationHelper(
         }
         errorMessageTextView.setText(message)
         errorMessageView.isVisible = true
-        errorMessageView.showMessage(context,250)
-    }
-    fun hideMessage() {
-        errorMessageView.hideMessage(context,1000).setAnimationListener(hideMessageAnimationListener)
+        errorMessageView.showMessage(context, 250)
     }
 
-    fun animateProgressBar(progressBar: ProgressBar,from: Float,to: Float) {
-        val pregressAnimator = ObjectAnimator.ofInt(progressBar, "progress", from.toInt(), to.toInt())
+    fun hideMessage() {
+        errorMessageView.hideMessage(context, 1000)
+            .setAnimationListener(hideMessageAnimationListener)
+    }
+
+    fun animateProgressBar(progressBar: ProgressBar, from: Float, to: Float) {
+        val pregressAnimator =
+            ObjectAnimator.ofInt(progressBar, "progress", from.toInt(), to.toInt())
         pregressAnimator.duration = 1000
         pregressAnimator.start()
     }

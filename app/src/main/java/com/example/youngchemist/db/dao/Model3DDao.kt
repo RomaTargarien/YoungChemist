@@ -10,8 +10,8 @@ interface Model3DDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun saveModel3D(model3D: Model3D)
 
-    @Query("SELECT * FROM saved3DModels WHERE userId LIKE :currentUserId")
-    fun getAllModels(currentUserId: String): List<Model3D>
+    @Query("SELECT * FROM saved3DModels")
+    fun getAllModels(): List<Model3D>
 
     @Delete
     suspend fun deleteModel(model3D: Model3D)

@@ -1,7 +1,6 @@
 package com.example.youngchemist.repositories
 
 import com.example.youngchemist.model.AuthResults
-import com.example.youngchemist.ui.util.Resource
 import com.example.youngchemist.ui.util.ResourceNetwork
 
 interface AuthRepository {

@@ -22,6 +22,7 @@ import androidx.transition.TransitionManager
 import com.example.youngchemist.databinding.FragmentAchievementsBinding
 import com.example.youngchemist.service.AchievementService
 import com.example.youngchemist.ui.screen.main.subjects.lectures.lectures_list.VerticalItemVerticalDecoration
+import com.example.youngchemist.ui.util.ResourceNetwork
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -41,19 +42,15 @@ class AchievementsFragment : Fragment() {
     private val achivementNumberFlow: MutableStateFlow<Int?> = MutableStateFlow(null)
 
     private var mService: AchievementService? = null
-    private var mBound: Boolean = false
     private val connection = object : ServiceConnection {
 
         override fun onServiceConnected(className: ComponentName, service: IBinder) {
             val binder = service as AchievementService.LocalBinder
             mService = binder.getService()
             observeAchievements()
-            mBound = true
         }
 
-        override fun onServiceDisconnected(arg0: ComponentName) {
-            mBound = false
-        }
+        override fun onServiceDisconnected(arg0: ComponentName) {}
     }
 
     private lateinit var binding: FragmentAchievementsBinding
@@ -75,19 +72,20 @@ class AchievementsFragment : Fragment() {
         } else {
             observeAchievements()
         }
+
         achievementsDoneAdapter.setOnClickListener {
             TransitionManager.beginDelayedTransition(binding.doneAchievementsContainer)
             binding.tvDoneAchievementTitle.text = if (it.second) it.first else "Выберите достижение"
             binding.tvDoneAchievementTitle.alpha = if (it.second) 1f else 0.5f
         }
         viewModel.doneTestsCount.observe(viewLifecycleOwner, {
-            animateNumber(it,binding.tvPassedTestsCount)
+            animateNumber(it, binding.tvPassedTestsCount)
         })
         viewModel.savedModelsCount.observe(viewLifecycleOwner, {
-            animateNumber(it,binding.tvSavedModelsCount)
+            animateNumber(it, binding.tvSavedModelsCount)
         })
         viewModel.readenLecturesCount.observe(viewLifecycleOwner, {
-            animateNumber(it,binding.tvReadenLecturesCount)
+            animateNumber(it, binding.tvReadenLecturesCount)
         })
     }
 
@@ -128,6 +126,23 @@ class AchievementsFragment : Fragment() {
             it.forEach {
                 if (!it.wasViewed) {
                     viewModel.achievementWasViewed(it)
+                }
+            }
+        })
+
+        mService?.doneAchievementsPercentage?.observe(viewLifecycleOwner, {
+            when (it) {
+                is ResourceNetwork.Loading -> {
+
+                }
+                is ResourceNetwork.Success -> {
+                    it.data?.let {
+                        binding.tvDoneAchievementsPercentage.text = "$it%"
+                        binding.pbDoneAchievementsPercentage.apply {
+                            progressMax = 100f
+                            setProgressWithAnimation(it.toFloat(), 1800)
+                        }
+                    }
                 }
             }
         })

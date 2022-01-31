@@ -76,7 +76,7 @@ class UserFragmentViewModel @Inject constructor(
         _buttonChangeSurnameState.postValue(false)
         surnameJob = viewModelScope.launch(Dispatchers.Default) {
             flow {
-                delay(1000)
+                delay(300)
                 emit(Pair(s.toString(),surnameValidation.validate(s.toString())))
             }.combine(currentUserFlow) { surnamePair,currentUser ->
                 Pair(surnamePair,currentUser?.surname)
@@ -104,7 +104,7 @@ class UserFragmentViewModel @Inject constructor(
         _buttonChangeNameState.postValue(false)
         nameJob = viewModelScope.launch(Dispatchers.Default) {
             flow {
-                delay(1000)
+                delay(300)
                 emit(Pair(s.toString(),nameValidation.validate(s.toString())))
             }.combine(currentUserFlow) { namePair,currentUser ->
                 Pair(namePair,currentUser?.name)

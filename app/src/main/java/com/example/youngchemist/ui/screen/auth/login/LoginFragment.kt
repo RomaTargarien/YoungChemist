@@ -1,35 +1,24 @@
 package com.example.youngchemist.ui.screen.auth.login
 
-import android.content.Context
 import android.os.Bundle
+import android.text.method.HideReturnsTransformationMethod
+import android.text.method.PasswordTransformationMethod
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.addCallback
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.transition.TransitionManager
-import com.example.youngchemist.databinding.FragmentLoginBinding
-import dagger.hilt.android.AndroidEntryPoint
-import android.graphics.Bitmap
-import android.graphics.Canvas
-import android.graphics.drawable.BitmapDrawable
-import android.renderscript.Allocation
-import android.renderscript.Element
-
-import android.renderscript.ScriptIntrinsicBlur
-
-import android.renderscript.RenderScript
-import android.text.method.HideReturnsTransformationMethod
-import android.text.method.PasswordTransformationMethod
-import android.util.Log
-import android.view.ViewTreeObserver
-import android.view.animation.Animation
-import android.view.inputmethod.InputMethodManager
-import androidx.activity.addCallback
 import com.example.youngchemist.R
+import com.example.youngchemist.databinding.FragmentLoginBinding
 import com.example.youngchemist.ui.base.AnimationHelper
-import com.example.youngchemist.ui.util.*
+import com.example.youngchemist.ui.util.ResourceNetwork
+import com.example.youngchemist.ui.util.closeKeyBoard
+import com.example.youngchemist.ui.util.slideUpViews
+import dagger.hilt.android.AndroidEntryPoint
 
 
 @AndroidEntryPoint
@@ -101,7 +90,7 @@ class LoginFragment : Fragment() {
             closeKeyBoard()
             val result = it.getContentIfNotHandled()
             result?.let {
-                Log.d("TAG",it.toString())
+                Log.d("TAG", it.toString())
                 when {
                     it is ResourceNetwork.Loading -> {
                         binding.mainContainer.alpha = 0.5f

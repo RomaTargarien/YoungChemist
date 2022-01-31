@@ -158,6 +158,7 @@ class MainFragment : Fragment() {
 
     override fun onDestroy() {
         super.onDestroy()
+        Log.d("TAG","fragment main destroyed")
         activity?.unbindService(connection)
     }
 

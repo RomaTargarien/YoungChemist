@@ -2,6 +2,7 @@ package com.example.youngchemist.ui.screen.main.subjects
 
 import android.content.Context
 import android.os.Bundle
+import android.transition.TransitionManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -72,6 +73,26 @@ class SubjectsFragment : Fragment() {
             binding.tvError.isVisible = false
             binding.tvTryAgain.isVisible = false
         }
+
+        viewModel.userName.observe(viewLifecycleOwner,{
+            when (it) {
+                is ResourceNetwork.Loading -> {
+
+                }
+                is ResourceNetwork.Success -> {
+                    it.data?.let {
+                        TransitionManager.beginDelayedTransition(binding.mainContainer)
+                        it.replaceFirstChar { it.uppercase() }.also {
+                            binding.tvUserName.text = resources.getString(R.string.hello_user_name,it)
+                        }
+                    }
+
+                }
+                is ResourceNetwork.Error -> {
+
+                }
+            }
+        })
 
         viewModel.subjectsState.observe(viewLifecycleOwner,{
             when (it) {

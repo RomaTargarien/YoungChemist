@@ -15,4 +15,7 @@ interface AchievementsDao {
 
     @Query("SELECT * FROM achievements WHERE achievementPrimaryKey LIKE :primaryKey")
     fun getAchievementByPrimaryKey(primaryKey: Int): UserAchievement
+
+    @Query("SELECT * FROM achievements")
+    fun getAllAchievements(): List<UserAchievement>
 }

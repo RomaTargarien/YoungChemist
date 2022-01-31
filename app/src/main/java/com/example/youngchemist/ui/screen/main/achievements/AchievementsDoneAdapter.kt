@@ -7,7 +7,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.youngchemist.R
 import com.example.youngchemist.databinding.ItemDoneAchievementBinding
 import com.example.youngchemist.model.user.UserAchievement
-import com.example.youngchemist.ui.util.BitmapUtils
 import com.mikhaellopez.circularprogressbar.CircularProgressBar
 import com.squareup.picasso.Picasso
 
@@ -19,8 +18,8 @@ class AchievementsDoneAdapter() :
     private val mapBinding: MutableMap<Int, ItemDoneAchievementBinding> = mutableMapOf()
     private var previousSelectedPosition: Int? = null
 
-    private var onClick: ((Pair<String,Boolean>) -> Unit)? = null
-    fun setOnClickListener(listener: (Pair<String,Boolean>) -> Unit) {
+    private var onClick: ((Pair<String, Boolean>) -> Unit)? = null
+    fun setOnClickListener(listener: (Pair<String, Boolean>) -> Unit) {
         onClick = listener
     }
 
@@ -35,50 +34,45 @@ class AchievementsDoneAdapter() :
     inner class AchievementsViewHolder(val binding: ItemDoneAchievementBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(item: UserAchievement, position: Int) {
-            if (item.iconByteArray.isNotEmpty()) {
-                val bitmap = BitmapUtils.convertCompressedByteArrayToBitmap(item.iconByteArray)
-                binding.ivDoneAchievement.setImageBitmap(bitmap)
-            } else {
-                item.apply {
-                    Picasso.get().load(imageUrl).placeholder(R.drawable.ic_icon_happy_flask)
-                        .into(binding.ivDoneAchievement)
-                }
+            item.apply {
+                Picasso.get().load(imageUrl).placeholder(R.drawable.ic_icon_happy_flask)
+                    .into(binding.ivDoneAchievement)
             }
             binding.ivDoneAchievement.setOnClickListener {
                 clickListener(position, item)
             }
         }
 
-        private fun clickListener(position: Int,item: UserAchievement) {
+        private fun clickListener(position: Int, item: UserAchievement) {
             if (position != previousSelectedPosition && previousSelectedPosition != null) {
-                achievementTitleBehavior(item.title,true)
+                achievementTitleBehavior(item.title, true)
                 mapBinding[previousSelectedPosition]?.pbSelection?.apply {
-                    setProgressWithAnimation(0f,500)
+                    setProgressWithAnimation(0f, 500)
                     progressDirection = CircularProgressBar.ProgressDirection.TO_RIGHT
                 }
                 previousSelectedPosition = null
             }
             if (position == previousSelectedPosition) {
-                achievementTitleBehavior(item.title,false)
+                achievementTitleBehavior(item.title, false)
                 binding.pbSelection.apply {
-                    setProgressWithAnimation(0f,500)
+                    setProgressWithAnimation(0f, 500)
                     progressDirection = CircularProgressBar.ProgressDirection.TO_RIGHT
                 }
                 previousSelectedPosition = null
             } else {
                 binding.pbSelection.apply {
-                    setProgressWithAnimation(100f,500)
+                    setProgressWithAnimation(100f, 500)
                     progressDirection = CircularProgressBar.ProgressDirection.TO_LEFT
                 }
-                achievementTitleBehavior(item.title,true)
+                achievementTitleBehavior(item.title, true)
                 previousSelectedPosition = position
             }
         }
 
 
-        private fun achievementTitleBehavior(title: String,isVisible: Boolean) {
+        private fun achievementTitleBehavior(title: String, isVisible: Boolean) {
             onClick?.let { click ->
-                click(Pair(title,isVisible))
+                click(Pair(title, isVisible))
             }
         }
     }
@@ -101,7 +95,7 @@ class AchievementsDoneAdapter() :
             .forEach {
                 mapBinding.remove(it)
             }
-        holder.bind(achievements[position],position)
+        holder.bind(achievements[position], position)
     }
 
     override fun getItemCount(): Int = achievements.size

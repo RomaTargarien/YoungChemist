@@ -2,14 +2,11 @@ package com.example.youngchemist.service
 
 import android.app.Service
 import android.content.Intent
-import android.content.ServiceConnection
-import android.graphics.BitmapFactory
 import android.os.Binder
 import android.os.IBinder
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.viewModelScope
 import com.example.youngchemist.model.Achievement
 import com.example.youngchemist.model.user.Model3D
 import com.example.youngchemist.model.user.PassedUserTest
@@ -17,21 +14,18 @@ import com.example.youngchemist.model.user.UserAchievement
 import com.example.youngchemist.model.user.UserProgress
 import com.example.youngchemist.repositories.DatabaseRepository
 import com.example.youngchemist.repositories.FireStoreRepository
-import com.example.youngchemist.ui.util.BitmapUtils
 import com.example.youngchemist.ui.util.Constants
+import com.example.youngchemist.ui.util.Constants.TEST_USER
 import com.example.youngchemist.ui.util.ResourceNetwork
-import com.example.youngchemist.ui.util.safeCall
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import java.io.InputStream
-import java.net.HttpURLConnection
-import java.net.URL
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
+import kotlin.math.roundToInt
 
 @AndroidEntryPoint
-class AchievementService: Service(), CoroutineScope {
+class AchievementService : Service(), CoroutineScope {
 
     private val binder = LocalBinder()
 
@@ -58,33 +52,31 @@ class AchievementService: Service(), CoroutineScope {
     private val userAchievementsFlow: MutableStateFlow<List<UserAchievement>?> =
         MutableStateFlow(null)
 
+    private val _doneAchievementsPercentage: MutableLiveData<ResourceNetwork<Int>> =
+        MutableLiveData()
+    val doneAchievementsPercentage: LiveData<ResourceNetwork<Int>> = _doneAchievementsPercentage
+
     override fun onBind(intent: Intent): IBinder {
         observeAchivementsProgress()
-        Log.d("TAG","bind")
+        Log.d("TAG", "bind")
         return binder
     }
 
     override fun onCreate() {
         super.onCreate()
-        Log.d("TAG","service onCreate")
+        Log.d("TAG", "service onCreate")
         getAchievements()
     }
 
-    private fun saveAchievement(userAchievement: UserAchievement) {
-        launch {
-            databaseRepository.saveAchievement(userAchievement)
-        }
-    }
-
     override fun onUnbind(intent: Intent?): Boolean {
-        Log.d("TAG","unbind")
+        Log.d("TAG", "unbind")
         return super.onUnbind(intent)
 
     }
 
     override fun onDestroy() {
         coroutineJob.cancel()
-        Log.d("TAG","Service destroyed")
+        Log.d("TAG", "Service destroyed")
         super.onDestroy()
     }
 
@@ -107,7 +99,7 @@ class AchievementService: Service(), CoroutineScope {
     private fun observeAchivementsProgress() {
         launch(Dispatchers.IO) {
             val passedUserTests = databaseRepository.getAllPassedUserTests(Constants.TEST_USER)
-            val userModels = databaseRepository.getAllModelsFlow("76V1UE5VssV0W8mXenibeUpvQxm1")
+            val userModels = databaseRepository.getAllModelsFlow(TEST_USER)
             val userProgress = databaseRepository.getProgress(Constants.TEST_USER)
             combine(
                 passedUserTests,
@@ -119,7 +111,6 @@ class AchievementService: Service(), CoroutineScope {
             }.filterNot {
                 it.achievementList == null
             }.collect { resultList ->
-                Log.d("TAG","resultList")
                 val userAchievementsList = mutableListOf<UserAchievement>()
                 resultList.achievementList!!.forEach { achievement ->
                     val userAchievement = achievement.convertToUserAchievement(Constants.TEST_USER)
@@ -148,9 +139,10 @@ class AchievementService: Service(), CoroutineScope {
         }
 
         launch {
-            databaseRepository.getAchievements(Constants.TEST_USER).combine(userAchievementsFlow) { a, b ->
-                Pair(a, b)
-            }
+            databaseRepository.getAchievements(Constants.TEST_USER)
+                .combine(userAchievementsFlow) { a, b ->
+                    Pair(a, b)
+                }
                 .collect {
                     val savedAchievements = it.first
                     val newAchievements = it.second
@@ -171,10 +163,26 @@ class AchievementService: Service(), CoroutineScope {
                             }
                         }
                     }
+                    _doneAchievementsPercentage.postValue(
+                        ResourceNetwork.Success(
+                            currentAchievementsDonePercentage(
+                                unDoneAchievements.size + doneAchievements.size,
+                                doneAchievements.size
+                            )
+                        )
+                    )
                     _doneAchievements.postValue(doneAchievements)
                     _unDoneAchievements.postValue(unDoneAchievements)
                 }
         }
+    }
+
+    private fun currentAchievementsDonePercentage(all: Int, done: Int): Int {
+        var number = 0
+        if (done != 0) {
+            number = ((done.toDouble() / all.toDouble()) * 100).roundToInt()
+        }
+        return number
     }
 
     inner class ResultList(

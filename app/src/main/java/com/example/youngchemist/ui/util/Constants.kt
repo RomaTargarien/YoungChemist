@@ -7,7 +7,6 @@ object Constants {
 
 
     const val SUBJECT_DATABASE = 0
-    const val ACHIEVEMENT_DATABASE = 1
 
-    const val TEST_USER = "77Jlai0eheRSL4qLI59mE3I1zxo1"
+    const val TEST_USER = "fTj09PZ4VhULXmQMkF104UuSefn1"
 }

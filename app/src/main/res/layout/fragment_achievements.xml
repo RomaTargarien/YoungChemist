@@ -29,7 +29,7 @@
                 android:paddingRight="25dp">
 
                 <com.mikhaellopez.circularprogressbar.CircularProgressBar
-                    android:id="@+id/circularProgressBar"
+                    android:id="@+id/pb_done_achievements_percentage"
                     android:layout_width="120dp"
                     android:layout_height="120dp"
                     android:layout_marginTop="36dp"
@@ -44,14 +44,15 @@
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
-                    android:id="@+id/textView14"
+                    android:id="@+id/tv_done_achievements_percentage"
                     style="@style/TittleTextStyle"
+                    android:textSize="32sp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    app:layout_constraintBottom_toBottomOf="@+id/circularProgressBar"
-                    app:layout_constraintEnd_toEndOf="@+id/circularProgressBar"
-                    app:layout_constraintStart_toStartOf="@+id/circularProgressBar"
-                    app:layout_constraintTop_toTopOf="@+id/circularProgressBar"
+                    app:layout_constraintBottom_toBottomOf="@+id/pb_done_achievements_percentage"
+                    app:layout_constraintEnd_toEndOf="@+id/pb_done_achievements_percentage"
+                    app:layout_constraintStart_toStartOf="@+id/pb_done_achievements_percentage"
+                    app:layout_constraintTop_toTopOf="@+id/pb_done_achievements_percentage"
                     tools:text="66%" />
 
 
@@ -124,7 +125,7 @@
                     android:paddingBottom="10dp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/circularProgressBar">
+                    app:layout_constraintTop_toBottomOf="@+id/pb_done_achievements_percentage">
 
                     <ImageView
                         android:layout_width="60dp"

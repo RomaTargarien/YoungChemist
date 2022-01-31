@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
@@ -59,22 +60,22 @@ class UserFragment : Fragment() {
             toggleErrorMessageBehavior(binding.container, binding.tvErrorMessageName, it)
         })
         viewModel.buttonChangeSurnameState.observe(viewLifecycleOwner, {
-            binding.ivChangeSurname.apply {
+            binding.bnSurnameChanging.apply {
                 isEnabled = it
                 alpha = if (it) 1f else 0.5f
             }
         })
         viewModel.buttonChangeNameState.observe(viewLifecycleOwner, {
-            binding.ivChangeName.apply {
+            binding.bnNameChanging.apply {
                 isEnabled = it
                 alpha = if (it) 1f else 0.5f
             }
         })
-        binding.ivChangeSurname.setOnClickListener {
+        binding.bnSurnameChanging.setOnClickListener {
             viewModel.changeUserSurname()
             binding.etFamilyName.clearFocus()
         }
-        binding.ivChangeName.setOnClickListener {
+        binding.bnNameChanging.setOnClickListener {
             viewModel.changeUserName()
             binding.etName.clearFocus()
         }
@@ -153,7 +154,13 @@ class UserFragment : Fragment() {
     private fun setOnClickListeners() {
         binding.ivEditName.setOnClickListener {
             viewModel.currentUserFlow.value?.let {
-                toggleFocus(binding.etName, binding.ivEditName, binding.ivChangeName, it.name)
+                toggleFocus(
+                    binding.etName,
+                    binding.ivEditName,
+                    binding.bnNameChanging,
+                    it.name,
+                    binding.nameContainer
+                )
             }
         }
         binding.ivEditSurname.setOnClickListener {
@@ -161,8 +168,9 @@ class UserFragment : Fragment() {
                 toggleFocus(
                     binding.etFamilyName,
                     binding.ivEditSurname,
-                    binding.ivChangeSurname,
-                    it.surname
+                    binding.bnSurnameChanging,
+                    it.surname,
+                    binding.surnameContainer,
                 )
             }
         }
@@ -179,8 +187,9 @@ class UserFragment : Fragment() {
                     toggleFocus(
                         binding.etName,
                         binding.ivEditName,
-                        binding.ivChangeName,
+                        binding.bnNameChanging,
                         it.name,
+                        binding.nameContainer,
                         true
                     )
                 }
@@ -193,8 +202,9 @@ class UserFragment : Fragment() {
                     toggleFocus(
                         binding.etFamilyName,
                         binding.ivEditSurname,
-                        binding.ivChangeSurname,
+                        binding.bnSurnameChanging,
                         it.surname,
+                        binding.surnameContainer,
                         true
                     )
                 }
@@ -205,21 +215,24 @@ class UserFragment : Fragment() {
     private fun toggleFocus(
         editTextField: EditText,
         editImageView: ImageView,
-        changeImageView: ImageView,
+        buttonChangeInfo: Button,
         userInfo: String,
+        container: ConstraintLayout,
         clearFocus: Boolean = false
     ) {
         if (clearFocus) {
             editTextField.isEnabled = false
             editTextField.setText(userInfo)
-            changeImageView.isVisible = false
+            TransitionManager.beginDelayedTransition(container)
+            buttonChangeInfo.isVisible = false
             editImageView.isVisible = true
         } else {
             editTextField.isEnabled = true
             editTextField.setSelection(editTextField.text.length)
             editTextField.requestFocus()
             editTextField.showKeyboard()
-            changeImageView.isVisible = true
+            TransitionManager.beginDelayedTransition(container)
+            buttonChangeInfo.isVisible = true
             editImageView.isVisible = false
         }
     }

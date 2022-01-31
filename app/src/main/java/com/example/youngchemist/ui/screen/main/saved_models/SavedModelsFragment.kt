@@ -57,6 +57,7 @@ class SavedModelsFragment : Fragment() {
             when (state) {
                 is Query.Searching -> {
                     binding.tvEmptySearch.isVisible = list.isEmpty()
+                    binding.tvAmountOffModels.text = list.size.toString()
                 }
                 is Query.All -> {
                     binding.tvEmptySearch.isVisible = false

@@ -42,9 +42,9 @@
                 android:layout_height="0dp"
                 android:layout_marginTop="20dp"
                 android:layout_marginBottom="20dp"
+                android:onClick="@{view -> viewModel.getUserInfo()}"
                 android:src="@drawable/ic_icon_refresh"
                 android:visibility="gone"
-                android:onClick="@{view -> viewModel.getUserInfo()}"
                 app:layout_constraintBottom_toBottomOf="@+id/imageView5"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.653"
@@ -93,7 +93,7 @@
                     android:visibility="gone"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"/>
+                    app:layout_constraintTop_toTopOf="parent" />
 
                 <ImageView
                     android:id="@+id/iv_error_name"
@@ -114,15 +114,18 @@
                     app:layout_constraintEnd_toEndOf="@+id/et_name"
                     app:layout_constraintTop_toTopOf="parent" />
 
-                <ImageView
-                    android:id="@+id/iv_change_name"
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
-                    android:src="@drawable/ic_icon_done"
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/bn_name_changing"
+                    android:layout_width="90dp"
+                    android:layout_height="40dp"
+                    android:background="@drawable/shape_rounded_rectangle_for_edittext"
+                    android:text="Готово"
                     android:visibility="gone"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="@+id/et_name"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    app:layout_constraintEnd_toEndOf="@+id/iv_edit_name"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                </androidx.appcompat.widget.AppCompatButton>
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -152,12 +155,12 @@
                     android:id="@+id/et_family_name"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
+                    android:layout_marginEnd="40dp"
                     android:background="@null"
                     android:enabled="false"
                     android:hint="@string/family_name_hint"
                     android:onTextChanged="@{viewModel.onSurnameTextChanged}"
                     android:textColor="@color/black"
-                    android:layout_marginEnd="40dp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     tools:layout_editor_absoluteX="15dp" />
 
@@ -168,7 +171,7 @@
                     android:visibility="gone"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"/>
+                    app:layout_constraintTop_toTopOf="parent" />
 
                 <ImageView
                     android:id="@+id/iv_error_surname"
@@ -189,15 +192,18 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
-                <ImageView
-                    android:id="@+id/iv_change_surname"
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
-                    android:src="@drawable/ic_icon_done"
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/bn_surname_changing"
+                    android:layout_width="90dp"
+                    android:layout_height="40dp"
+                    android:background="@drawable/shape_rounded_rectangle_for_edittext"
+                    android:text="Готово"
                     android:visibility="gone"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    app:layout_constraintEnd_toEndOf="@+id/iv_edit_surname"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                </androidx.appcompat.widget.AppCompatButton>
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 

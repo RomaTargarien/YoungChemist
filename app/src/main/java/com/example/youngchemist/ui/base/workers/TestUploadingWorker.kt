@@ -12,7 +12,6 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
 
 @HiltWorker
 class TestUploadingWorker @AssistedInject constructor(
@@ -37,7 +36,8 @@ class TestUploadingWorker @AssistedInject constructor(
                     is ResourceNetwork.Success -> {
                         return@withContext Result.success()
                     }
-                    else -> {}
+                    else -> {
+                    }
                 }
             }
             return@withContext Result.failure()

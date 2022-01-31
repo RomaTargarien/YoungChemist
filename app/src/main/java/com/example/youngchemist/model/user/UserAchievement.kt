@@ -3,6 +3,7 @@ package com.example.youngchemist.model.user
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.example.youngchemist.model.Achievement
+import com.example.youngchemist.model.UserInfo
 
 @Entity(tableName = "achievements")
 data class UserAchievement(
@@ -12,9 +13,8 @@ data class UserAchievement(
     var imageUrl: String = "",
     var itemsDone: Int = 0,
     var itemsToDone: Int = 0,
-    var wasViewed: Boolean = false,
-    var iconByteArray: ByteArray = byteArrayOf()
-) {
+    var wasViewed: Boolean = false
+) : UserInfo {
     @PrimaryKey(autoGenerate = true)
     var achievementPrimaryKey: Int = 0
 
@@ -89,4 +89,5 @@ data class UserAchievement(
             itemsDone = 0
         }
     }
+
 }
