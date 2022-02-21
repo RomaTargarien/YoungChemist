@@ -9,22 +9,14 @@ import com.example.youngchemist.repositories.AuthRepository
 import com.example.youngchemist.ui.base.validation.ValidationImpl.LoginValidation
 import com.example.youngchemist.ui.base.validation.ValidationImpl.PasswordValidation
 import com.example.youngchemist.ui.screen.Screens
-import com.example.youngchemist.ui.util.Event
-import com.example.youngchemist.ui.util.Resource
-import com.example.youngchemist.ui.util.ResourceNetwork
-import com.example.youngchemist.ui.util.UserState
+import com.example.youngchemist.ui.util.*
 import com.github.terrakok.cicerone.Router
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.*
 import javax.inject.Inject
 
+@FlowPreview
 @HiltViewModel
 class LoginFragmnetViewModel @Inject constructor(
     private val router: Router,
@@ -34,33 +26,17 @@ class LoginFragmnetViewModel @Inject constructor(
     private val userPreferences: UserPreferences
 ) : ViewModel() {
 
+    val login = MutableStateFlow(DEFAULT_LOGIN)
+    val errorLoginBehavior = MutableStateFlow<TextInputResource<String>>(TextInputResource.ErrorInput(null))
 
-    private var loginJob: Job? = null
-    private var passwordJob: Job? = null
+    val password = MutableStateFlow(DEFAULT_PASSWORD)
+    val errorPasswordBehavior = MutableStateFlow<TextInputResource<String>>(TextInputResource.ErrorInput(null))
 
-    var loginText: String = ""
-    var passwordText: String = ""
+    val enableRegistration: StateFlow<Boolean> = combine(errorPasswordBehavior, errorLoginBehavior) { _ ->
+        isUserInformationValid()
+    }.drop(1).toStateFlow(DEFAULT_ENABLE_REGISTRATION,viewModelScope)
 
-    private val stateLogin = MutableStateFlow<Resource<String>>(Resource.Error(""))
-
-    private val statePassword = MutableStateFlow<Resource<String>>(Resource.Error(""))
-
-    private val _enterButtonEnabled: MutableLiveData<Boolean> = MutableLiveData(false)
-    val enterButtonEnabled: LiveData<Boolean> = _enterButtonEnabled
-
-    private val _errorLoginMessageBehavior: MutableLiveData<Pair<String?, Boolean>> =
-        MutableLiveData()
-
-    val errorLoginMessageBehavior: LiveData<Pair<String?, Boolean>> = _errorLoginMessageBehavior
-
-    private val _errorPasswordMessageBehavior: MutableLiveData<Pair<String?, Boolean>> =
-        MutableLiveData()
-
-    val errorPasswordMessageBehavior: LiveData<Pair<String?, Boolean>> =
-        _errorPasswordMessageBehavior
-
-    private val _isPasswordShown: MutableLiveData<Boolean> = MutableLiveData(false)
-    val isPasswordShown: LiveData<Boolean> = _isPasswordShown
+    val isPasswordShown = MutableStateFlow(DEFAULT_PASSWORD_VISIBILITY)
 
     private val _loginState: MutableLiveData<Event<ResourceNetwork<String>>> = MutableLiveData()
     val loginState: LiveData<Event<ResourceNetwork<String>>> = _loginState
@@ -68,9 +44,23 @@ class LoginFragmnetViewModel @Inject constructor(
     private val _isErrorMessageVisible: MutableLiveData<Pair<String?, Boolean>> = MutableLiveData()
     val isErrorMessageVisible: LiveData<Pair<String?, Boolean>> = _isErrorMessageVisible
 
-
     init {
-        observe()
+        viewModelScope.launch(Dispatchers.Default) { login.drop(1).onEach {
+            errorLoginBehavior.emit(TextInputResource.InputInProcess())
+        }.debounce(300).collect {
+            errorLoginBehavior.emit(loginValidation.validate(it))
+        }}
+
+        viewModelScope.launch(Dispatchers.Default) { password.drop(1).onEach {
+            errorPasswordBehavior.emit(TextInputResource.InputInProcess())
+        }.debounce(300).collect {
+            errorPasswordBehavior.emit(passwordValidation.validate(it))
+        }}
+    }
+
+    private fun isUserInformationValid(): Boolean {
+        return errorLoginBehavior.value is TextInputResource.SuccessInput
+                && errorPasswordBehavior.value is TextInputResource.SuccessInput
     }
 
     fun navigateToRegisterScreen() {
@@ -93,71 +83,14 @@ class LoginFragmnetViewModel @Inject constructor(
     fun login() {
         viewModelScope.launch {
             _loginState.postValue(Event(ResourceNetwork.Loading()))
-            val loginResult = authRepository.login(loginText, passwordText)
+            val loginResult = authRepository.login(login.value, password.value)
             _loginState.postValue(Event(loginResult))
         }
     }
 
-
-    fun onEmailTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
-        loginJob?.cancel()
-        loginText = s.toString()
-        _errorLoginMessageBehavior.postValue(Pair(null, false))
-        _enterButtonEnabled.postValue(false)
-        loginJob = viewModelScope.launch(Dispatchers.Default) {
-            flow {
-                delay(1000)
-                emit(loginValidation.validate(s.toString()))
-            }.collect {
-                stateLogin.emit(it)
-            }
-        }
-    }
-
-    fun onPasswordTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
-        passwordJob?.cancel()
-        passwordText = s.toString()
-        _errorPasswordMessageBehavior.postValue(Pair(null, false))
-        _enterButtonEnabled.postValue(false)
-        passwordJob = viewModelScope.launch(Dispatchers.Default) {
-            flow {
-                delay(1000)
-                emit(passwordValidation.validate(s.toString()))
-            }.collect {
-                statePassword.emit(it)
-            }
-        }
-    }
-
-    private fun observe() {
-        viewModelScope.launch {
-            combine(stateLogin, statePassword) { login, password ->
-                Pair(login, password)
-            }.collect { result ->
-                val loginResult = result.first
-                val passwordResult = result.second
-                if (loginResult is Resource.Success && passwordResult is Resource.Success) {
-                    _enterButtonEnabled.postValue(true)
-                } else {
-                    loginResult.message?.let {
-                        if (it.isNotEmpty()) {
-                            _errorLoginMessageBehavior.postValue(Pair(it, true))
-                        }
-                    }
-                    passwordResult.message?.let {
-                        if (it.isNotEmpty()) {
-                            _errorPasswordMessageBehavior.postValue(Pair(it, true))
-                        }
-                    }
-                    _enterButtonEnabled.postValue(false)
-                }
-            }
-        }
-    }
-
     fun togglePasswordVisibility() {
-        _isPasswordShown.value?.let {
-            _isPasswordShown.postValue(!it)
+        viewModelScope.launch {
+            isPasswordShown.emit(!isPasswordShown.value)
         }
     }
 
@@ -169,11 +102,10 @@ class LoginFragmnetViewModel @Inject constructor(
         }
     }
 
-
-    override fun onCleared() {
-        super.onCleared()
-        loginJob?.cancel()
-        passwordJob?.cancel()
+    companion object {
+        private const val DEFAULT_LOGIN = ""
+        private const val DEFAULT_PASSWORD = ""
+        private const val DEFAULT_PASSWORD_VISIBILITY = false
+        private const val DEFAULT_ENABLE_REGISTRATION = false
     }
-
 }

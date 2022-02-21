@@ -19,9 +19,53 @@
             android:id="@+id/main_container"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@drawable/main_background"
-            android:paddingLeft="30dp"
-            android:paddingRight="30dp">
+            android:background="@drawable/main_background">
+
+            <com.google.android.material.appbar.AppBarLayout
+                android:id="@+id/appBar"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <com.google.android.material.appbar.MaterialToolbar
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/violet"
+                    app:title="@string/app_name">
+
+                </com.google.android.material.appbar.MaterialToolbar>
+
+            </com.google.android.material.appbar.AppBarLayout>
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/guideline_left"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_percent="0.05" />
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/guideline_right"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_percent="0.95" />
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/guideline_bottom"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                app:layout_constraintGuide_percent="0.95" />
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/guideline_top"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                app:layout_constraintGuide_percent="0.1" />
 
             <TextView
                 android:id="@+id/tv_welcome"
@@ -29,11 +73,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/welcome"
-                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.1" />
+                app:layout_constraintTop_toTopOf="@id/guideline_top" />
 
             <TextView
                 android:id="@+id/tv_login_error_message"
@@ -42,23 +84,23 @@
                 android:layout_marginStart="10dp"
                 android:layout_marginBottom="2dp"
                 android:textColor="#F44336"
-                android:visibility="gone"
+                app:showErrorMessage="@{viewModel.errorLoginBehavior}"
+                android:alpha="0"
                 app:layout_constraintBottom_toTopOf="@+id/login_container"
-                app:layout_constraintStart_toStartOf="parent">
-
-            </TextView>
+                app:layout_constraintStart_toStartOf="@id/guideline_left" />
 
             <LinearLayout
                 android:id="@+id/login_container"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="60dp"
+                android:layout_marginTop="30dp"
                 android:background="@drawable/shape_rounded_rectangle_for_edittext"
                 android:backgroundTint="@color/white"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/tv_welcome"
-                app:layout_constraintVertical_bias="0.06">
+                app:layout_constraintBottom_toTopOf="@+id/name_container"
+                app:layout_constraintEnd_toEndOf="@id/guideline_right"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toStartOf="@id/guideline_left"
+                app:layout_constraintTop_toTopOf="@id/tv_welcome">
 
                 <EditText
                     android:id="@+id/et_login"
@@ -66,14 +108,9 @@
                     android:layout_height="match_parent"
                     android:background="@null"
                     android:hint="@string/login_hint"
-                    android:onTextChanged="@{viewModel.onLoginlTextChanged}"
-                    android:selection="@{viewModel.authResults.login.length()}"
-                    android:text="@={viewModel.authResults.login}">
-
-                </EditText>
+                    android:text="@={viewModel.login}" />
 
             </LinearLayout>
-
 
             <TextView
                 android:id="@+id/tv_name_error_message"
@@ -81,24 +118,23 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
                 android:textColor="#F44336"
-                android:visibility="gone"
+                app:showErrorMessage="@{viewModel.errorNameBehavior}"
+                android:alpha="0"
                 app:layout_constraintBottom_toTopOf="@+id/name_container"
-                app:layout_constraintStart_toStartOf="parent">
-
-            </TextView>
+                app:layout_constraintStart_toStartOf="@id/guideline_left" />
 
 
             <LinearLayout
                 android:id="@+id/name_container"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="60dp"
                 android:background="@drawable/shape_rounded_rectangle_for_edittext"
                 android:backgroundTint="@color/white"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/login_container"
-                app:layout_constraintVertical_bias="0.05">
+                app:layout_constraintBottom_toTopOf="@+id/surname_container"
+                app:layout_constraintEnd_toEndOf="@id/guideline_right"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toStartOf="@id/guideline_left"
+                app:layout_constraintTop_toBottomOf="@+id/login_container">
 
                 <EditText
                     android:id="@+id/et_name"
@@ -106,11 +142,7 @@
                     android:layout_height="match_parent"
                     android:background="@null"
                     android:hint="@string/name"
-                    android:onTextChanged="@{viewModel.onNameTextChanged}"
-                    android:selection="@{viewModel.authResults.name.length()}"
-                    android:text="@={viewModel.authResults.name}">
-
-                </EditText>
+                    android:text="@={viewModel.name}" />
 
             </LinearLayout>
 
@@ -120,22 +152,22 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
                 android:textColor="#F44336"
-                android:visibility="gone"
+                app:showErrorMessage="@{viewModel.errorSurnameBehavior}"
+                android:alpha="0"
                 app:layout_constraintBottom_toTopOf="@+id/surname_container"
-                app:layout_constraintStart_toStartOf="parent">
-
-            </TextView>
+                app:layout_constraintStart_toStartOf="@id/guideline_left" />
 
 
             <LinearLayout
                 android:id="@+id/surname_container"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="60dp"
                 android:background="@drawable/shape_rounded_rectangle_for_edittext"
                 android:backgroundTint="@color/white"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintBottom_toTopOf="@+id/password_container"
+                app:layout_constraintEnd_toEndOf="@id/guideline_right"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toStartOf="@id/guideline_left"
                 app:layout_constraintTop_toBottomOf="@+id/name_container"
                 app:layout_constraintVertical_bias="0.06">
 
@@ -145,11 +177,7 @@
                     android:layout_height="match_parent"
                     android:background="@null"
                     android:hint="@string/family_name_hint"
-                    android:onTextChanged="@{viewModel.onSurnameTextChanged}"
-                    android:selection="@{viewModel.authResults.surname.length()}"
-                    android:text="@={viewModel.authResults.surname}">
-
-                </EditText>
+                    android:text="@={viewModel.surname}" />
 
             </LinearLayout>
 
@@ -157,25 +185,23 @@
                 android:id="@+id/tv_password_error_message"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
                 android:textColor="#F44336"
-                android:visibility="gone"
+                app:showErrorMessage="@{viewModel.errorPasswordBehavior}"
+                android:alpha="0"
                 app:layout_constraintBottom_toTopOf="@+id/password_container"
-                app:layout_constraintStart_toStartOf="parent">
-
-            </TextView>
+                app:layout_constraintStart_toStartOf="@id/guideline_left"/>
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/password_container"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="60dp"
                 android:background="@drawable/shape_rounded_rectangle_for_edittext"
                 android:backgroundTint="@color/white"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/surname_container"
-                app:layout_constraintVertical_bias="0.08">
+                app:layout_constraintBottom_toTopOf="@+id/repetaed_password_container"
+                app:layout_constraintEnd_toEndOf="@id/guideline_right"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toStartOf="@id/guideline_left"
+                app:layout_constraintTop_toBottomOf="@+id/surname_container">
 
                 <EditText
                     android:id="@+id/et_password"
@@ -183,95 +209,89 @@
                     android:layout_height="match_parent"
                     android:background="@null"
                     android:hint="@string/password_hint"
-                    android:onTextChanged="@{viewModel.onPasswordlTextChanged}"
-                    android:selection="@{viewModel.authResults.password.length()}"
-                    android:text="@={viewModel.authResults.password}">
-
-                </EditText>
+                    app:setPasswordVisibility="@{viewModel.isPasswordShown()}"
+                    android:text="@={viewModel.password}" />
 
                 <ImageView
                     android:id="@+id/iv_is_password_shown"
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="8dp"
+                    app:passwordVisibility="@{viewModel.isPasswordShown()}"
                     android:onClick="@{view -> viewModel.togglePasswordVisibility()}"
                     android:src="@drawable/ic_icon_hide_password"
                     app:layout_constraintBottom_toBottomOf="@+id/password_container"
+                    app:layout_constraintDimensionRatio="1:1"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="@+id/password_container">
-
-                </ImageView>
+                    app:layout_constraintTop_toTopOf="@+id/password_container" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
-
 
 
             <TextView
                 android:id="@+id/tv_repeated_password_error_message"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
                 android:textColor="#F44336"
-                android:visibility="gone"
+                app:showErrorMessage="@{viewModel.errorRepeatedPasswordBehavior}"
+                android:alpha="0"
                 app:layout_constraintBottom_toTopOf="@+id/repetaed_password_container"
-                app:layout_constraintStart_toStartOf="parent">
-
-            </TextView>
+                app:layout_constraintStart_toStartOf="@id/guideline_left"/>
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/repetaed_password_container"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="60dp"
                 android:background="@drawable/shape_rounded_rectangle_for_edittext"
                 android:backgroundTint="@color/white"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/password_container"
-                app:layout_constraintVertical_bias="0.1">
+                app:layout_constraintBottom_toTopOf="@+id/bn_register"
+                app:layout_constraintEnd_toEndOf="@id/guideline_right"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toStartOf="@id/guideline_left"
+                app:layout_constraintTop_toBottomOf="@+id/password_container">
 
                 <EditText
                     android:id="@+id/et_repeated_password"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:background="@null"
+                    app:setPasswordVisibility="@{viewModel.isRepeatedPasswordShown()}"
                     android:hint="@string/repeated_password_hint"
-                    android:onTextChanged="@{viewModel.onRepeatedPasswordTextChanged}"
-                    android:text="@={viewModel.authResults.repeatedPassword}"
-                    android:selection="@{viewModel.authResults.repeatedPassword.length()}">
-
-                </EditText>
+                    android:text="@={viewModel.repeatedPassword}" />
 
                 <ImageView
                     android:id="@+id/iv_is_repeated_password_shown"
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="8dp"
+                    app:passwordVisibility="@{viewModel.isRepeatedPasswordShown()}"
                     android:onClick="@{view -> viewModel.toggleRepeatedPasswordVisibility()}"
                     android:src="@drawable/ic_icon_hide_password"
                     app:layout_constraintBottom_toBottomOf="@+id/repetaed_password_container"
+                    app:layout_constraintDimensionRatio="1:1"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="@+id/repetaed_password_container">
+                    app:layout_constraintTop_toTopOf="@+id/repetaed_password_container" />
 
-                </ImageView>
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
 
-
             <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/bn_register"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="60dp"
                 android:background="@drawable/shape_rounded_button"
+                app:enableButton="@{viewModel.enableRegistration}"
                 android:onClick="@{view -> viewModel.register()}"
                 android:text="@string/register"
                 android:textColor="@color/white"
                 android:textSize="16sp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/repetaed_password_container"
-                app:layout_constraintVertical_bias="0.3" />
-
+                app:layout_constraintBottom_toTopOf="@id/tv_already_have_an_account"
+                app:layout_constraintEnd_toEndOf="@id/guideline_right"
+                app:layout_constraintStart_toStartOf="@id/guideline_left"
+                app:layout_constraintTop_toBottomOf="@+id/repetaed_password_container" />
 
             <TextView
                 android:id="@+id/tv_already_have_an_account"
@@ -280,11 +300,11 @@
                 android:layout_height="wrap_content"
                 android:text="@string/already_have_an_account"
                 android:textColor="#838383"
-                android:textSize="14sp"
-                app:layout_constraintBottom_toBottomOf="parent"
+                android:layout_marginBottom="2dp"
+                android:textSize="18sp"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/bn_register" />
+                app:layout_constraintBottom_toTopOf="@+id/tv_enter"
+                app:layout_constraintStart_toStartOf="parent" />
 
             <TextView
                 android:id="@+id/tv_enter"
@@ -293,13 +313,10 @@
                 android:onClick="@{view -> viewModel.navigateToLoginScreen()}"
                 android:text="@string/enter"
                 android:textColor="#2196F3"
-                android:textSize="18sp"
-                app:layout_constraintBottom_toBottomOf="parent"
+                android:textSize="22sp"
+                app:layout_constraintBottom_toBottomOf="@id/guideline_bottom"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/tv_already_have_an_account"
-                app:layout_constraintVertical_bias="0.1" />
-
+                app:layout_constraintStart_toStartOf="parent" />
 
 
         </androidx.constraintlayout.widget.ConstraintLayout>

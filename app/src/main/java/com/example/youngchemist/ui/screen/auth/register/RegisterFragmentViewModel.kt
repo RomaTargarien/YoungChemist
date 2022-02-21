@@ -7,27 +7,21 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.youngchemist.R
 import com.example.youngchemist.db.shared_pref.UserPreferences
-import com.example.youngchemist.model.AuthResults
 import com.example.youngchemist.repositories.AuthRepository
 import com.example.youngchemist.ui.base.validation.ValidationImpl.*
 import com.example.youngchemist.ui.screen.Screens
-import com.example.youngchemist.ui.util.Event
-import com.example.youngchemist.ui.util.Resource
-import com.example.youngchemist.ui.util.ResourceNetwork
-import com.example.youngchemist.ui.util.UserState
+import com.example.youngchemist.ui.util.*
 import com.github.terrakok.cicerone.Router
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+@FlowPreview
 @HiltViewModel
 class RegisterFragmentViewModel @Inject constructor(
     private val router: Router,
@@ -40,50 +34,38 @@ class RegisterFragmentViewModel @Inject constructor(
     private val userPreferences: UserPreferences
 ) : ViewModel() {
 
-    val authResults: AuthResults
+    val name = MutableStateFlow(DEFAULT_NAME)
+    val errorNameBehavior =
+        MutableStateFlow<TextInputResource<String>>(TextInputResource.ErrorInput(null))
 
-    private var loginJob: Job? = null
-    private var nameJob: Job? = null
-    private var surnameJob: Job? = null
-    private var passwordJob: Job? = null
-    private var repeatesPasswordJob: Job? = null
+    val surname = MutableStateFlow(DEFAULT_SURNAME)
+    val errorSurnameBehavior =
+        MutableStateFlow<TextInputResource<String>>(TextInputResource.ErrorInput(null))
 
-    private val stateLogin = MutableStateFlow<Resource<String>>(Resource.Error(""))
-    private val stateName = MutableStateFlow<Resource<String>>(Resource.Error(""))
-    private val stateSurname = MutableStateFlow<Resource<String>>(Resource.Error(""))
-    private val statePassword = MutableStateFlow<Resource<String>>(Resource.Error(""))
-    private val stateRepeatedPassword = MutableStateFlow<Resource<String>>(Resource.Error(""))
+    val login = MutableStateFlow(DEFAULT_LOGIN)
+    val errorLoginBehavior =
+        MutableStateFlow<TextInputResource<String>>(TextInputResource.ErrorInput(null))
 
-    private val _errorLoginMessageBehavior: MutableLiveData<Pair<String?, Boolean>> =
-        MutableLiveData<Pair<String?, Boolean>>()
-    val errorLoginMessageBehavior: LiveData<Pair<String?, Boolean>> = _errorLoginMessageBehavior
+    val password = MutableStateFlow(DEFAULT_PASSWORD)
+    val errorPasswordBehavior =
+        MutableStateFlow<TextInputResource<String>>(TextInputResource.ErrorInput(null))
 
-    private val _errorNameMessageBehavior: MutableLiveData<Pair<String?, Boolean>> =
-        MutableLiveData<Pair<String?, Boolean>>()
-    val errorNameMessageBehavior: LiveData<Pair<String?, Boolean>> = _errorNameMessageBehavior
+    val repeatedPassword = MutableStateFlow(DEFAULT_REPEATED_PASSWORD)
+    val errorRepeatedPasswordBehavior =
+        MutableStateFlow<TextInputResource<String>>(TextInputResource.ErrorInput(null))
 
-    private val _errorSurnameMessageBehavior: MutableLiveData<Pair<String?, Boolean>> =
-        MutableLiveData<Pair<String?, Boolean>>()
-    val errorSurnameMessageBehavior: LiveData<Pair<String?, Boolean>> = _errorSurnameMessageBehavior
+    val enableRegistration: StateFlow<Boolean> = combine(
+        errorNameBehavior,
+        errorSurnameBehavior,
+        errorPasswordBehavior,
+        errorRepeatedPasswordBehavior,
+        errorLoginBehavior
+    ) { _ -> isUserInformationValid() }
+        .drop(1)
+        .toStateFlow(DEFAULT_ENABLE_REGISTRATION, viewModelScope)
 
-    private val _errorPasswordMessageBehavior: MutableLiveData<Pair<String?, Boolean>> =
-        MutableLiveData<Pair<String?, Boolean>>()
-    val errorPasswordMessageBehavior: LiveData<Pair<String?, Boolean>> =
-        _errorPasswordMessageBehavior
-
-    private val _errorRepeatedPasswordMessageBehavior: MutableLiveData<Pair<String?, Boolean>> =
-        MutableLiveData<Pair<String?, Boolean>>()
-    val errorRepeatedPasswordMessageBehavior: LiveData<Pair<String?, Boolean>> =
-        _errorRepeatedPasswordMessageBehavior
-
-    private val _registerButtonEnabled: MutableLiveData<Boolean> = MutableLiveData(false)
-    val registerButtonEnabled: LiveData<Boolean> = _registerButtonEnabled
-
-    private val _isPasswordShown: MutableLiveData<Boolean> = MutableLiveData(false)
-    val isPasswordShown: LiveData<Boolean> = _isPasswordShown
-
-    private val _isRepeatedPasswordShown: MutableLiveData<Boolean> = MutableLiveData(false)
-    val isRepeatedPasswordShown: LiveData<Boolean> = _isRepeatedPasswordShown
+    val isPasswordShown = MutableStateFlow(DEFAULT_PASSWORD_VISIBILITY)
+    val isRepeatedPasswordShown = MutableStateFlow(DEFAULT_REPEATED_PASSWORD_VISIBILITY)
 
     private val _registerState: MutableLiveData<Event<ResourceNetwork<String>>> = MutableLiveData()
     val registerState: LiveData<Event<ResourceNetwork<String>>> = _registerState
@@ -91,6 +73,61 @@ class RegisterFragmentViewModel @Inject constructor(
     private val _isErrorMessageVisible: MutableLiveData<Pair<String?, Boolean>> = MutableLiveData()
     val isErrorMessageVisible: LiveData<Pair<String?, Boolean>> = _isErrorMessageVisible
 
+    init {
+        viewModelScope.launch(Dispatchers.Default) {
+            name.drop(1).onEach {
+                errorNameBehavior.emit(TextInputResource.InputInProcess())
+            }.debounce(300).collect {
+                errorNameBehavior.emit(nameValidation.validate(it))
+            }
+        }
+
+        viewModelScope.launch(Dispatchers.Default) {
+            surname.drop(1).onEach {
+                errorSurnameBehavior.emit(TextInputResource.InputInProcess())
+            }.debounce(300).collect {
+                errorSurnameBehavior.emit(surnameValidation.validate(it))
+            }
+        }
+
+        viewModelScope.launch(Dispatchers.Default) {
+            login.drop(1).onEach {
+                errorLoginBehavior.emit(TextInputResource.InputInProcess())
+            }.debounce(300).collect {
+                errorLoginBehavior.emit(loginValidation.validate(it))
+            }
+        }
+
+        viewModelScope.launch(Dispatchers.Default) {
+            password.drop(1).onEach {
+                errorPasswordBehavior.emit(TextInputResource.InputInProcess())
+            }.debounce(300).collect {
+                errorPasswordBehavior.emit(passwordValidation.validate(it))
+            }
+        }
+    }
+
+    fun isUserInformationValid(): Boolean {
+        if (errorPasswordBehavior.value is TextInputResource.SuccessInput
+            && errorRepeatedPasswordBehavior.value is TextInputResource.SuccessInput
+        ) {
+            if (password.value != repeatedPassword.value) {
+                viewModelScope.launch {
+                    errorRepeatedPasswordBehavior.emit(
+                        TextInputResource.ErrorInput(
+                            context.getString(R.string.password_must_be_equals)
+                        )
+                    )
+                }
+                return false
+            }
+        }
+        return errorRepeatedPasswordBehavior.value is TextInputResource.SuccessInput
+                && errorNameBehavior.value is TextInputResource.SuccessInput
+                && errorSurnameBehavior.value is TextInputResource.SuccessInput
+                && errorLoginBehavior.value is TextInputResource.SuccessInput
+                && errorPasswordBehavior.value is TextInputResource.SuccessInput
+    }
 
     fun navigateToLoginScreen() {
         router.navigateTo(Screens.loginScreen())
@@ -103,7 +140,11 @@ class RegisterFragmentViewModel @Inject constructor(
     fun register() {
         viewModelScope.launch(Dispatchers.IO) {
             _registerState.postValue(Event(ResourceNetwork.Loading()))
-            val registerResult = authRepository.register(authResults)
+            val registerResult = authRepository.register(
+                login.value,
+                password.value,
+                name.value,
+                surname.value)
             _registerState.postValue(Event(registerResult))
         }
     }
@@ -113,144 +154,12 @@ class RegisterFragmentViewModel @Inject constructor(
         router.newRootScreen(Screens.mainScreen(null))
     }
 
-    init {
-        authResults = AuthResults()
-        observe()
-    }
-
-
-    fun onLoginlTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
-        loginJob?.cancel()
-        authResults.login = s.toString()
-        _errorLoginMessageBehavior.postValue(Pair(null, false))
-        _registerButtonEnabled.postValue(false)
-        loginJob = viewModelScope.launch(Dispatchers.Default) {
-            flow {
-                delay(1000)
-                emit(loginValidation.validate(s.toString()))
-            }.collect {
-                if (it is Resource.Error) {
-                    _errorLoginMessageBehavior.postValue(Pair(it.message, true))
-                }
-                stateLogin.emit(it)
-            }
-        }
-    }
-
-    fun onNameTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
-        nameJob?.cancel()
-        authResults.name = s.toString()
-        _errorNameMessageBehavior.postValue(Pair(null, false))
-        _registerButtonEnabled.postValue(false)
-        nameJob = viewModelScope.launch(Dispatchers.Default) {
-            flow {
-                delay(1000)
-                emit(nameValidation.validate(s.toString()))
-            }.collect {
-                if (it is Resource.Error) {
-                    _errorNameMessageBehavior.postValue(Pair(it.message, true))
-                }
-                stateName.emit(it)
-            }
-        }
-    }
-
-    fun onSurnameTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
-        surnameJob?.cancel()
-        authResults.surname = s.toString()
-        _errorSurnameMessageBehavior.postValue(Pair(null, false))
-        _registerButtonEnabled.postValue(false)
-        surnameJob = viewModelScope.launch(Dispatchers.Default) {
-            flow {
-                delay(1000)
-                emit(surnameValidation.validate(s.toString()))
-            }.collect {
-                if (it is Resource.Error) {
-                    _errorSurnameMessageBehavior.postValue(Pair(it.message, true))
-                }
-                stateSurname.emit(it)
-            }
-        }
-    }
-
-    fun onPasswordlTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
-        passwordJob?.cancel()
-        authResults.password = s.toString()
-        _errorPasswordMessageBehavior.postValue(Pair(null, false))
-        _registerButtonEnabled.postValue(false)
-        passwordJob = viewModelScope.launch(Dispatchers.Default) {
-            flow {
-                delay(1000)
-                emit(passwordValidation.validate(s.toString()))
-            }.collect {
-                if (it is Resource.Error) {
-                    _errorPasswordMessageBehavior.postValue(Pair(it.message, true))
-                }
-                statePassword.emit(it)
-            }
-        }
-    }
-
-    fun onRepeatedPasswordTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
-        repeatesPasswordJob?.cancel()
-        authResults.repeatedPassword = s.toString()
-        _errorRepeatedPasswordMessageBehavior.postValue(Pair(null, false))
-        _registerButtonEnabled.postValue(false)
-        repeatesPasswordJob = viewModelScope.launch(Dispatchers.Default) {
-            flow {
-                delay(1000)
-                emit(passwordValidation.validate(s.toString()))
-            }.collect {
-                if (it is Resource.Error) {
-                    _errorRepeatedPasswordMessageBehavior.postValue(Pair(it.message, true))
-                }
-                stateRepeatedPassword.emit(it)
-            }
-        }
-    }
-
-    fun observe() {
-        viewModelScope.launch {
-            combine(
-                stateLogin,
-                stateName,
-                stateSurname,
-                statePassword,
-                stateRepeatedPassword
-            ) { login, name, surname, password, repeatedPassword ->
-                AuthResults(
-                    loginValidation = login,
-                    nameValidation = name,
-                    surnameValidation = surname,
-                    passwordValidation = password,
-                    repeatedPasswordValidation = repeatedPassword
-                )
-            }.collect { result ->
-                if (result.allSuccess()) {
-                    if (!authResults.arePasswordEquals()) {
-                        _errorRepeatedPasswordMessageBehavior.postValue(
-                            Pair(context.getString(R.string.password_must_be_equals), true)
-                        )
-                    } else {
-                        _registerButtonEnabled.postValue(true)
-                    }
-                } else {
-                    _registerButtonEnabled.postValue(false)
-                }
-            }
-        }
-    }
-
     fun togglePasswordVisibility() {
-        _isPasswordShown.value?.let {
-            _isPasswordShown.postValue(!it)
-        }
+        viewModelScope.launch { isPasswordShown.emit(!isPasswordShown.value) }
     }
 
     fun toggleRepeatedPasswordVisibility() {
-        _isRepeatedPasswordShown.value?.let {
-            _isRepeatedPasswordShown.postValue(!it)
-        }
+        viewModelScope.launch { isRepeatedPasswordShown.emit(!isRepeatedPasswordShown.value) }
     }
 
     fun showError(message: String?) {
@@ -261,12 +170,14 @@ class RegisterFragmentViewModel @Inject constructor(
         }
     }
 
-    override fun onCleared() {
-        super.onCleared()
-        loginJob?.cancel()
-        surnameJob?.cancel()
-        passwordJob?.cancel()
-        repeatesPasswordJob?.cancel()
+    companion object {
+        private const val DEFAULT_LOGIN = ""
+        private const val DEFAULT_PASSWORD = ""
+        private const val DEFAULT_NAME = ""
+        private const val DEFAULT_SURNAME = ""
+        private const val DEFAULT_REPEATED_PASSWORD = ""
+        private const val DEFAULT_ENABLE_REGISTRATION = false
+        private const val DEFAULT_PASSWORD_VISIBILITY = false
+        private const val DEFAULT_REPEATED_PASSWORD_VISIBILITY = false
     }
-
 }

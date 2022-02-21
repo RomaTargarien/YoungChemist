@@ -15,7 +15,8 @@ import com.example.youngchemist.ui.screen.main.subjects.lectures.lectures_list.L
 import com.example.youngchemist.ui.screen.main.subjects.lectures.test.tests.RootTestFragment
 import com.example.youngchemist.ui.screen.main.subjects.lectures.test.result.TestResultFragment
 import com.github.terrakok.cicerone.androidx.FragmentScreen
-
+import kotlinx.coroutines.FlowPreview
+@FlowPreview
 object Screens {
 
     fun authScreen() = FragmentScreen {
@@ -61,5 +62,4 @@ object Screens {
     fun qrCodeFragmnet(result: String,lastSelectedItemPosition: Int) = FragmentScreen {
         QrCodeFragment.newInstance(result,lastSelectedItemPosition)
     }
-
 }

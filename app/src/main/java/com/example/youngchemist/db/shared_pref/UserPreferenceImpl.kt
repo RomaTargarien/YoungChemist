@@ -39,9 +39,6 @@ class UserPreferenceImpl @Inject constructor(
 
     override var userState: Int = -1
         get() = field
-        set(value) {
-            field = value
-        }
 
     override val userStateFlow: MutableStateFlow<Resource<String>?> = MutableStateFlow(null)
 

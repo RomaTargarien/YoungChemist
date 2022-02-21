@@ -3,6 +3,7 @@ package com.example.youngchemist.model.ui
 import com.example.youngchemist.model.Test
 import com.example.youngchemist.model.user.AnswerUser
 import com.example.youngchemist.model.user.PassedUserTest
+import kotlin.math.roundToInt
 
 data class TestUi(
     var userUid: String = "",
@@ -28,7 +29,7 @@ data class TestUi(
         }
         passedUserTest.answers = userAnswersList
         val del = mark / tasksUi.size
-        val roundedMark: Double = Math.round(del * 100.0) / 10.0
+        val roundedMark: Double = (del * 100.0).roundToInt() / 10.0
         passedUserTest.mark = roundedMark
         return passedUserTest
     }

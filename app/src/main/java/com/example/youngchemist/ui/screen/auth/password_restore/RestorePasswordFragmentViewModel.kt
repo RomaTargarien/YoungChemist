@@ -7,19 +7,19 @@ import androidx.lifecycle.viewModelScope
 import com.example.youngchemist.repositories.AuthRepository
 import com.example.youngchemist.ui.base.validation.ValidationImpl.LoginValidation
 import com.example.youngchemist.ui.util.Event
-import com.example.youngchemist.ui.util.Resource
 import com.example.youngchemist.ui.util.ResourceNetwork
+import com.example.youngchemist.ui.util.TextInputResource
+import com.example.youngchemist.ui.util.toStateFlow
 import com.github.terrakok.cicerone.Router
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+@FlowPreview
 @HiltViewModel
 class RestorePasswordFragmentViewModel @Inject constructor(
     private val router: Router,
@@ -27,27 +27,36 @@ class RestorePasswordFragmentViewModel @Inject constructor(
     private val authRepository: AuthRepository
 ) : ViewModel() {
 
-    var loginText = ""
+    val login = MutableStateFlow(DEFAULT_LOGIN)
+    val errorLoginBehavior =
+        MutableStateFlow<TextInputResource<String>>(TextInputResource.ErrorInput(null))
 
-    private var loginJob: Job? = null
-    private val stateLogin = MutableStateFlow<Resource<String>>(Resource.Error(""))
+    val enablePasswordChange: StateFlow<Boolean> = combine(errorLoginBehavior) {
+        isUserInformationValid()
+    }.drop(1).toStateFlow(DEFAULT_ENABLE_REGISTRATION, viewModelScope)
 
-    private val _errorLoginMessageBehavior: MutableLiveData<Pair<String?, Boolean>> =
-        MutableLiveData<Pair<String?, Boolean>>()
-    val errorLoginMessageBehavior: LiveData<Pair<String?,Boolean>> = _errorLoginMessageBehavior
-
-    private val _restorePasswordButtonEnabled: MutableLiveData<Boolean> = MutableLiveData(false)
-    val restorePasswordButtonEnabled: LiveData<Boolean> = _restorePasswordButtonEnabled
-
-    private val _restorePasswordState: MutableLiveData<Event<ResourceNetwork<String>>> = MutableLiveData()
+    private val _restorePasswordState: MutableLiveData<Event<ResourceNetwork<String>>> =
+        MutableLiveData()
     val restorePasswordState: LiveData<Event<ResourceNetwork<String>>> = _restorePasswordState
 
-    private val _isResultMessageVisible: MutableLiveData<Triple<String?,Boolean,Boolean>> = MutableLiveData()
-    val isResultMessageVisible: LiveData<Triple<String?, Boolean,Boolean>> = _isResultMessageVisible
+    private val _isResultMessageVisible: MutableLiveData<Triple<String?, Boolean, Boolean>> =
+        MutableLiveData()
+    val isResultMessageVisible: LiveData<Triple<String?, Boolean, Boolean>> =
+        _isResultMessageVisible
 
 
     init {
-        observe()
+        viewModelScope.launch(Dispatchers.Default) {
+            login.drop(1).onEach {
+                errorLoginBehavior.emit(TextInputResource.InputInProcess())
+            }.debounce(300).collect {
+                errorLoginBehavior.emit(loginValidation.validate(it))
+            }
+        }
+    }
+
+    private fun isUserInformationValid(): Boolean {
+        return errorLoginBehavior.value is TextInputResource.SuccessInput
     }
 
     fun exit() {
@@ -57,50 +66,21 @@ class RestorePasswordFragmentViewModel @Inject constructor(
     fun restorePassword() {
         viewModelScope.launch {
             _restorePasswordState.postValue(Event(ResourceNetwork.Loading()))
-            val result = authRepository.restorePassword(loginText)
+            val result = authRepository.restorePassword(login.value)
             _restorePasswordState.postValue(Event(result))
         }
     }
 
-    fun onLoginTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
-        loginText = s.toString()
-        loginJob?.cancel()
-        _restorePasswordButtonEnabled.postValue(false)
-        _errorLoginMessageBehavior.postValue(Pair(null,false))
-        loginJob = viewModelScope.launch(Dispatchers.Default) {
-            flow {
-                delay(1000)
-                emit(loginValidation.validate(s.toString()))
-            }.collect {
-                stateLogin.emit(it)
-            }
-        }
-    }
-
-    private fun observe() {
-        viewModelScope.launch {
-            stateLogin.collect {
-                if (it is Resource.Success) {
-                    _restorePasswordButtonEnabled.postValue(true)
-                } else {
-                    _restorePasswordButtonEnabled.postValue(false)
-                    _errorLoginMessageBehavior.postValue(Pair(it.message,true))
-                }
-            }
-        }
-    }
-
-    fun showResultMessage(message: String?,itIsErrorMessage: Boolean = true) {
+    fun showResultMessage(message: String?, itIsErrorMessage: Boolean = true) {
         viewModelScope.launch(Dispatchers.Default) {
-            _isResultMessageVisible.postValue(Triple(message,true,itIsErrorMessage))
+            _isResultMessageVisible.postValue(Triple(message, true, itIsErrorMessage))
             delay(3000)
-            _isResultMessageVisible.postValue(Triple(message,false,itIsErrorMessage))
+            _isResultMessageVisible.postValue(Triple(message, false, itIsErrorMessage))
         }
     }
 
-    override fun onCleared() {
-        super.onCleared()
-        loginJob?.cancel()
+    companion object {
+        private const val DEFAULT_LOGIN = ""
+        private const val DEFAULT_ENABLE_REGISTRATION = false
     }
-
 }

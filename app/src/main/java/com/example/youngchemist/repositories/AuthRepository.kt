@@ -5,7 +5,7 @@ import com.example.youngchemist.ui.util.ResourceNetwork
 
 interface AuthRepository {
 
-    suspend fun register(authResults: AuthResults): ResourceNetwork<String>
+    suspend fun register(login: String,password: String,name: String,surname: String): ResourceNetwork<String>
 
     suspend fun login(login: String, password: String): ResourceNetwork<String>
 

@@ -64,7 +64,9 @@ class UserFragmentViewModel @Inject constructor(
             _userState.postValue(ResourceNetwork.Loading())
             val result = fireStoreRepository.getUser(Constants.TEST_USER).await()
             if (result is ResourceNetwork.Success) {
-                result.data?.let { _currentUserFlow.emit(it) }
+                result.data?.let {
+                    _currentUserFlow.emit(it)
+                }
             }
             _userState.postValue(result)
         }

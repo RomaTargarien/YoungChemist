@@ -1,5 +1,6 @@
 package com.example.youngchemist.ui.screen.main.subjects
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -9,7 +10,6 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import com.example.youngchemist.db.shared_pref.UserPreferences
 import com.example.youngchemist.model.Subject
-import com.example.youngchemist.model.User
 import com.example.youngchemist.repositories.DatabaseRepository
 import com.example.youngchemist.repositories.FireStoreRepository
 import com.example.youngchemist.ui.base.workers.ImageUrlDecoderWorker
@@ -21,7 +21,10 @@ import com.example.youngchemist.ui.util.ResourceNetwork
 import com.github.terrakok.cicerone.Router
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.filterNot
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -73,6 +76,9 @@ class SubjectsFragmentViewModel @Inject constructor(
                 }
                 .filterNot { it.isEmpty() }
                 .collect {
+                    it.forEach {
+                        Log.d("TAG",it.title +" "  +  it.iconByteArray.size)
+                    }
                     _subjectsState.postValue(ResourceNetwork.Success(it))
                     decodeSubjectItemImageUrl(it)
                 }

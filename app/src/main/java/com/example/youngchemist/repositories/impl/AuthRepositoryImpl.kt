@@ -23,14 +23,14 @@ class AuthRepositoryImpl @Inject constructor(
     val users = firestore.collection("users")
 
     override suspend fun register(
-        authResults: AuthResults
+        login: String,password: String,name: String,surname: String
     ) = withContext(Dispatchers.IO) {
         safeCall {
             val result =
-                auth.createUserWithEmailAndPassword(authResults.login!!, authResults.password!!)
+                auth.createUserWithEmailAndPassword(login, password)
                     .await()
             val uid = result.user?.uid
-            val user = User(uid!!, authResults.name!!, authResults.surname!!)
+            val user = User(uid!!, name, surname)
             users.document(uid).set(user).await()
             ResourceNetwork.Success("")
         }

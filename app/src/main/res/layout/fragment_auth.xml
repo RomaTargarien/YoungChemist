@@ -16,100 +16,117 @@
         android:layout_height="match_parent"
         tools:context=".ui.screen.auth.AuthFragment">
 
-
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@drawable/main_background">
 
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/constraintLayout3"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/guideline1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_percent="0.04" />
 
-            </androidx.constraintlayout.widget.ConstraintLayout>
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/guideline2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_percent="0.96" />
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/guideline5"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                app:layout_constraintGuide_percent="0.95" />
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/constraintLayout2"
-                android:layout_width="380dp"
-                android:layout_height="400dp"
-                app:layout_constraintVertical_bias="0.17"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_marginTop="6dp"
                 android:background="@drawable/shape_rounded_rectangle_auth_screen"
-                app:layout_constraintBottom_toBottomOf="@+id/constraintLayout3"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
+                app:layout_constraintDimensionRatio="1:1"
+                app:layout_constraintEnd_toEndOf="@id/guideline2"
+                app:layout_constraintStart_toStartOf="@+id/guideline1"
+                app:layout_constraintTop_toBottomOf="@+id/appBar">
+
+                <androidx.constraintlayout.widget.Guideline
+                    android:id="@+id/guideline3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    app:layout_constraintGuide_percent="0.92" />
+
+                <androidx.constraintlayout.widget.Guideline
+                    android:id="@+id/guideline4"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    app:layout_constraintGuide_percent="0.08" />
 
                 <ImageView
-                    android:layout_width="300dp"
-                    android:layout_height="300dp"
-                    android:layout_gravity="center_horizontal"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
                     android:src="@drawable/ic_icon_flask"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent">
-
-                </ImageView>
+                    app:layout_constraintEnd_toEndOf="@id/guideline3"
+                    app:layout_constraintStart_toStartOf="@+id/guideline4"
+                    app:layout_constraintTop_toTopOf="parent" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <TextView
                 android:id="@+id/textView10"
                 style="@style/TittleTextStyle"
-                android:layout_width="250dp"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:text="@string/investigate"
                 android:textAlignment="center"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/constraintLayout2"
-                app:layout_constraintVertical_bias="0.3" />
+                android:layout_marginBottom="8dp"
+                app:layout_constraintBottom_toTopOf="@+id/textView11"
+                app:layout_constraintEnd_toEndOf="@id/guideline2"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toStartOf="@+id/guideline1" />
 
             <TextView
                 android:id="@+id/textView11"
                 style="@style/SubTitleTextStyle"
-                android:layout_width="300dp"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:text="@string/description"
                 android:textAlignment="center"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/textView10"
-                app:layout_constraintVertical_bias="0.1">
+                app:layout_constraintBottom_toTopOf="@+id/appCompatButton3"
+                app:layout_constraintEnd_toStartOf="@+id/guideline2"
+                app:layout_constraintStart_toStartOf="@+id/guideline1"
+                app:layout_constraintTop_toBottomOf="@+id/constraintLayout2"
+                app:layout_constraintVertical_bias="0.9" />
 
-            </TextView>
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/appCompatButton3"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="5dp"
+                android:background="@drawable/shape_outlined_rectangle"
+                android:onClick="@{view -> viewModel.navigateToRegisterScreen()}"
+                android:text="@string/register"
+                app:layout_constraintBottom_toBottomOf="@id/guideline5"
+                app:layout_constraintEnd_toStartOf="@+id/appCompatButton"
+                app:layout_constraintStart_toStartOf="@id/guideline1" />
 
             <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/appCompatButton"
-                android:layout_width="182dp"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:background="@drawable/shape_outlined_rectangle"
-                android:onClick="@{view -> viewModel.navigateToRegisterScreen()}"
-                android:paddingLeft="10dp"
-                android:paddingRight="10dp"
-                android:text="@string/register"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="@+id/constraintLayout2"
-                app:layout_constraintTop_toBottomOf="@+id/constraintLayout2"
-                app:layout_constraintVertical_bias="0.9">
-
-            </androidx.appcompat.widget.AppCompatButton>
-
-            <androidx.appcompat.widget.AppCompatButton
-                android:layout_width="182dp"
-                android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
                 android:background="@drawable/shape_outlined_rectangle"
                 android:onClick="@{view -> viewModel.navigateToLoginScreen()}"
                 android:text="@string/enter"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="@+id/constraintLayout2"
-                app:layout_constraintTop_toBottomOf="@+id/constraintLayout2"
-                app:layout_constraintVertical_bias="0.9">
-
-            </androidx.appcompat.widget.AppCompatButton>
+                app:layout_constraintBottom_toBottomOf="@id/guideline5"
+                app:layout_constraintEnd_toStartOf="@+id/guideline2"
+                app:layout_constraintStart_toEndOf="@+id/appCompatButton3" />
 
             <com.google.android.material.appbar.AppBarLayout
                 android:id="@+id/appBar"
@@ -121,13 +138,15 @@
 
                 <com.google.android.material.appbar.MaterialToolbar
                     android:layout_width="match_parent"
-                    app:title="@string/app_name"
+                    android:layout_height="wrap_content"
                     android:background="@color/violet"
-                    android:layout_height="wrap_content">
+                    app:title="@string/app_name">
 
                 </com.google.android.material.appbar.MaterialToolbar>
 
             </com.google.android.material.appbar.AppBarLayout>
+
+
 
 
         </androidx.constraintlayout.widget.ConstraintLayout>

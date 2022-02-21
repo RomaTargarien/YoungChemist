@@ -15,20 +15,28 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.ProgressBar
 import androidx.fragment.app.Fragment
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
+import androidx.lifecycle.viewModelScope
 import com.example.youngchemist.R
 import com.example.youngchemist.model.ui.LectureUi
 import com.example.youngchemist.model.user.UserProgress
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.stateIn
 import java.math.RoundingMode
 import java.nio.ByteBuffer
 import java.text.DecimalFormat
-
-val String.Companion.EMPTY: String get() = ""
 
 fun View.showMessage(context: Context, animTime: Long) {
     val enterAnim = AnimationUtils.loadAnimation(context, R.anim.result_message_anim_enter).apply {
         duration = animTime
     }
     this.startAnimation(enterAnim)
+}
+
+fun <T> Flow<T>.toStateFlow(initialValue: T,scope: CoroutineScope): StateFlow<T> {
+    return this.stateIn(scope, SharingStarted.Lazily, initialValue)
 }
 
 fun View.hideMessage(context: Context, animTime: Long): Animation {
@@ -74,30 +82,6 @@ fun Fragment.closeKeyBoard() {
 fun View.showKeyboard() {
     val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
     imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0)
-}
-fun View.closeKeyBoard() {
-    val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-    imm.hideSoftInputFromWindow(this.windowToken, 0)
-}
-
-fun Int.toDp(context: Context): Int = TypedValue.applyDimension(
-    TypedValue.COMPLEX_UNIT_DIP, this.toFloat(), context.resources.displayMetrics
-).toInt()
-
-fun Collection<LectureUi>.getLecturesId(): List<String> {
-    val lecturesId = mutableListOf<String>()
-    for (item in this) {
-        lecturesId.add(item.lectureId)
-    }
-    return lecturesId
-}
-
-fun Collection<UserProgress>.getLocalLecturesId(): List<String> {
-    val lecturesId = mutableListOf<String>()
-    for (item in this) {
-        lecturesId.add(item.lectureId)
-    }
-    return lecturesId
 }
 
 fun Long.evaluateTime(): String {

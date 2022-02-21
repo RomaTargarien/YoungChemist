@@ -2,7 +2,6 @@ package com.example.youngchemist.ui.screen.main.subjects.lectures.test.tests
 
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,7 +10,6 @@ import androidx.annotation.RequiresApi
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
 import com.example.youngchemist.R
 import com.example.youngchemist.databinding.FragmentRootTestBinding
 import com.example.youngchemist.model.Test
@@ -19,14 +17,8 @@ import com.example.youngchemist.ui.base.AnimationHelper
 import com.example.youngchemist.ui.screen.main.subjects.lectures.test.tests.dialogs.TestNoSaveDialogFragment
 import com.example.youngchemist.ui.screen.main.subjects.lectures.test.tests.dialogs.TestSaveDialogFragment
 import com.example.youngchemist.ui.util.FragmentAnimationBehavior
-import com.example.youngchemist.ui.util.ResourceNetwork
-import com.example.youngchemist.ui.util.TestExitBehavior
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
 
 
 @AndroidEntryPoint
