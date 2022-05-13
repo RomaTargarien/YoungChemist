@@ -7,19 +7,22 @@ import com.example.youngchemist.model.Test
 import com.example.youngchemist.model.user.UserProgress
 import com.example.youngchemist.repositories.DatabaseRepository
 import com.example.youngchemist.ui.screen.main.subjects.lectures.lecture_base.BaseLaunchTestViewModel
-import com.example.youngchemist.ui.util.Constants.TEST_USER
 import com.github.terrakok.cicerone.Router
+import com.google.firebase.auth.FirebaseUser
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+@FlowPreview
 @HiltViewModel
 class LectureFragmentViewModel @Inject constructor(
     private val router: Router,
-    private val databaseRepository: DatabaseRepository
+    private val databaseRepository: DatabaseRepository,
+    private val currentUser: FirebaseUser
 ) : BaseLaunchTestViewModel(router) {
 
     private val _isPaginationVisible: MutableLiveData<Boolean> = MutableLiveData(false)
@@ -32,7 +35,7 @@ class LectureFragmentViewModel @Inject constructor(
 
     fun getTest(test: Test) {
         viewModelScope.launch {
-            databaseRepository.getAllPassedUserTests(TEST_USER).collect {
+            databaseRepository.getAllPassedUserTests(currentUser.uid).collect {
                 _hasTheTestBeenDoneFlow.emit(
                     it.map { it.testUid }.contains(test.testId)
                 )

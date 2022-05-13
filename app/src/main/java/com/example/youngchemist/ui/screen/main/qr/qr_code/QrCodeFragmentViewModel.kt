@@ -1,6 +1,5 @@
 package com.example.youngchemist.ui.screen.main.qr.qr_code
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -9,11 +8,11 @@ import com.example.youngchemist.model.user.Model3D
 import com.example.youngchemist.repositories.DatabaseRepository
 import com.example.youngchemist.repositories.FireStoreRepository
 import com.example.youngchemist.ui.screen.Screens
-import com.example.youngchemist.ui.util.Constants.TEST_USER
 import com.example.youngchemist.ui.util.ResourceNetwork
 import com.github.terrakok.cicerone.Router
+import com.google.firebase.auth.FirebaseUser
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
@@ -23,11 +22,13 @@ import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
 
+@FlowPreview
 @HiltViewModel
 class QrCodeFragmentViewModel @Inject constructor(
     private val router: Router,
     private val fireStoreRepository: FireStoreRepository,
-    private val databaseRepository: DatabaseRepository
+    private val databaseRepository: DatabaseRepository,
+    private val currentUser: FirebaseUser
 ) : ViewModel() {
 
     private val _model3DState: MutableLiveData<ResourceNetwork<Model3D>> = MutableLiveData()
@@ -53,7 +54,7 @@ class QrCodeFragmentViewModel @Inject constructor(
                     Pair(model, save)
                 }.collect { pair ->
                     if (pair.second) {
-                        pair.first.userId = TEST_USER
+                        pair.first.userId = currentUser.uid
                         pair.first.addingDate = getCurrentTime()
                         databaseRepository.save3DModel(pair.first)
                         _wasSaved.postValue(true)
@@ -73,7 +74,7 @@ class QrCodeFragmentViewModel @Inject constructor(
     fun get3DModel(modelId: String) {
         viewModelScope.launch {
             _model3DState.postValue(ResourceNetwork.Loading())
-            val model = databaseRepository.getModel(TEST_USER,modelId)
+            val model = databaseRepository.getModel(currentUser.uid, modelId)
             if (model != null) {
                 _model3DState.postValue(ResourceNetwork.Success(model))
                 _wasSaved.postValue(true)

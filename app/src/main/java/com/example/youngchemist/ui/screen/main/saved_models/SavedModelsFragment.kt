@@ -1,8 +1,6 @@
 package com.example.youngchemist.ui.screen.main.saved_models
 
-import android.content.Intent
 import android.graphics.*
-import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -18,6 +16,7 @@ import androidx.transition.TransitionManager
 import com.example.youngchemist.R
 import com.example.youngchemist.databinding.FragmentSavedModelsBinding
 import com.example.youngchemist.model.user.Model3D
+import com.example.youngchemist.ui.base.intent_3d.Intent3DCreator
 import com.example.youngchemist.ui.custom.snack_bar.CustomSnackBar
 import com.example.youngchemist.ui.custom.snack_bar.CustomSnackBar.Companion.setOnClickListener
 import dagger.hilt.android.AndroidEntryPoint
@@ -42,7 +41,6 @@ class SavedModelsFragment : Fragment() {
         model3DAdapter = Model3DAdapter()
         binding.viewModel = viewModel
         enableSwipe()
-        viewModel.start()
         binding.rv3DModels.apply {
             layoutManager =
                 LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
@@ -50,7 +48,7 @@ class SavedModelsFragment : Fragment() {
         }
         bitmap = BitmapFactory.decodeResource(resources, R.drawable.trash)
 
-        viewModel.model3DState.observe(viewLifecycleOwner, {
+        viewModel.model3DState.observe(viewLifecycleOwner) {
             val list = it.first
             val state = it.second
             model3DAdapter.submitList(list)
@@ -60,17 +58,15 @@ class SavedModelsFragment : Fragment() {
                     binding.tvAmountOffModels.text = list.size.toString()
                 }
                 is Query.All -> {
-                    binding.tvEmptySearch.isVisible = false
+                    binding.tvEmptyList.isVisible = list.isEmpty()
                     animateTextNumberVisibility(list.size)
                 }
             }
-
-        })
-
-        model3DAdapter.setOnClickListener {
-            startActivity(createIntent(it.modelUri))
         }
 
+        model3DAdapter.setOnClickListener {
+            startActivity(Intent3DCreator.create3DIntent(it.modelUri))
+        }
     }
 
     private fun enableSwipe() {
@@ -153,18 +149,6 @@ class SavedModelsFragment : Fragment() {
         }
     }
 
-    private fun createIntent(modelUrl: String): Intent {
-        val intent = Intent(Intent.ACTION_VIEW)
-        val uri = Uri.parse(AR_URI).buildUpon()
-            .appendQueryParameter(FILE, modelUrl)
-            .appendQueryParameter(MODE, MODE_TYPE)
-            .build()
-        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-        intent.data = uri
-        intent.setPackage(PACKAGE_NAME)
-        return intent
-    }
-
     private fun undo(model3D: Model3D) {
         CustomSnackBar.make(activity?.window?.decorView?.rootView as ViewGroup,model3D.modelTitle)
             .setOnClickListener {
@@ -174,19 +158,5 @@ class SavedModelsFragment : Fragment() {
             .setAnchorView(binding.snackbarAnchor)
             .setDuration(3000)
             .show()
-    }
-
-    override fun onPause() {
-        super.onPause()
-        Log.d("TAG", "pause")
-        viewModel.cancel()
-    }
-
-    companion object {
-        private const val PACKAGE_NAME = "com.google.ar.core"
-        private const val MODE = "mode"
-        private const val MODE_TYPE = "3d_only"
-        private const val FILE = "file"
-        private const val AR_URI = "https://arvr.google.com/scene-viewer/1.0"
     }
 }

@@ -8,24 +8,27 @@ import com.example.youngchemist.repositories.AuthRepository
 import com.example.youngchemist.ui.base.workers.UserInfoDownloadingWorker
 import com.example.youngchemist.ui.base.workers.UserInfoUploadingWorker
 import com.example.youngchemist.ui.screen.Screens
-import com.example.youngchemist.ui.util.Constants.TEST_USER
 import com.example.youngchemist.ui.util.Resource
 import com.example.youngchemist.ui.util.ResourceNetwork
 import com.example.youngchemist.ui.util.UserState
 import com.github.terrakok.cicerone.Router
+import com.google.firebase.auth.FirebaseUser
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
+@FlowPreview
 @HiltViewModel
 class MainFragmentViewModel @Inject constructor(
     private val workManager: WorkManager,
     private val userSharedPreferences: UserPreferences,
     private val router: Router,
-    private val authRepository: AuthRepository
+    private val authRepository: AuthRepository,
+    private val currentUser: FirebaseUser
 ) : ViewModel() {
 
     private val _bottomSheetState: MutableLiveData<Float> = MutableLiveData()
@@ -37,18 +40,23 @@ class MainFragmentViewModel @Inject constructor(
         }
         when (userSharedPreferences.userState) {
             UserState.REGISTER -> {
-                saveUser(TEST_USER)
+                saveUser(currentUser.uid)
                 viewModelScope.launch {
                     userSharedPreferences.userStateFlow.emit(Resource.Success())
                 }
             }
             UserState.LOGIN -> {
-                if (!(TEST_USER in userSharedPreferences.loggedUsers)) {
-                    downloadUserInfo(TEST_USER)
+                if (!(currentUser.uid in userSharedPreferences.loggedUsers)) {
+                    downloadUserInfo(currentUser.uid)
                 } else {
                     viewModelScope.launch {
                         userSharedPreferences.userStateFlow.emit(Resource.Success())
                     }
+                }
+            }
+            UserState.LOGGED -> {
+                viewModelScope.launch {
+                    userSharedPreferences.userStateFlow.emit(Resource.Success())
                 }
             }
         }
@@ -59,10 +67,10 @@ class MainFragmentViewModel @Inject constructor(
             }
         }
         val constraints = Constraints.Builder()
-                .setRequiredNetworkType(NetworkType.CONNECTED)
-                .build()
+            .setRequiredNetworkType(NetworkType.CONNECTED)
+            .build()
 
-        val work = PeriodicWorkRequestBuilder<UserInfoUploadingWorker>(15, TimeUnit.MINUTES)
+        val work = PeriodicWorkRequestBuilder<UserInfoUploadingWorker>(4, TimeUnit.HOURS)
             .setConstraints(constraints)
             .build()
         workManager.enqueue(work)
@@ -80,7 +88,6 @@ class MainFragmentViewModel @Inject constructor(
         val data = Data.Builder().putString(KEY_USER_ID, userId).build()
         val workRequest =
             OneTimeWorkRequestBuilder<UserInfoDownloadingWorker>().setInputData(data).build()
-        //Log.d("TAG","ID " + workRequest.id.toString())
         workManager.enqueue(workRequest)
         viewModelScope.launch {
             workManager.getWorkInfoByIdLiveData(workRequest.id).asFlow().collect {
@@ -117,7 +124,6 @@ class MainFragmentViewModel @Inject constructor(
 
     override fun onCleared() {
         super.onCleared()
-        Log.d("TAG", "onCleared main")
     }
 
     companion object {

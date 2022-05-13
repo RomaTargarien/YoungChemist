@@ -10,7 +10,9 @@ import androidx.fragment.app.viewModels
 import com.example.youngchemist.R
 import com.example.youngchemist.databinding.FragmentAuthBinding
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.FlowPreview
 
+@FlowPreview
 @AndroidEntryPoint
 class AuthFragment : Fragment() {
 

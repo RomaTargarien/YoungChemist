@@ -1,7 +1,6 @@
 package com.example.youngchemist.ui.base.workers
 
 import android.content.Context
-import android.util.Log
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
@@ -27,10 +26,8 @@ class TestUploadingWorker @AssistedInject constructor(
             val testId = inputData.getString(KEY_TEST_ID) as String
             val testToUpload = databaseRepository.getPassedUserTest(userId, testId)
             testToUpload?.let { test ->
-                val result = fireStoreRepository.saveTest(userId, test)
-                when (result) {
+                when (fireStoreRepository.saveTest(userId, test)) {
                     is ResourceNetwork.Error -> {
-                        Log.d("TAG", result.message.toString())
                         return@withContext Result.retry()
                     }
                     is ResourceNetwork.Success -> {

@@ -56,7 +56,7 @@
                     android:layout_height="wrap_content"
                     android:background="@null"
                     android:enabled="false"
-                    android:hint="Поиск по предметам"
+                    android:hint="@string/subject_search"
                     android:paddingLeft="10dp" />
             </LinearLayout>
 

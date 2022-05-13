@@ -4,7 +4,9 @@ import androidx.lifecycle.ViewModel
 import com.example.youngchemist.model.Test
 import com.example.youngchemist.ui.screen.Screens
 import com.github.terrakok.cicerone.Router
+import kotlinx.coroutines.FlowPreview
 
+@FlowPreview
 abstract class BaseLaunchTestViewModel(
     private val router: Router
 ): ViewModel() {

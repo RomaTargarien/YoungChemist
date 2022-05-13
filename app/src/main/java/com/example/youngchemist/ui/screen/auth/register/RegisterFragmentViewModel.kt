@@ -1,6 +1,8 @@
 package com.example.youngchemist.ui.screen.auth.register
 
 import android.content.Context
+import android.content.res.Resources
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -30,8 +32,8 @@ class RegisterFragmentViewModel @Inject constructor(
     private val passwordValidation: PasswordValidation,
     private val surnameValidation: SurnameValidation,
     private val authRepository: AuthRepository,
-    @ApplicationContext private val context: Context,
-    private val userPreferences: UserPreferences
+    private val userPreferences: UserPreferences,
+    private val resources: Resources
 ) : ViewModel() {
 
     val name = MutableStateFlow(DEFAULT_NAME)
@@ -105,9 +107,17 @@ class RegisterFragmentViewModel @Inject constructor(
                 errorPasswordBehavior.emit(passwordValidation.validate(it))
             }
         }
+
+        viewModelScope.launch(Dispatchers.Default) {
+            repeatedPassword.drop(1).onEach {
+                errorRepeatedPasswordBehavior.emit(TextInputResource.InputInProcess())
+            }.debounce(300).collect {
+                errorRepeatedPasswordBehavior.emit(passwordValidation.validate(it))
+            }
+        }
     }
 
-    fun isUserInformationValid(): Boolean {
+    private fun isUserInformationValid(): Boolean {
         if (errorPasswordBehavior.value is TextInputResource.SuccessInput
             && errorRepeatedPasswordBehavior.value is TextInputResource.SuccessInput
         ) {
@@ -115,7 +125,7 @@ class RegisterFragmentViewModel @Inject constructor(
                 viewModelScope.launch {
                     errorRepeatedPasswordBehavior.emit(
                         TextInputResource.ErrorInput(
-                            context.getString(R.string.password_must_be_equals)
+                            resources.getString(R.string.password_must_be_equals)
                         )
                     )
                 }

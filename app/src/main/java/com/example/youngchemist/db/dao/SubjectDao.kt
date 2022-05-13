@@ -16,7 +16,4 @@ interface SubjectDao {
     @Query("SELECT * FROM subjects")
     fun getSubjects(): Flow<List<Subject>>
 
-    @Query("SELECT * FROM subjects WHERE subjectPrimaryKey LIKE :primaryKey")
-    fun getSubjectByPrimaryKey(primaryKey: Int): Subject
-
 }

@@ -1,6 +1,7 @@
 package com.example.youngchemist.di
 
 import android.content.Context
+import android.content.res.Resources
 import androidx.room.Room
 import androidx.work.WorkManager
 import com.example.youngchemist.db.SubjectDatabase
@@ -11,6 +12,8 @@ import com.example.youngchemist.repositories.DatabaseRepository
 import com.example.youngchemist.repositories.FireStoreRepository
 import com.example.youngchemist.repositories.impl.DatabaseRepositoryImpl
 import com.example.youngchemist.repositories.impl.FireStoreRepositoryImpl
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import dagger.Module
@@ -90,7 +93,15 @@ object MainModule {
 
     @Provides
     @Singleton
-    fun provideWorkManager(@ApplicationContext context: Context): WorkManager = WorkManager.getInstance(context)
+    fun provideWorkManager(@ApplicationContext context: Context): WorkManager =
+        WorkManager.getInstance(context)
+
+    @Provides
+    fun provideCurrentUser(): FirebaseUser = FirebaseAuth.getInstance().currentUser!!
+
+    @Provides
+    @Singleton
+    fun provideResources(@ApplicationContext context: Context): Resources = context.resources
 
 
 }

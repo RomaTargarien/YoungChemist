@@ -1,11 +1,6 @@
 package com.example.youngchemist.ui.screen.main.subjects.lectures.test.tests
 
-import android.content.Context
-import android.net.ConnectivityManager
-import android.net.NetworkCapabilities
-import android.os.Build
 import android.os.CountDownTimer
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -20,17 +15,15 @@ import com.example.youngchemist.model.ui.TaskUi
 import com.example.youngchemist.model.ui.TestUi
 import com.example.youngchemist.model.user.PassedUserTest
 import com.example.youngchemist.repositories.DatabaseRepository
-import com.example.youngchemist.repositories.FireStoreRepository
 import com.example.youngchemist.ui.base.workers.TestUploadingWorker
 import com.example.youngchemist.ui.screen.Screens
-import com.example.youngchemist.ui.util.Constants.TEST_USER
 import com.example.youngchemist.ui.util.FragmentAnimationBehavior
-import com.example.youngchemist.ui.util.ResourceNetwork
 import com.example.youngchemist.ui.util.evaluateTime
 import com.github.terrakok.cicerone.Router
+import com.google.firebase.auth.FirebaseUser
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -39,12 +32,13 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+@FlowPreview
 @HiltViewModel
 class TestFragmentViewModel @Inject constructor(
     private val router: Router,
     private val workManager: WorkManager,
-    @ApplicationContext val context: Context,
-    private val databaseRepository: DatabaseRepository
+    private val databaseRepository: DatabaseRepository,
+    private val currentUser: FirebaseUser
 ) : ViewModel() {
 
     private val _test: MutableStateFlow<Test?> = MutableStateFlow(null)
@@ -100,7 +94,7 @@ class TestFragmentViewModel @Inject constructor(
                     val test = it.first!!
                     val tasks = it.second
                     val testUi = TestUi(
-                        TEST_USER,
+                        currentUser.uid,
                         test.testId,
                         if (saveWithNoProgress) ArrayList(initializeEmptyTaskUiList(test.tasks)) else ArrayList(
                             tasks
@@ -141,7 +135,7 @@ class TestFragmentViewModel @Inject constructor(
         }
     }
 
-    fun enterTest() {
+    private fun enterTest() {
         currentPage.value?.let {
             var page = it.first
             _currentPage.postValue(Pair(++page, FragmentAnimationBehavior.Enter()))

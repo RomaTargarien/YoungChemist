@@ -12,17 +12,15 @@ class Intent3DCreator {
         private const val MODE_TYPE = "3d_only"
         private const val PACKAGE_NAME = "com.google.ar.core"
 
-        fun create3DIntent(uri: String): Intent {
-            val intentUri = Uri.parse(SCENE_VIEWER_URI)
-                .buildUpon()
-                .appendQueryParameter(FILE, uri)
-                .appendQueryParameter(MODE, MODE_TYPE)
-                .build()
-            val intent = Intent(Intent.ACTION_VIEW)
-            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-            intent.setData(intentUri)
-            intent.setPackage(PACKAGE_NAME)
-            return intent
-        }
+        fun create3DIntent(uri: String): Intent =
+            Intent(Intent.ACTION_VIEW).apply {
+                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                setPackage(PACKAGE_NAME)
+                data = Uri.parse(SCENE_VIEWER_URI)
+                    .buildUpon()
+                    .appendQueryParameter(FILE, uri)
+                    .appendQueryParameter(MODE, MODE_TYPE)
+                    .build()
+            }
     }
 }

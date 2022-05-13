@@ -13,8 +13,6 @@ interface DatabaseRepository {
     //Subjects database
     suspend fun getSubjects(): Flow<List<Subject>>
 
-    suspend fun getSubjectByPrimaryKey(primaryKey: Int): Subject
-
     suspend fun saveSubject(subject: Subject)
 
     //Lectures database

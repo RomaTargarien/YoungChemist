@@ -1,23 +1,17 @@
 package com.example.youngchemist.ui.screen
 
-import android.content.ComponentName
-import android.content.Context
-import android.content.Intent
-import android.content.ServiceConnection
-import android.os.Build
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.os.IBinder
-import android.util.Log
 import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
 import com.example.youngchemist.R
 import com.example.youngchemist.R.id.activity_container
-import com.example.youngchemist.service.AchievementService
 import com.example.youngchemist.ui.base.MainNavigator
 import com.github.terrakok.cicerone.NavigatorHolder
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.FlowPreview
 import javax.inject.Inject
 
+@FlowPreview
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
@@ -47,8 +41,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun navigationBarColor() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            window.navigationBarColor = resources.getColor(R.color.black)
-        }
+        window.navigationBarColor = resources.getColor(R.color.black)
     }
 }

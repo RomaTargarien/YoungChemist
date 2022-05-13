@@ -1,6 +1,5 @@
 package com.example.youngchemist.ui.screen.main.user
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -10,30 +9,31 @@ import com.example.youngchemist.model.User
 import com.example.youngchemist.repositories.AuthRepository
 import com.example.youngchemist.repositories.FireStoreRepository
 import com.example.youngchemist.ui.base.validation.ValidationImpl
-import com.example.youngchemist.ui.screen.Screens
 import com.example.youngchemist.ui.screen.main.user.bottom_sheet.BottomSheetViewModelBase
 import com.example.youngchemist.ui.screen.main.user.bottom_sheet.change_email.BottomSheetChangeEmailViewModel
 import com.example.youngchemist.ui.screen.main.user.bottom_sheet.change_password.BottomSheetChangePasswordViewModel
-import com.example.youngchemist.ui.util.Constants
-import com.example.youngchemist.ui.util.Resource
 import com.example.youngchemist.ui.util.ResourceNetwork
+import com.example.youngchemist.ui.util.TextInputResource
 import com.github.terrakok.cicerone.Router
+import com.google.firebase.auth.FirebaseUser
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 import javax.inject.Inject
-import kotlin.coroutines.EmptyCoroutineContext
 
 @HiltViewModel
 class UserFragmentViewModel @Inject constructor(
-    private val router: Router,
     private val userPreferences: UserPreferences,
     private val loginValidation: ValidationImpl.LoginValidation,
     private val passwordValidation: ValidationImpl.PasswordValidation,
     private val surnameValidation: ValidationImpl.SurnameValidation,
     private val nameValidation: ValidationImpl.NameValidation,
     private val authRepository: AuthRepository,
-    private val fireStoreRepository: FireStoreRepository
+    private val fireStoreRepository: FireStoreRepository,
+    private val currentUser: FirebaseUser
 ) : ViewModel() {
 
     var bottomSheetViewModel: BottomSheetViewModelBase? = null
@@ -62,7 +62,7 @@ class UserFragmentViewModel @Inject constructor(
     fun getUserInfo() {
         viewModelScope.launch {
             _userState.postValue(ResourceNetwork.Loading())
-            val result = fireStoreRepository.getUser(Constants.TEST_USER).await()
+            val result = fireStoreRepository.getUser(currentUser.uid).await()
             if (result is ResourceNetwork.Success) {
                 result.data?.let {
                     _currentUserFlow.emit(it)
@@ -85,7 +85,7 @@ class UserFragmentViewModel @Inject constructor(
             }.collect {
                 val surnamePair = it.first
                 val currentUserSurname = it.second
-                if (surnamePair.second is Resource.Success) {
+                if (surnamePair.second is TextInputResource.SuccessInput) {
                     if (surnamePair.first == currentUserSurname) {
                         _buttonChangeSurnameState.postValue(false)
                     } else {
@@ -93,7 +93,7 @@ class UserFragmentViewModel @Inject constructor(
                         _buttonChangeSurnameState.postValue(true)
                     }
                 }
-                if (surnamePair.second is Resource.Error) {
+                if (surnamePair.second is TextInputResource.ErrorInput) {
                     _errorMessageNewSurnameBehavior.postValue(surnamePair.second.message)
                 }
             }
@@ -113,7 +113,7 @@ class UserFragmentViewModel @Inject constructor(
             }.collect {
                 val namePair = it.first
                 val currentUserName = it.second
-                if (namePair.second is Resource.Success) {
+                if (namePair.second is TextInputResource.SuccessInput) {
                     if (namePair.first == currentUserName) {
                         _buttonChangeNameState.postValue(false)
                     } else {
@@ -121,7 +121,7 @@ class UserFragmentViewModel @Inject constructor(
                         _buttonChangeNameState.postValue(true)
                     }
                 }
-                if (namePair.second is Resource.Error) {
+                if (namePair.second is TextInputResource.ErrorInput) {
                     _errorMessageNewNameBehavior.postValue(namePair.second.message)
                 }
             }

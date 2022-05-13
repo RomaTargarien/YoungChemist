@@ -4,16 +4,16 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.youngchemist.model.ui.LectureUi
-import com.example.youngchemist.model.user.PassedUserTest
 import com.example.youngchemist.model.user.UserProgress
 import com.example.youngchemist.repositories.DatabaseRepository
 import com.example.youngchemist.repositories.FireStoreRepository
 import com.example.youngchemist.ui.screen.Screens
 import com.example.youngchemist.ui.screen.main.subjects.lectures.lecture_base.BaseLaunchTestViewModel
-import com.example.youngchemist.ui.util.Constants.TEST_USER
 import com.example.youngchemist.ui.util.ResourceNetwork
 import com.github.terrakok.cicerone.Router
+import com.google.firebase.auth.FirebaseUser
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNot
@@ -21,11 +21,13 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+@FlowPreview
 @HiltViewModel
 class LecturesListViewModel @Inject constructor(
     private val router: Router,
     private val fireStoreRepository: FireStoreRepository,
-    private val databaseRepository: DatabaseRepository
+    private val databaseRepository: DatabaseRepository,
+    private val currentUser: FirebaseUser
 ) : BaseLaunchTestViewModel(router) {
 
     private val _lecturesUiState: MutableLiveData<ResourceNetwork<List<LectureUi>>> =
@@ -49,8 +51,8 @@ class LecturesListViewModel @Inject constructor(
     fun getLectures(collectionId: String) {
         viewModelScope.launch {
             _lecturesUiState.postValue(ResourceNetwork.Loading())
-            val progressList = databaseRepository.getProgress(TEST_USER)
-            val passedUserTests = databaseRepository.getAllPassedUserTests(TEST_USER)
+            val progressList = databaseRepository.getProgress(currentUser.uid)
+            val passedUserTests = databaseRepository.getAllPassedUserTests(currentUser.uid)
             val lectures = databaseRepository.getLectures(collectionId)
             combine(lectures, passedUserTests, progressList) { lecture, tests, progress ->
                 Triple(lecture, tests, progress)
@@ -111,7 +113,7 @@ class LecturesListViewModel @Inject constructor(
 
     private fun initializeNewProgressProgress(lectureId: String) {
         viewModelScope.launch {
-            val userProgress = UserProgress(TEST_USER, lectureId, 0)
+            val userProgress = UserProgress(currentUser.uid, lectureId, 0)
             databaseRepository.saveProgress(userProgress)
         }
     }

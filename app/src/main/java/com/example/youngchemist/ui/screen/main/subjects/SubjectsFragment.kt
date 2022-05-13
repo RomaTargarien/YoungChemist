@@ -16,8 +16,10 @@ import com.example.youngchemist.databinding.FragmentSubjectsBinding
 import com.example.youngchemist.ui.util.Resource
 import com.example.youngchemist.ui.util.ResourceNetwork
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.FlowPreview
 
 
+@FlowPreview
 @AndroidEntryPoint
 class SubjectsFragment : Fragment() {
 
@@ -46,7 +48,7 @@ class SubjectsFragment : Fragment() {
         adapter.setOnClickListener {
             viewModel.navigateToLecturesListScreen(it)
         }
-        viewModel.userState.observe(viewLifecycleOwner,{
+        viewModel.userState.observe(viewLifecycleOwner) {
             when (it) {
                 is Resource.Loading -> {
                     binding.containerUserState.isVisible = true
@@ -66,7 +68,7 @@ class SubjectsFragment : Fragment() {
                     binding.ivUserState.setImageResource(R.drawable.success)
                 }
             }
-        })
+        }
 
         binding.tvTryAgain.setOnClickListener {
             viewModel.tryAgain()
@@ -74,7 +76,7 @@ class SubjectsFragment : Fragment() {
             binding.tvTryAgain.isVisible = false
         }
 
-        viewModel.userName.observe(viewLifecycleOwner,{
+        viewModel.userName.observe(viewLifecycleOwner) {
             when (it) {
                 is ResourceNetwork.Loading -> {
 
@@ -83,7 +85,8 @@ class SubjectsFragment : Fragment() {
                     it.data?.let {
                         TransitionManager.beginDelayedTransition(binding.mainContainer)
                         it.replaceFirstChar { it.uppercase() }.also {
-                            binding.tvUserName.text = resources.getString(R.string.hello_user_name,it)
+                            binding.tvUserName.text =
+                                resources.getString(R.string.hello_user_name, it)
                         }
                     }
 
@@ -92,9 +95,9 @@ class SubjectsFragment : Fragment() {
 
                 }
             }
-        })
+        }
 
-        viewModel.subjectsState.observe(viewLifecycleOwner,{
+        viewModel.subjectsState.observe(viewLifecycleOwner) {
             when (it) {
                 is ResourceNetwork.Loading -> {
                     binding.progressFlask.isVisible = true
@@ -111,7 +114,7 @@ class SubjectsFragment : Fragment() {
                     binding.tvTryAgain.isVisible = true
                 }
             }
-        })
+        }
     }
 
     private fun View.showKeyboard() {

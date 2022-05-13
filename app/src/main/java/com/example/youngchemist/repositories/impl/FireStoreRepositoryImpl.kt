@@ -17,7 +17,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
+import java.util.*
 import javax.inject.Inject
+import kotlin.collections.ArrayList
 
 class FireStoreRepositoryImpl @Inject constructor(
     private val firestore: FirebaseFirestore,
@@ -31,7 +33,6 @@ class FireStoreRepositoryImpl @Inject constructor(
     override suspend fun getAllSubjects() = withContext(Dispatchers.IO) {
         safeCall {
             val result = subjects.get().await()
-            Log.d("TAG", result.toString())
             val subjectsList = mutableListOf<Subject>()
             for (document in result.documents) {
                 document.toObject(Subject::class.java)?.let {
@@ -110,7 +111,7 @@ class FireStoreRepositoryImpl @Inject constructor(
 
     override suspend fun saveLecture(lecture: Lecture) = withContext(Dispatchers.IO) {
         safeCall {
-            firestore.collection("vessels").document(lecture.lectureId).set(lecture).await()
+            firestore.collection("titration").document(lecture.lectureId).set(lecture).await()
             ResourceNetwork.Success("")
         }
     }

@@ -26,11 +26,11 @@ sealed class ValidationImpl : Validation {
             if (password.isEmpty()) {
                 return TextInputResource.ErrorInput(context.getString(R.string.error_input_empty))
             }
-            if (password.length < Constants.PASSWORD_MIN_LENGHT) {
+            if (password.length < Constants.PASSWORD_MIN_LENGTH) {
                 return TextInputResource.ErrorInput(
                     context.getString(
                         R.string.error_password_too_short,
-                        Constants.PASSWORD_MIN_LENGHT
+                        Constants.PASSWORD_MIN_LENGTH
                     )
                 )
             } else {
@@ -44,11 +44,11 @@ sealed class ValidationImpl : Validation {
             if (name.isEmpty()) {
                 return TextInputResource.ErrorInput(context.getString(R.string.error_input_empty))
             }
-            if (name.length < Constants.NAME_MIN_LENGHT) {
+            if (name.length < Constants.NAME_MIN_LENGTH) {
                 return TextInputResource.ErrorInput(
                     context.getString(
                         R.string.error_name_too_short,
-                        Constants.NAME_MIN_LENGHT
+                        Constants.NAME_MIN_LENGTH
                     )
                 )
             } else {
@@ -62,11 +62,11 @@ sealed class ValidationImpl : Validation {
             if (surname.isEmpty()) {
                 return TextInputResource.ErrorInput(context.getString(R.string.error_input_empty))
             }
-            if (surname.length < Constants.SURNAME_MIN_LENGHT) {
+            if (surname.length < Constants.SURNAME_MIN_LENGTH) {
                 return TextInputResource.ErrorInput(
                     context.getString(
                         R.string.error_surname_too_short,
-                        Constants.SURNAME_MIN_LENGHT
+                        Constants.SURNAME_MIN_LENGTH
                     )
                 )
             } else {

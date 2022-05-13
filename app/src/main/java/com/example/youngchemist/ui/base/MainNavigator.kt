@@ -5,10 +5,10 @@ import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentTransaction
 import com.example.youngchemist.R
 import com.example.youngchemist.ui.screen.auth.AuthFragment
-import com.example.youngchemist.ui.screen.main.subjects.SubjectsFragment
-import com.example.youngchemist.ui.screen.main.subjects.lectures.lectures_list.LecturesListFragment
 import com.github.terrakok.cicerone.androidx.AppNavigator
+import kotlinx.coroutines.FlowPreview
 
+@FlowPreview
 class MainNavigator(activity: FragmentActivity, containerId: Int) :
     AppNavigator(activity, containerId) {
     override fun setupFragmentTransaction(
@@ -24,8 +24,6 @@ class MainNavigator(activity: FragmentActivity, containerId: Int) :
                 R.anim.nav_default_pop_enter_anim,
                 R.anim.nav_default_pop_exit_anim
             )
-
-
         }
     }
 }

@@ -7,6 +7,7 @@ import com.example.youngchemist.ui.base.validation.ValidationImpl
 import com.example.youngchemist.ui.screen.main.user.bottom_sheet.BottomSheetViewModelBase
 import com.example.youngchemist.ui.util.Resource
 import com.example.youngchemist.ui.util.ResourceNetwork
+import com.example.youngchemist.ui.util.TextInputResource
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collect
@@ -76,7 +77,7 @@ class BottomSheetChangeEmailViewModel(
                 delay(1000)
                 emit(passwordValidation.validate(s.toString()))
             }.collect {
-                if (it is Resource.Success) {
+                if (it is TextInputResource.SuccessInput) {
                     _buttonNextState.postValue(true)
                     passwordState.emit(s.toString())
                 } else {
@@ -95,7 +96,7 @@ class BottomSheetChangeEmailViewModel(
                 delay(1000)
                 emit(loginValidation.validate(s.toString()))
             }.collect {
-                if (it is Resource.Success) {
+                if (it is TextInputResource.SuccessInput) {
                     _buttonChangeState.postValue(true)
                     newEmailState.emit(s.toString())
                 } else {

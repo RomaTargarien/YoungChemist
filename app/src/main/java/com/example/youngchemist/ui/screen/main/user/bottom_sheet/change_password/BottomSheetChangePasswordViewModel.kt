@@ -1,14 +1,12 @@
 package com.example.youngchemist.ui.screen.main.user.bottom_sheet.change_password
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.youngchemist.repositories.AuthRepository
 import com.example.youngchemist.ui.base.validation.ValidationImpl
 import com.example.youngchemist.ui.screen.main.user.bottom_sheet.BottomSheetViewModelBase
-import com.example.youngchemist.ui.util.Constants.TEST_USER
-import com.example.youngchemist.ui.util.Resource
 import com.example.youngchemist.ui.util.ResourceNetwork
+import com.example.youngchemist.ui.util.TextInputResource
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collect
@@ -87,7 +85,7 @@ class BottomSheetChangePasswordViewModel(
                 delay(1000)
                 emit(passwordValidation.validate(s.toString()))
             }.collect {
-                if (it is Resource.Success) {
+                if (it is TextInputResource.SuccessInput) {
                     _buttonNextState.postValue(true)
                     oldPasswordFlow.emit(s.toString())
                 } else {
@@ -106,7 +104,7 @@ class BottomSheetChangePasswordViewModel(
                 delay(1000)
                 emit(passwordValidation.validate(s.toString()))
             }.collect {
-                if (it is Resource.Success) {
+                if (it is TextInputResource.SuccessInput) {
                     _buttonChangeState.postValue(true)
                     newPasswordFlow.emit(s.toString())
                 } else {

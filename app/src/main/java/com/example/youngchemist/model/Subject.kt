@@ -11,8 +11,7 @@ data class Subject(
     val subjectId: String = "",
     val title: String = "",
     val icon_url: String = "",
-    val collectionId: String = "",
-    var iconByteArray: ByteArray = byteArrayOf()
+    val collectionId: String = ""
 ): Parcelable {
     @PrimaryKey(autoGenerate = true)
     var subjectPrimaryKey: Int = 0

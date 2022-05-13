@@ -1,6 +1,7 @@
 package com.example.youngchemist.ui.screen.main.subjects.lectures.lecture
 
 import android.annotation.SuppressLint
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.webkit.JavascriptInterface

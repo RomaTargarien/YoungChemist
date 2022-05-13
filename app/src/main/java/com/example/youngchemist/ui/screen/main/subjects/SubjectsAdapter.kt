@@ -7,7 +7,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.youngchemist.R
 import com.example.youngchemist.databinding.ItemSubjectBinding
 import com.example.youngchemist.model.Subject
-import com.example.youngchemist.ui.util.BitmapUtils
 import com.squareup.picasso.Picasso
 
 class SubjectsAdapter : RecyclerView.Adapter<SubjectsAdapter.SubjectViewHolder>() {
@@ -49,15 +48,10 @@ class SubjectsAdapter : RecyclerView.Adapter<SubjectsAdapter.SubjectViewHolder>(
         }
 
         private fun loadImage(item: Subject) {
-            if (item.iconByteArray.isEmpty()) {
-                Picasso.get()
-                    .load(item.icon_url)
-                    .placeholder(R.drawable.ic_icon_happy_flask)
-                    .into(binding.ivSubject)
-            } else {
-                val bitmap = BitmapUtils.convertCompressedByteArrayToBitmap(item.iconByteArray)
-                binding.ivSubject.setImageBitmap(bitmap)
-            }
+            Picasso.get()
+                .load(item.icon_url)
+                .placeholder(R.drawable.ic_icon_happy_flask)
+                .into(binding.ivSubject)
         }
     }
 

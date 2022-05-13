@@ -5,7 +5,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.youngchemist.ui.screen.Screens
 import com.example.youngchemist.ui.screen.main.qr.analyzer.BaseImageAnalyzer
-import com.example.youngchemist.ui.util.EMPTY
 import com.github.terrakok.cicerone.Router
 import com.google.android.gms.tasks.Task
 import com.google.mlkit.vision.barcode.Barcode

@@ -95,13 +95,13 @@ class MainFragment : Fragment() {
                 }
             })
 
-        viewModel.bottomSheetState.observe(viewLifecycleOwner,{
-            val slideOffSet = (1 - (0.5+it/2)).toFloat()
+        viewModel.bottomSheetState.observe(viewLifecycleOwner) {
+            val slideOffSet = (1 - (0.5 + it / 2)).toFloat()
             binding.bottomNavMenu.visibility = if (it.equals(1f)) View.GONE else View.VISIBLE
             binding.fabQrCode.visibility = if (it.equals(1f)) View.GONE else View.VISIBLE
             binding.bottomAppBar.animate().alpha(slideOffSet).setDuration(0).start()
             binding.fabQrCode.animate().alpha(slideOffSet).setDuration(0).start()
-        })
+        }
 
         requireActivity().onBackPressedDispatcher.addCallback {
             viewModel.exit()
@@ -109,7 +109,7 @@ class MainFragment : Fragment() {
     }
 
     private fun showUnViewedAchievementNumber() {
-        mService?.doneAchievements?.observe(viewLifecycleOwner, {
+        mService?.doneAchievements?.observe(viewLifecycleOwner) {
             it.count {
                 !it.wasViewed
             }.also {
@@ -120,7 +120,7 @@ class MainFragment : Fragment() {
                         .apply { isVisible = true; number = it }
                 }
             }
-        })
+        }
     }
 
     private fun bindToService() {
@@ -158,7 +158,6 @@ class MainFragment : Fragment() {
 
     override fun onDestroy() {
         super.onDestroy()
-        Log.d("TAG","fragment main destroyed")
         activity?.unbindService(connection)
     }
 

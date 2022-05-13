@@ -35,10 +35,6 @@ class DatabaseRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getSubjectByPrimaryKey(primaryKey: Int) = withContext(Dispatchers.IO) {
-        subjectsDao.getSubjectByPrimaryKey(primaryKey)
-    }
-
 
     //Lectures database
     override suspend fun getLectures(collectionId: String) = withContext(Dispatchers.IO) {

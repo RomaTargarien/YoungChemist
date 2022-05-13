@@ -1,7 +1,6 @@
 package com.example.youngchemist.ui.base.workers
 
 import android.content.Context
-import android.util.Log
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
@@ -30,14 +29,13 @@ class UserInfoDownloadingWorker @AssistedInject constructor(
     override suspend fun doWork(): Result {
         return withContext(Dispatchers.IO) {
             val userId = inputData.getString(KEY_USER_ID) as String
-            val result = fireStoreRepository.getUser(userId).await()
-            when (result) {
+            when (val result = fireStoreRepository.getUser(userId).await()) {
                 is ResourceNetwork.Success -> {
                     result.data?.let {
-                        val resultTests = saveData(it.passedUserTests)
-                        val resultUserProgress = saveData(it.userProgress)
-                        val resultModels = saveData(it.saved3DModels)
-                        val resultAchievements = saveData(it.doneAchievements)
+                        val resultTests = saveDataAsync(it.passedUserTests)
+                        val resultUserProgress = saveDataAsync(it.userProgress)
+                        val resultModels = saveDataAsync(it.saved3DModels)
+                        val resultAchievements = saveDataAsync(it.doneAchievements)
                         resultTests.await()
                         resultUserProgress.await()
                         resultModels.await()
@@ -47,11 +45,9 @@ class UserInfoDownloadingWorker @AssistedInject constructor(
                     return@withContext Result.success()
                 }
                 is ResourceNetwork.Error -> {
-                    Log.d("TAG", result.message.toString())
                     return@withContext Result.retry()
                 }
-                else -> {
-                }
+                else -> {}
             }
             return@withContext Result.failure()
         }
@@ -64,7 +60,7 @@ class UserInfoDownloadingWorker @AssistedInject constructor(
         userPreferences.loggedUsers = setOfUsers
     }
 
-    private fun saveData(data: List<UserInfo>) = CoroutineScope(Dispatchers.Default).async {
+    private fun saveDataAsync(data: List<UserInfo>) = CoroutineScope(Dispatchers.Default).async {
         if (data.isNotEmpty()) {
             when (data[0]) {
                 is PassedUserTest -> {

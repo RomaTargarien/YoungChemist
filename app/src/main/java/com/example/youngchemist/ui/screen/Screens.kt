@@ -1,8 +1,8 @@
 package com.example.youngchemist.ui.screen
 
-import com.example.youngchemist.model.ui.LectureUi
 import com.example.youngchemist.model.Subject
 import com.example.youngchemist.model.Test
+import com.example.youngchemist.model.ui.LectureUi
 import com.example.youngchemist.ui.screen.auth.AuthFragment
 import com.example.youngchemist.ui.screen.auth.login.LoginFragment
 import com.example.youngchemist.ui.screen.auth.password_restore.RestorePasswordFragment
@@ -12,10 +12,11 @@ import com.example.youngchemist.ui.screen.main.qr.qr_code.QrCodeFragment
 import com.example.youngchemist.ui.screen.main.qr.scan.ScanFragment
 import com.example.youngchemist.ui.screen.main.subjects.lectures.lecture.LectureFragment
 import com.example.youngchemist.ui.screen.main.subjects.lectures.lectures_list.LecturesListFragment
-import com.example.youngchemist.ui.screen.main.subjects.lectures.test.tests.RootTestFragment
 import com.example.youngchemist.ui.screen.main.subjects.lectures.test.result.TestResultFragment
+import com.example.youngchemist.ui.screen.main.subjects.lectures.test.tests.RootTestFragment
 import com.github.terrakok.cicerone.androidx.FragmentScreen
 import kotlinx.coroutines.FlowPreview
+
 @FlowPreview
 object Screens {
 

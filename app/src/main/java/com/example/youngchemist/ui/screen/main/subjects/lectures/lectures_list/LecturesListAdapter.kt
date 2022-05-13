@@ -1,41 +1,24 @@
 package com.example.youngchemist.ui.screen.main.subjects.lectures.lectures_list
 
-import android.animation.AnimatorSet
-import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
-import android.content.Context
-import android.util.Log
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AnimationUtils
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.youngchemist.R
-import com.example.youngchemist.databinding.ItemAnswerBinding
 import com.example.youngchemist.databinding.ItemLectureInListBinding
 import com.example.youngchemist.model.Test
 import com.example.youngchemist.model.ui.LectureUi
 import com.example.youngchemist.model.user.UserProgress
+import com.example.youngchemist.ui.util.animateProgress
 import kotlin.math.roundToInt
-import android.os.VibrationEffect
-
-import android.os.Build
-
-import androidx.core.content.ContextCompat.getSystemService
-
-import android.os.Vibrator
-import androidx.core.content.ContextCompat
-import com.example.youngchemist.ui.util.*
 
 
 class LecturesListAdapter : RecyclerView.Adapter<LecturesListAdapter.LectureViewHolder>() {
 
     private val lectures: MutableList<LectureUi> = mutableListOf()
-
-    private val mapBinding: MutableMap<Int, ItemLectureInListBinding> = mutableMapOf()
-    private var previousSelectedPosition: Int? = null
 
     fun submitList(lecturesList: List<LectureUi>) {
         val result: DiffUtil.DiffResult = DiffUtil.calculateDiff(DiffCallback(lectures, lecturesList))
@@ -59,7 +42,7 @@ class LecturesListAdapter : RecyclerView.Adapter<LecturesListAdapter.LectureView
             item.userProgress?.let {
                 toggleUserProgressState(it,item)
             }
-            setOnClickListeners(item,position)
+            setOnClickListeners(item)
         }
 
         private fun toggleTestState(isTestEnabled: Boolean) {
@@ -72,33 +55,25 @@ class LecturesListAdapter : RecyclerView.Adapter<LecturesListAdapter.LectureView
         }
 
         private fun toggleUserProgressState(userProgress: UserProgress,lectureUi: LectureUi) {
-            if (userProgress.isLectureEnabled) {
-                binding.ivLectureAvailable.setImageResource(R.drawable.success)
-                val to = ((userProgress.lastReadenPage.toFloat() / lectureUi.data.size.toFloat()) * 100).toInt()
-                binding.pbLecture.animateProgress(0,to)
-                val animator = ValueAnimator.ofFloat(0.0f, lectureUi.mark.toFloat())
-                animator.duration = 2000
-                animator.addUpdateListener(object : ValueAnimator.AnimatorUpdateListener {
-                    override fun onAnimationUpdate(p0: ValueAnimator?) {
-                        val number = (p0?.animatedValue as Float).toDouble()
-                        val roundedNumber: Double = (number * 10.0).roundToInt() / 10.0
-                        binding.tvTestMark.text = roundedNumber.toString()
-                    }
-                })
-                animator.start()
-            }
+            val to = ((userProgress.lastReadenPage.toFloat() / lectureUi.data.size.toFloat()) * 100).toInt()
+            binding.pbLecture.animateProgress(0,to)
+            val animator = ValueAnimator.ofFloat(0.0f, lectureUi.mark.toFloat())
+            animator.duration = 2000
+            animator.addUpdateListener(object : ValueAnimator.AnimatorUpdateListener {
+                override fun onAnimationUpdate(p0: ValueAnimator?) {
+                    val number = (p0?.animatedValue as Float).toDouble()
+                    val roundedNumber: Double = (number * 10.0).roundToInt() / 10.0
+                    binding.tvTestMark.text = roundedNumber.toString()
+                }
+            })
+            animator.start()
         }
 
-        private fun setOnClickListeners(lectureUi: LectureUi,position: Int) {
+        private fun setOnClickListeners(lectureUi: LectureUi) {
             binding.cvLecture.setOnClickListener {
                 lectureUi.userProgress?.let {
-                    if (it.isLectureEnabled) {
-                        onClick?.let { click ->
-                            click(lectureUi)
-                        }
-                    } else {
-                        Vibration.makeSmallVibration(itemView.context)
-                        binding.ivLectureAvailable.bounce().start()
+                    onClick?.let { click ->
+                        click(lectureUi)
                     }
                 }
             }
@@ -110,35 +85,6 @@ class LecturesListAdapter : RecyclerView.Adapter<LecturesListAdapter.LectureView
                             lectureUi.test?.let { click(it) }
                         }
                     }
-                }
-            }
-            binding.ivLecture.setOnClickListener {
-                lectureUi.userProgress?.let {
-                    if (!it.isLectureEnabled) {
-                        if (position != previousSelectedPosition && previousSelectedPosition != null) {
-                            mapBinding[previousSelectedPosition]?.clMain?.transitionToState(R.id.start)
-                            previousSelectedPosition = null
-                        }
-                        if (position == previousSelectedPosition) {
-                            binding.clMain.transitionToState(R.id.start)
-                            previousSelectedPosition = null
-                        } else {
-                            binding.clMain.transitionToState(R.id.end)
-                            previousSelectedPosition = position
-                        }
-                    }
-                }
-            }
-
-            binding.ivEnterKey.setOnClickListener {
-                if (binding.etKey.text.toString() == lectureUi.lectureKeyWord) {
-                    onLectureIsUnlockedClicked?.let { click ->
-                        lectureUi.userProgress?.isLectureEnabled = true
-                        click(lectureUi)
-                    }
-                } else {
-                    Vibration.makeSmallVibration(itemView.context)
-                    binding.ivEnterKey.bounce().start()
                 }
             }
         }
@@ -155,13 +101,6 @@ class LecturesListAdapter : RecyclerView.Adapter<LecturesListAdapter.LectureView
     }
 
     override fun onBindViewHolder(holder: LectureViewHolder, position: Int) {
-        mapBinding[position] = holder.binding
-        mapBinding.filterValues { it == holder.binding }.keys
-            .toList()
-            .filter { it != position }
-            .forEach {
-                mapBinding.remove(it)
-            }
         holder.bind(lectures[position],position)
         val animation = AnimationUtils.loadAnimation(holder.itemView.context, R.anim.alpha_anim)
         holder.binding.clMain.startAnimation(animation)
@@ -177,11 +116,6 @@ class LecturesListAdapter : RecyclerView.Adapter<LecturesListAdapter.LectureView
     private var onClick: ((LectureUi) -> Unit)? = null
     fun setOnClickListener(listener: (LectureUi) -> Unit) {
         onClick = listener
-    }
-
-    private var onLectureIsUnlockedClicked: ((LectureUi)-> Unit)? = null
-    fun setOnLectureIsUnlockedListener(listener: (LectureUi) -> Unit) {
-        onLectureIsUnlockedClicked = listener
     }
 
     inner class DiffCallback(private val oldList: List<LectureUi>, private val newList: List<LectureUi>) :
