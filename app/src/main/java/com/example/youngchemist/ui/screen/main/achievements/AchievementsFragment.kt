@@ -1,12 +1,7 @@
 package com.example.youngchemist.ui.screen.main.achievements
 
 import android.animation.ValueAnimator
-import android.content.ComponentName
-import android.content.Context
-import android.content.Intent
-import android.content.ServiceConnection
 import android.os.Bundle
-import android.os.IBinder
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,16 +10,18 @@ import android.view.animation.Animation
 import android.widget.TextView
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.transition.TransitionManager
 import com.example.youngchemist.databinding.FragmentAchievementsBinding
-import com.example.youngchemist.service.AchievementService
+import com.example.youngchemist.ui.screen.main.MainFragmentViewModel
 import com.example.youngchemist.ui.screen.main.subjects.lectures.lectures_list.VerticalItemVerticalDecoration
 import com.example.youngchemist.ui.util.ResourceNetwork
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.filterNotNull
@@ -32,26 +29,15 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 
+@FlowPreview
 @AndroidEntryPoint
 class AchievementsFragment : Fragment() {
 
     private val viewModel: AchievementsFragmentViewModel by viewModels()
-
+    private val mainViewModel: MainFragmentViewModel by activityViewModels()
     private lateinit var achievementsUnDoneAdapter: AchievementsUnDoneAdapter
     private lateinit var achievementsDoneAdapter: AchievementsDoneAdapter
     private val achivementNumberFlow: MutableStateFlow<Int?> = MutableStateFlow(null)
-
-    private var mService: AchievementService? = null
-    private val connection = object : ServiceConnection {
-
-        override fun onServiceConnected(className: ComponentName, service: IBinder) {
-            val binder = service as AchievementService.LocalBinder
-            mService = binder.getService()
-            observeAchievements()
-        }
-
-        override fun onServiceDisconnected(arg0: ComponentName) {}
-    }
 
     private lateinit var binding: FragmentAchievementsBinding
     override fun onCreateView(
@@ -65,28 +51,22 @@ class AchievementsFragment : Fragment() {
         binding.viewModel = viewModel
         achievementsUnDoneAdapter = AchievementsUnDoneAdapter()
         achievementsDoneAdapter = AchievementsDoneAdapter()
-        bindToService()
         initializeRecyclers()
-        if (mService == null) {
-            bindToService()
-        } else {
-            observeAchievements()
-        }
-
+        observeAchievements()
         achievementsDoneAdapter.setOnClickListener {
             TransitionManager.beginDelayedTransition(binding.doneAchievementsContainer)
             binding.tvDoneAchievementTitle.text = if (it.second) it.first else "Выберите достижение"
             binding.tvDoneAchievementTitle.alpha = if (it.second) 1f else 0.5f
         }
-        viewModel.doneTestsCount.observe(viewLifecycleOwner, {
+        viewModel.doneTestsCount.observe(viewLifecycleOwner) {
             animateNumber(it, binding.tvPassedTestsCount)
-        })
-        viewModel.savedModelsCount.observe(viewLifecycleOwner, {
+        }
+        viewModel.savedModelsCount.observe(viewLifecycleOwner) {
             animateNumber(it, binding.tvSavedModelsCount)
-        })
-        viewModel.readenLecturesCount.observe(viewLifecycleOwner, {
+        }
+        viewModel.readenLecturesCount.observe(viewLifecycleOwner) {
             animateNumber(it, binding.tvReadenLecturesCount)
-        })
+        }
     }
 
     private fun animateNumber(count: Int, textView: TextView) {
@@ -108,17 +88,11 @@ class AchievementsFragment : Fragment() {
         }
     }
 
-    private fun bindToService() {
-        Intent(requireContext(), AchievementService::class.java).also { intent ->
-            activity?.bindService(intent, connection, Context.BIND_AUTO_CREATE)
-        }
-    }
-
     private fun observeAchievements() {
-        mService?.unDoneAchievements?.observe(viewLifecycleOwner, {
+        mainViewModel.unDoneAchievements.observe(viewLifecycleOwner) {
             achievementsUnDoneAdapter.submitList(it)
-        })
-        mService?.doneAchievements?.observe(viewLifecycleOwner, {
+        }
+        mainViewModel.doneAchievements.observe(viewLifecycleOwner) {
             achievementsDoneAdapter.submitList(it)
             lifecycleScope.launch {
                 achivementNumberFlow.emit(it.count { !it.wasViewed })
@@ -128,9 +102,9 @@ class AchievementsFragment : Fragment() {
                     viewModel.achievementWasViewed(it)
                 }
             }
-        })
+        }
 
-        mService?.doneAchievementsPercentage?.observe(viewLifecycleOwner, {
+        mainViewModel.doneAchievementsPercentage.observe(viewLifecycleOwner) {
             when (it) {
                 is ResourceNetwork.Loading -> {
 
@@ -145,7 +119,7 @@ class AchievementsFragment : Fragment() {
                     }
                 }
             }
-        })
+        }
     }
 
     override fun onResume() {

@@ -1,27 +1,22 @@
 package com.example.youngchemist.ui.screen.main.subjects.lectures.lectures_list
 
-import android.content.ComponentName
-import android.content.Context
-import android.content.Intent
-import android.content.ServiceConnection
 import android.os.Bundle
-import android.os.IBinder
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.addCallback
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.youngchemist.R
 import com.example.youngchemist.databinding.FragmentLecturesListBinding
 import com.example.youngchemist.model.Subject
 import com.example.youngchemist.model.Test
-import com.example.youngchemist.service.AchievementService
+import com.example.youngchemist.ui.screen.main.MainFragmentViewModel
 import com.example.youngchemist.ui.screen.main.subjects.lectures.lecture_base.StartTestDialogFragment
 import com.example.youngchemist.ui.util.ResourceNetwork
-import com.example.youngchemist.ui.util.closeKeyBoard
 import com.squareup.picasso.Picasso
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.FlowPreview
@@ -33,19 +28,8 @@ class LecturesListFragment : Fragment() {
 
     private lateinit var binding: FragmentLecturesListBinding
     private val viewModel: LecturesListViewModel by viewModels()
+    private val mainViewModel: MainFragmentViewModel by activityViewModels()
     private var subject: Subject? = null
-    private var mService: AchievementService? = null
-    private val connection = object : ServiceConnection {
-
-        override fun onServiceConnected(className: ComponentName, service: IBinder) {
-            val binder = service as AchievementService.LocalBinder
-            mService = binder.getService()
-            showUnViewedAchievementNumber()
-        }
-
-        override fun onServiceDisconnected(arg0: ComponentName) {}
-    }
-
     private lateinit var lecturesListAdapter: LecturesListAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -70,8 +54,8 @@ class LecturesListFragment : Fragment() {
         }
         initializeRecyclerView()
         setOnClickListeners()
-        checkServiceConnection()
         observeUserProgressCounts()
+        showUnViewedAchievementNumber()
         viewModel.lecturesUiState.observe(viewLifecycleOwner) {
             when (it) {
                 is ResourceNetwork.Success -> {
@@ -96,14 +80,6 @@ class LecturesListFragment : Fragment() {
     private fun showStartTestDialogFragment(test: Test) {
         val startTestDialogFragment = StartTestDialogFragment(viewModel,test)
         startTestDialogFragment.show(requireActivity().supportFragmentManager, "dialog")
-    }
-
-    private fun checkServiceConnection() {
-        if (mService == null) {
-            bindToService()
-        } else {
-            showUnViewedAchievementNumber()
-        }
     }
 
     private fun initializeRecyclerView() {
@@ -149,7 +125,7 @@ class LecturesListFragment : Fragment() {
     }
 
     private fun showUnViewedAchievementNumber() {
-        mService?.doneAchievements?.observe(viewLifecycleOwner) {
+        mainViewModel.doneAchievements.observe(viewLifecycleOwner) {
             it.count {
                 !it.wasViewed
             }.also {
@@ -161,12 +137,6 @@ class LecturesListFragment : Fragment() {
                     }
                 }
             }
-        }
-    }
-
-    private fun bindToService() {
-        Intent(requireContext(), AchievementService::class.java).also { intent ->
-            activity?.bindService(intent, connection, Context.BIND_AUTO_CREATE)
         }
     }
 

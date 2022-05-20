@@ -18,10 +18,6 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.YoungChemist">
-        <service
-            android:name=".service.AchievementService"
-            android:enabled="true"
-            android:exported="true"/>
 
         <activity
             android:name=".ui.screen.MainActivity"

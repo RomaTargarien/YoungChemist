@@ -74,7 +74,7 @@ dependencies {
     //Worker
     implementation "com.google.dagger:hilt-android:2.38.1"
     implementation "androidx.hilt:hilt-work:1.0.0"
-    implementation "androidx.work:work-runtime-ktx:2.6.0"
+    implementation "androidx.work:work-runtime-ktx:2.7.1"
 
     //Lifecycles
     implementation "androidx.lifecycle:lifecycle-extensions:2.2.0"

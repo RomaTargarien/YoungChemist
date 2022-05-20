@@ -1,54 +1,34 @@
 package com.example.youngchemist.ui.screen.main
 
-import android.content.ComponentName
-import android.content.Context
-import android.content.Intent
-import android.content.ServiceConnection
 import android.os.Bundle
-import android.os.IBinder
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.addCallback
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.transition.TransitionManager
 import com.example.youngchemist.R
 import com.example.youngchemist.databinding.FragmentMainBinding
-import com.example.youngchemist.service.AchievementService
 import com.example.youngchemist.ui.screen.main.achievements.AchievementsFragment
 import com.example.youngchemist.ui.screen.main.saved_models.SavedModelsFragment
 import com.example.youngchemist.ui.screen.main.subjects.SubjectsFragment
 import com.example.youngchemist.ui.screen.main.user.UserFragment
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.FlowPreview
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEventListener
 
 
+@FlowPreview
 @AndroidEntryPoint
 class MainFragment : Fragment() {
 
     private lateinit var binding: FragmentMainBinding
-    private val viewModel: MainFragmentViewModel by viewModels()
+    private val viewModel: MainFragmentViewModel by activityViewModels()
     private var lastSelectedItem: Int? = null
-    private var mService: AchievementService? = null
-    private var mBound: Boolean = false
-
-    private val connection = object : ServiceConnection {
-
-        override fun onServiceConnected(className: ComponentName, service: IBinder) {
-            val binder = service as AchievementService.LocalBinder
-            mService = binder.getService()
-            showUnViewedAchievementNumber()
-            mBound = true
-        }
-
-        override fun onServiceDisconnected(arg0: ComponentName) {
-            mBound = false
-        }
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -59,6 +39,8 @@ class MainFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.viewModel = viewModel
+        viewModel.updateAchievements()
+        showUnViewedAchievementNumber()
         binding.bottomNavMenu.background = null
         binding.bottomNavMenu.menu.getItem(2).isEnabled = false
         binding.bottomNavMenu.setOnItemSelectedListener { menuItem ->
@@ -81,12 +63,6 @@ class MainFragment : Fragment() {
         binding.fabQrCode.setOnClickListener {
             viewModel.navigateToScanFragemnt(lastSelectedItem ?: R.id.subjects)
         }
-        if (mService == null) {
-            bindToService()
-        } else {
-            showUnViewedAchievementNumber()
-        }
-        bindToService()
         KeyboardVisibilityEvent.setEventListener(
             requireActivity(),
             object : KeyboardVisibilityEventListener {
@@ -109,7 +85,7 @@ class MainFragment : Fragment() {
     }
 
     private fun showUnViewedAchievementNumber() {
-        mService?.doneAchievements?.observe(viewLifecycleOwner) {
+        viewModel.doneAchievements.observe(viewLifecycleOwner) {
             it.count {
                 !it.wasViewed
             }.also {
@@ -120,12 +96,6 @@ class MainFragment : Fragment() {
                         .apply { isVisible = true; number = it }
                 }
             }
-        }
-    }
-
-    private fun bindToService() {
-        Intent(requireContext(), AchievementService::class.java).also { intent ->
-            activity?.bindService(intent, connection, Context.BIND_AUTO_CREATE)
         }
     }
 
@@ -154,11 +124,6 @@ class MainFragment : Fragment() {
             R.anim.nav_default_pop_enter_anim,
             R.anim.nav_default_pop_exit_anim
         ).replace(R.id.tab_content, fragment).commit()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        activity?.unbindService(connection)
     }
 
     companion object {
