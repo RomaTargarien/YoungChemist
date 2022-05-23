@@ -7,7 +7,7 @@
 
         <variable
             name="viewModel"
-            type="com.example.youngchemist.ui.screen.main.subjects.lectures.lectures_list.LecturesListViewModel" />
+            type="com.chemist.youngchemist.ui.screen.main.subjects.lectures.lectures_list.LecturesListViewModel" />
 
     </data>
 

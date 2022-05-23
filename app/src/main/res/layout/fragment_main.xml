@@ -6,7 +6,7 @@
     <data>
         <variable
             name="viewModel"
-            type="com.example.youngchemist.ui.screen.main.MainFragmentViewModel" />
+            type="com.chemist.youngchemist.ui.screen.main.MainFragmentViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

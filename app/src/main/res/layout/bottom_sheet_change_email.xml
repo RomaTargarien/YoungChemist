@@ -9,7 +9,7 @@
             type="int" />
         <variable
             name="viewModel"
-            type="com.example.youngchemist.ui.screen.main.user.bottom_sheet.change_email.BottomSheetChangeEmailViewModel" />
+            type="com.chemist.youngchemist.ui.screen.main.user.bottom_sheet.change_email.BottomSheetChangeEmailViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

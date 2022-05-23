@@ -7,7 +7,7 @@
 
         <variable
             name="viewModel"
-            type="com.example.youngchemist.ui.screen.auth.AuthFragmentViewModel" />
+            type="com.chemist.youngchemist.ui.screen.auth.AuthFragmentViewModel" />
 
     </data>
 
@@ -145,8 +145,6 @@
                 </com.google.android.material.appbar.MaterialToolbar>
 
             </com.google.android.material.appbar.AppBarLayout>
-
-
 
 
         </androidx.constraintlayout.widget.ConstraintLayout>

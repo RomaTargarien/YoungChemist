@@ -7,7 +7,7 @@
 
         <variable
             name="viewModel"
-            type="com.example.youngchemist.ui.screen.main.user.UserFragmentViewModel" />
+            type="com.chemist.youngchemist.ui.screen.main.user.UserFragmentViewModel" />
 
     </data>
 

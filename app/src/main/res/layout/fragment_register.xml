@@ -7,7 +7,7 @@
 
         <variable
             name="viewModel"
-            type="com.example.youngchemist.ui.screen.auth.register.RegisterFragmentViewModel" />
+            type="com.chemist.youngchemist.ui.screen.auth.register.RegisterFragmentViewModel" />
     </data>
 
     <FrameLayout

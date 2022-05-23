@@ -6,7 +6,7 @@
     <data>
         <variable
             name="viewModel"
-            type="com.example.youngchemist.ui.screen.main.saved_models.SavedModelsFragmentViewModel" />
+            type="com.chemist.youngchemist.ui.screen.main.saved_models.SavedModelsFragmentViewModel" />
 
     </data>
 

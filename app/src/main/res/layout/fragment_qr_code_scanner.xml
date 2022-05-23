@@ -7,7 +7,7 @@
 
         <variable
             name="viewModel"
-            type="com.example.youngchemist.ui.screen.main.qr.qr_code.QrCodeFragmentViewModel" />
+            type="com.chemist.youngchemist.ui.screen.main.qr.qr_code.QrCodeFragmentViewModel" />
 
     </data>
 
