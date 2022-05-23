@@ -1,5 +1,6 @@
 package com.chemist.youngchemist.ui.screen.main.subjects
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -9,6 +10,7 @@ import com.chemist.youngchemist.model.Subject
 import com.chemist.youngchemist.repositories.DatabaseRepository
 import com.chemist.youngchemist.repositories.FireStoreRepository
 import com.chemist.youngchemist.ui.screen.Screens
+import com.chemist.youngchemist.ui.screen.main.saved_models.Query
 import com.chemist.youngchemist.ui.util.Resource
 import com.chemist.youngchemist.ui.util.ResourceNetwork
 import com.github.terrakok.cicerone.Router
@@ -42,19 +44,26 @@ class SubjectsFragmentViewModel @Inject constructor(
 
 
     init {
-        getAllSubjects()
         getUserName()
         viewModelScope.launch {
             userPreferences.userStateFlow.filterNotNull().collect {
                 _userState.postValue(it)
             }
         }
-    }
 
-    fun initSubjectSearch() {
         viewModelScope.launch {
-            subjectSearchText.debounce(300).collect {
-
+            combine(
+                subjectSearchText,
+                databaseRepository.getSubjects()
+            ) { title, list ->
+                if (title.isEmpty() && list.isEmpty()) {
+                    loadSubjects()
+                    ResourceNetwork.Loading()
+                } else {
+                    ResourceNetwork.Success(list.filter { it.title.lowercase().startsWith(title) })
+                }
+            }.collect {
+                _subjectsState.postValue(it)
             }
         }
     }
@@ -64,23 +73,7 @@ class SubjectsFragmentViewModel @Inject constructor(
     }
 
     fun tryAgain() {
-        getAllSubjects()
-    }
-
-    private fun getAllSubjects() {
-        viewModelScope.launch {
-            _subjectsState.postValue(ResourceNetwork.Loading())
-            databaseRepository.getSubjects()
-                .onEach {
-                    if (it.isEmpty()) {
-                        loadSubjects()
-                    }
-                }
-                .filterNot { it.isEmpty() }
-                .collect {
-                    _subjectsState.postValue(ResourceNetwork.Success(it))
-                }
-        }
+        loadSubjects()
     }
 
     private fun loadSubjects() {

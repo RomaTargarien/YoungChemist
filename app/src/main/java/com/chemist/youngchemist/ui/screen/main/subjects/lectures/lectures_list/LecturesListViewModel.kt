@@ -40,6 +40,9 @@ class LecturesListViewModel @Inject constructor(
     private val _readenLecturesCount: MutableLiveData<Pair<Int, Int>> = MutableLiveData()
     val readenLecturesCount: LiveData<Pair<Int, Int>> = _readenLecturesCount
 
+    private var subjectCollectionId: String = ""
+    private val lecturesIds: MutableSet<String> = mutableSetOf()
+
     fun exit() {
         router.exit()
     }
@@ -50,6 +53,7 @@ class LecturesListViewModel @Inject constructor(
 
     fun getLectures(collectionId: String) {
         viewModelScope.launch {
+            subjectCollectionId = collectionId
             _lecturesUiState.postValue(ResourceNetwork.Loading())
             val progressList = databaseRepository.getProgress(currentUser.uid)
             val passedUserTests = databaseRepository.getAllPassedUserTests(currentUser.uid)
@@ -58,7 +62,7 @@ class LecturesListViewModel @Inject constructor(
                 Triple(lecture, tests, progress)
             }.onEach {
                 if (it.first.isEmpty()) {
-                    loadRemoteLectures(collectionId)
+                    loadRemoteLectures()
                 }
             }.filterNot {
                 it.first.isEmpty()
@@ -68,6 +72,7 @@ class LecturesListViewModel @Inject constructor(
                 val userProgress = it.third
                 val lecturesUi = savedLectures.map { it.convertToLectureUi() }
                 lecturesUi.forEach { lectureUi ->
+                    lecturesIds.add(lectureUi.lectureId)
                     lectureUi.addUserPassedTests(passedTests)
                     lectureUi.addUserProgress(userProgress).also {
                         if (!it) { initializeNewProgressProgress(lectureUi.lectureId) }
@@ -79,13 +84,16 @@ class LecturesListViewModel @Inject constructor(
         }
     }
 
-    private fun loadRemoteLectures(collectionId: String) {
+    fun loadRemoteLectures() {
         viewModelScope.launch {
-            val result = fireStoreRepository.getAllLectures(collectionId)
+            val result = fireStoreRepository.getAllLectures(subjectCollectionId)
             when (result) {
                 is ResourceNetwork.Success -> {
                     result.data?.forEach {
-                        databaseRepository.saveLecture(it)
+                        if (it.collectionId !in lecturesIds) {
+                            databaseRepository.saveLecture(it)
+                            lecturesIds.add(it.collectionId)
+                        }
                     }
                 }
                 is ResourceNetwork.Error -> {

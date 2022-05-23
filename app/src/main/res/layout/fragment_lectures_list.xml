@@ -170,6 +170,18 @@
                     app:layout_constraintTop_toTopOf="parent"
                     tools:text="Посуда" />
 
+                <ImageView
+                    android:id="@+id/iv_reload"
+                    android:layout_width="35dp"
+                    android:layout_height="35dp"
+                    android:src="@drawable/ic_baseline_refresh_24"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    android:onClick="@{view -> viewModel.loadRemoteLectures()}"
+                    android:layout_marginEnd="10dp"
+                    android:visibility="gone"
+                    app:layout_constraintTop_toTopOf="parent"/>
+
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 

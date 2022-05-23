@@ -36,7 +36,7 @@ class SavedModelsFragmentViewModel @Inject constructor(
                 databaseRepository.getAllModelsFlow(currentUser.uid)
             ) { title, list ->
                 val list2 = list.filter {
-                    it.modelTitle.startsWith(title)
+                    it.modelTitle.lowercase().startsWith(title)
                 }
                 if (title.isEmpty()) {
                     Pair(list2, Query.All)

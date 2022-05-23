@@ -59,6 +59,7 @@ class SavedModelsFragment : Fragment() {
                 }
                 is Query.All -> {
                     binding.tvEmptyList.isVisible = list.isEmpty()
+                    binding.tvEmptySearch.isVisible = false
                     animateTextNumberVisibility(list.size)
                 }
             }

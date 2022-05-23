@@ -10,7 +10,7 @@ class Intent3DCreator {
         private const val FILE = "file"
         private const val MODE = "mode"
         private const val MODE_TYPE = "3d_only"
-        private const val PACKAGE_NAME = "com.google.ar.core"
+        private const val PACKAGE_NAME = "com.google.android.googlequicksearchbox"
 
         fun create3DIntent(uri: String): Intent =
             Intent(Intent.ACTION_VIEW).apply {

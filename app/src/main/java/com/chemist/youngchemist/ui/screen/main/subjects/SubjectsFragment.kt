@@ -34,15 +34,9 @@ class SubjectsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         val adapter = SubjectsAdapter()
         binding.viewModel = viewModel
-        binding.ivSearch.setOnClickListener {
-            binding.etSubjectSearch.isEnabled = true
-            binding.etSubjectSearch.requestFocus()
-            binding.etSubjectSearch.showKeyboard()
-        }
-
+        binding.lifecycleOwner = viewLifecycleOwner
         binding.rvSubjects.layoutManager = GridLayoutManager(this.requireContext(),3)
         binding.rvSubjects.adapter = adapter
         adapter.setOnClickListener {
@@ -52,17 +46,20 @@ class SubjectsFragment : Fragment() {
             when (it) {
                 is Resource.Loading -> {
                     binding.containerUserState.isVisible = true
+                    binding.etSubjectSearch.isEnabled = false
                     adapter.isClickable = false
                 }
                 is Resource.Error -> {
                     binding.pbUserState.isVisible = false
                     binding.ivUserState.isVisible = true
+                    binding.etSubjectSearch.isEnabled = false
                     adapter.isClickable = false
                     binding.ivUserState.setImageResource(R.drawable.error)
                 }
                 is Resource.Success -> {
                     binding.pbUserState.isVisible = false
                     binding.ivUserState.isVisible = true
+                    binding.etSubjectSearch.isEnabled = true
                     adapter.isClickable = true
                     adapter.notifyDataSetChanged()
                     binding.ivUserState.setImageResource(R.drawable.success)

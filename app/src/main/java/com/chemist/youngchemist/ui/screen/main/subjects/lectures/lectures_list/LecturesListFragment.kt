@@ -50,6 +50,7 @@ class LecturesListFragment : Fragment() {
         binding.viewModel = viewModel
         subject?.let {
             viewModel.getLectures(it.collectionId)
+            binding.tvSubjectTitle.text = it.title
             loadImage(it)
         }
         initializeRecyclerView()
@@ -59,15 +60,18 @@ class LecturesListFragment : Fragment() {
         viewModel.lecturesUiState.observe(viewLifecycleOwner) {
             when (it) {
                 is ResourceNetwork.Success -> {
+                    binding.ivReload.isVisible = true
                     binding.progressFlask.isVisible = false
                     it.data?.let {
                         lecturesListAdapter.submitList(it)
                     }
                 }
                 is ResourceNetwork.Error -> {
+                    binding.ivReload.isVisible = false
                     binding.progressFlask.isVisible = false
                 }
                 is ResourceNetwork.Loading -> {
+                    binding.ivReload.isVisible = false
                     binding.progressFlask.isVisible = true
                 }
             }

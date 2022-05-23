@@ -54,10 +54,11 @@
 
                 <EditText
                     android:id="@+id/et_subject_search"
-                    android:layout_width="wrap_content"
+                    android:layout_width="200dp"
                     android:layout_height="wrap_content"
                     android:background="@null"
-                    android:enabled="false"
+                    android:enabled="true"
+                    android:text="@={viewModel.subjectSearchText}"
                     android:hint="@string/subject_search"
                     android:paddingLeft="10dp" />
             </LinearLayout>
