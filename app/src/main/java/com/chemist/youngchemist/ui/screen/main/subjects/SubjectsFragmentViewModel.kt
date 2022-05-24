@@ -1,6 +1,5 @@
 package com.chemist.youngchemist.ui.screen.main.subjects
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -10,7 +9,6 @@ import com.chemist.youngchemist.model.Subject
 import com.chemist.youngchemist.repositories.DatabaseRepository
 import com.chemist.youngchemist.repositories.FireStoreRepository
 import com.chemist.youngchemist.ui.screen.Screens
-import com.chemist.youngchemist.ui.screen.main.saved_models.Query
 import com.chemist.youngchemist.ui.util.Resource
 import com.chemist.youngchemist.ui.util.ResourceNetwork
 import com.github.terrakok.cicerone.Router
@@ -40,32 +38,16 @@ class SubjectsFragmentViewModel @Inject constructor(
     private val _userName: MutableLiveData<ResourceNetwork<String>> = MutableLiveData()
     val userName: LiveData<ResourceNetwork<String>> = _userName
 
+    private val subjectIds: MutableSet<String> = mutableSetOf()
     val subjectSearchText: MutableStateFlow<String> = MutableStateFlow("")
 
+    private val _numberOfSubjectsDownloaded: MutableSharedFlow<Int?> = MutableSharedFlow()
+    val numberOfSubjectsDownloaded: SharedFlow<Int?> = _numberOfSubjectsDownloaded
 
     init {
         getUserName()
-        viewModelScope.launch {
-            userPreferences.userStateFlow.filterNotNull().collect {
-                _userState.postValue(it)
-            }
-        }
-
-        viewModelScope.launch {
-            combine(
-                subjectSearchText,
-                databaseRepository.getSubjects()
-            ) { title, list ->
-                if (title.isEmpty() && list.isEmpty()) {
-                    loadSubjects()
-                    ResourceNetwork.Loading()
-                } else {
-                    ResourceNetwork.Success(list.filter { it.title.lowercase().startsWith(title) })
-                }
-            }.collect {
-                _subjectsState.postValue(it)
-            }
-        }
+        initSubjectsFlow()
+        initUserStateFlow()
     }
 
     fun navigateToLecturesListScreen(subject: Subject) {
@@ -76,15 +58,23 @@ class SubjectsFragmentViewModel @Inject constructor(
         loadSubjects()
     }
 
-    private fun loadSubjects() {
+    fun loadSubjects() {
         viewModelScope.launch {
+            _subjectsState.postValue(ResourceNetwork.Loading())
             when (val result = fireStoreRepository.getAllSubjects()) {
                 is ResourceNetwork.Success -> {
+                    var newSubjectsNumber = 0
                     result.data?.forEach {
-                        databaseRepository.saveSubject(it)
+                        if (it.subjectId !in subjectIds) {
+                            newSubjectsNumber++
+                            databaseRepository.saveSubject(it)
+                            subjectIds.add(it.subjectId)
+                        }
                     }
+                    _numberOfSubjectsDownloaded.emit(newSubjectsNumber)
                 }
                 is ResourceNetwork.Error -> {
+                    _numberOfSubjectsDownloaded.emit(null)
                     _subjectsState.postValue(ResourceNetwork.Error(result.message))
                 }
             }
@@ -97,6 +87,35 @@ class SubjectsFragmentViewModel @Inject constructor(
             val result = fireStoreRepository.getUser(currentUser.uid).await()
             if (result is ResourceNetwork.Success) {
                 result.data?.let { _userName.postValue(ResourceNetwork.Success(it.name)) }
+            }
+        }
+    }
+
+    private fun initSubjectsFlow() {
+        viewModelScope.launch {
+            combine(
+                subjectSearchText,
+                databaseRepository.getSubjects()
+            ) { title, list ->
+                list.forEach {
+                    subjectIds.add(it.subjectId)
+                }
+                if (title.isEmpty() && list.isEmpty()) {
+                    loadSubjects()
+                    ResourceNetwork.Loading()
+                } else {
+                    ResourceNetwork.Success(list.filter { it.title.lowercase().startsWith(title) })
+                }
+            }.collect {
+                _subjectsState.postValue(it)
+            }
+        }
+    }
+
+    private fun initUserStateFlow() {
+        viewModelScope.launch {
+            userPreferences.userStateFlow.filterNotNull().collect {
+                _userState.postValue(it)
             }
         }
     }

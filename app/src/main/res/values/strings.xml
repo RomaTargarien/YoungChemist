@@ -37,7 +37,7 @@
     <string name="ERROR_EMAIL_ALREADY_IN_USE">К сожалению, этот логин уже занят. Попробуйте зарегестрироваться с другим логином</string>
     <string name="ERROR_USER_NOT_FOUND">Такого пользователя не существует! Проверьте введенные данные. </string>
     <string name="ERROR_UNKNOWN">Произошла ошибка, попробуйте повторить это действие позже</string>
-    <string name="ERROR_INVALID_CREDENTIALS">Проверьте правильность вв</string>
+    <string name="ERROR_INVALID_CREDENTIALS">Проверьте правильность ввода</string>
     <string name="select_page">Выбрать страницу</string>
     <string name="start_test">Начать тест</string>
     <string name="done">Готово</string>
@@ -67,4 +67,9 @@
     <string name="email_has_successfully_changed">Логин успешно изменен</string>
     <string name="exit">Выйти</string>
     <string name="subject_search">Поиск по предметам</string>
+    <string name="no_new_lectures">Новых лекций нет</string>
+    <string name="new_lectures_number">Количество новых лекций - %d</string>
+    <string name="no_new_subjects">Новых предметов нет</string>
+    <string name="new_subjects_number">Количество новых предметов - %d</string>
+    <string name="error_while_loading">Не удалось обновить</string>
 </resources>

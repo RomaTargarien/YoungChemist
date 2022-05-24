@@ -80,10 +80,8 @@ class LecturesListAdapter : RecyclerView.Adapter<LecturesListAdapter.LectureView
 
             binding.bnBeginTest.setOnClickListener {
                 lectureUi.userProgress?.let {
-                    if (it.isLectureEnabled) {
-                        onBeginTestButtonClicked?.let { click ->
-                            lectureUi.test?.let { click(it) }
-                        }
+                    onBeginTestButtonClicked?.let { click ->
+                        lectureUi.test?.let { click(it) }
                     }
                 }
             }

@@ -12,6 +12,6 @@ abstract class BaseLaunchTestViewModel(
 ): ViewModel() {
 
     fun navigateToTestScreen(test: Test) {
-        router.replaceScreen(Screens.rootTestScreen(test))
+        router.navigateTo(Screens.rootTestScreen(test))
     }
 }

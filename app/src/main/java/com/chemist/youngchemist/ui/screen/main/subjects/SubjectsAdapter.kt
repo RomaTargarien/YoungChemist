@@ -4,10 +4,8 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.chemist.youngchemist.R
 import com.chemist.youngchemist.databinding.ItemSubjectBinding
 import com.chemist.youngchemist.model.Subject
-import com.squareup.picasso.Picasso
 
 class SubjectsAdapter : RecyclerView.Adapter<SubjectsAdapter.SubjectViewHolder>() {
 
@@ -31,13 +29,8 @@ class SubjectsAdapter : RecyclerView.Adapter<SubjectsAdapter.SubjectViewHolder>(
     inner class SubjectViewHolder(val binding: ItemSubjectBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(item: Subject) {
-            if (!isClickable) {
-                binding.containerItem.alpha = 0.5f
-            } else {
-                binding.containerItem.alpha = 1f
-            }
-            binding.title.setText(item.title)
-            loadImage(item)
+            binding.subject = item
+            binding.containerItem.alpha = if (isClickable) 1f else 0.5f
             binding.ivSubject.setOnClickListener {
                 onClick?.let { click ->
                     if (isClickable) {
@@ -45,13 +38,6 @@ class SubjectsAdapter : RecyclerView.Adapter<SubjectsAdapter.SubjectViewHolder>(
                     }
                 }
             }
-        }
-
-        private fun loadImage(item: Subject) {
-            Picasso.get()
-                .load(item.icon_url)
-                .placeholder(R.drawable.ic_icon_happy_flask)
-                .into(binding.ivSubject)
         }
     }
 

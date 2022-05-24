@@ -8,5 +8,6 @@ interface UserPreferences {
     var userState: Int
     val userStateFlow: MutableStateFlow<Resource<String>?>
     val bottomSheetState: MutableStateFlow<Float?>
+    var lastEmail: String?
 }
 

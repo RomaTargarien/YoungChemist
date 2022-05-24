@@ -42,7 +42,7 @@
                 android:backgroundTint="@color/white"
                 android:orientation="horizontal"
                 android:padding="10dp"
-                app:layout_constraintEnd_toStartOf="@+id/linearLayout2"
+                app:layout_constraintEnd_toStartOf="@+id/iv_refresh"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/tv_user_name">
 
@@ -63,23 +63,40 @@
                     android:paddingLeft="10dp" />
             </LinearLayout>
 
-            <LinearLayout
-                android:id="@+id/linearLayout2"
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/iv_refresh"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
+                android:layout_height="0dp"
                 android:background="@drawable/shape_rounded_rectangle_for_edittext"
                 android:backgroundTint="@color/white"
-                android:padding="10dp"
+                app:layout_constraintBottom_toBottomOf="@+id/linearLayout"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/tv_user_name">
+                app:layout_constraintTop_toTopOf="@+id/linearLayout">
 
                 <ImageView
+                    android:id="@+id/iv_reload"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:background="#CDCDCD"
-                    android:src="@drawable/ic_baseline_bar_chart" />
-            </LinearLayout>
+                    android:onClick="@{view -> viewModel.loadSubjects()}"
+                    android:src="@drawable/ic_baseline_refresh_24"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:tint="@color/dark_violet" />
+
+                <ProgressBar
+                    android:id="@+id/pb_subject"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    android:visibility="gone"
+                    android:indeterminateTint="@color/dark_violet"/>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/constraintLayout"
@@ -130,6 +147,8 @@
                     android:layout_width="145dp"
                     android:layout_height="145dp"
                     android:src="@drawable/colbes"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/textView4"
                     app:layout_constraintTop_toTopOf="parent">
 

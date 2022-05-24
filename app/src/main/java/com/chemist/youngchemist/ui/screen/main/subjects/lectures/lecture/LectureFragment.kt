@@ -21,12 +21,14 @@ import com.chemist.youngchemist.ui.listeners.OnUriGetting
 import com.chemist.youngchemist.ui.screen.main.subjects.lectures.lecture_base.StartTestDialogFragment
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 
+@FlowPreview
 @AndroidEntryPoint
 @SuppressLint("SetJavaScriptEnabled")
 class LectureFragment : Fragment() {

@@ -9,6 +9,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.chemist.youngchemist.R
 import com.chemist.youngchemist.databinding.FragmentLecturesListBinding
@@ -17,9 +18,12 @@ import com.chemist.youngchemist.model.Test
 import com.chemist.youngchemist.ui.screen.main.MainFragmentViewModel
 import com.chemist.youngchemist.ui.screen.main.subjects.lectures.lecture_base.StartTestDialogFragment
 import com.chemist.youngchemist.ui.util.ResourceNetwork
+import com.google.android.material.snackbar.Snackbar
 import com.squareup.picasso.Picasso
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 
 
 @FlowPreview
@@ -31,6 +35,7 @@ class LecturesListFragment : Fragment() {
     private val mainViewModel: MainFragmentViewModel by activityViewModels()
     private var subject: Subject? = null
     private lateinit var lecturesListAdapter: LecturesListAdapter
+    private var snackbarNewLectures: Snackbar? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,13 +62,14 @@ class LecturesListFragment : Fragment() {
         setOnClickListeners()
         observeUserProgressCounts()
         showUnViewedAchievementNumber()
+        observeNewLecturesDownloadedNumber()
         viewModel.lecturesUiState.observe(viewLifecycleOwner) {
             when (it) {
                 is ResourceNetwork.Success -> {
                     binding.ivReload.isVisible = true
                     binding.progressFlask.isVisible = false
                     it.data?.let {
-                        lecturesListAdapter.submitList(it)
+                        lecturesListAdapter.submitList(it.sortedBy { it.lectureOrderNumber })
                     }
                 }
                 is ResourceNetwork.Error -> {
@@ -142,6 +148,26 @@ class LecturesListFragment : Fragment() {
                 }
             }
         }
+    }
+
+    private fun observeNewLecturesDownloadedNumber() {
+        lifecycleScope.launch {
+            viewModel.numberOfLecturesDownloaded.collect { number ->
+                val messageText = when (number) {
+                    null -> resources.getString(R.string.error_while_loading)
+                    0 -> resources.getString(R.string.no_new_lectures)
+                    else -> resources.getString(R.string.new_lectures_number, number)
+                }
+                snackbarNewLectures =
+                    Snackbar.make(binding.container, messageText, Snackbar.LENGTH_SHORT)
+                snackbarNewLectures?.show()
+            }
+        }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        snackbarNewLectures?.dismiss()
     }
 
     companion object {

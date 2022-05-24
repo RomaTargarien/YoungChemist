@@ -19,6 +19,7 @@ class UserPreferenceImpl @Inject constructor(
         context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
 
     private val KEY_USER_ID = "key.user"
+    private val KEY_EMAIL = "key.email"
 
 
     override var loggedUsers: Set<String> = sharedPref.let {
@@ -33,6 +34,15 @@ class UserPreferenceImpl @Inject constructor(
         set(value) {
             val edit = sharedPref.edit()
             edit.putStringSet(KEY_USER_ID, value)
+            edit.apply()
+            field = value
+        }
+
+    override var lastEmail: String? = null
+        get() = sharedPref.getString(KEY_EMAIL,null)
+        set(value) {
+            val edit = sharedPref.edit()
+            edit.putString(KEY_EMAIL,value)
             edit.apply()
             field = value
         }

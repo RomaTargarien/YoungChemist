@@ -92,18 +92,6 @@ fun Long.evaluateTime(): String {
 
 }
 
-fun View.bounce(): AnimatorSet {
-    val animatorSet = AnimatorSet()
-
-    val object1: ObjectAnimator =
-        ObjectAnimator.ofFloat(this, "scaleX", 1f, 1.25f, 0.75f, 1.15f, 1f)
-    val object2: ObjectAnimator =
-        ObjectAnimator.ofFloat(this, "scaleY", 1f, 0.75f, 1.25f, 0.85f, 1f)
-
-    animatorSet.playTogether(object1, object2)
-    return animatorSet
-}
-
 fun ProgressBar.animateProgress(from: Int, to: Int) {
     val pregressAnimator = ObjectAnimator.ofInt(this, "progress", from, to)
     pregressAnimator.duration = 1800

@@ -19,11 +19,11 @@ import com.chemist.youngchemist.model.user.UserProgress
         Model3D::class,
         UserProgress::class,
         UserAchievement::class],
-    version = 26
+    version = 27
 )
 @TypeConverters(Converters::class)
 abstract class SubjectDatabase : RoomDatabase() {
-    abstract fun getSubjectdao(): SubjectDao
+    abstract fun getSubjectDao(): SubjectDao
     abstract fun getLectureDao(): LectureDao
     abstract fun getTestDao(): TestDao
     abstract fun getModel3DDao(): Model3DDao

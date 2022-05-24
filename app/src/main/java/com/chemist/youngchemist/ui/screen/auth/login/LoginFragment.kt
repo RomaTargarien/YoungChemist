@@ -20,7 +20,6 @@ import kotlinx.coroutines.FlowPreview
 @AndroidEntryPoint
 class LoginFragment : Fragment() {
 
-
     private val viewModel: LoginFragmnetViewModel by viewModels()
     private lateinit var binding: FragmentLoginBinding
     private lateinit var animationHelper: AnimationHelper
@@ -46,8 +45,7 @@ class LoginFragment : Fragment() {
             binding.bnLogin
         )
 
-
-        viewModel.isErrorMessageVisible.observe(viewLifecycleOwner, {
+        viewModel.isErrorMessageVisible.observe(viewLifecycleOwner) {
             if (it.second) {
                 it.first?.let {
                     animationHelper.showMessage(it)
@@ -55,9 +53,9 @@ class LoginFragment : Fragment() {
             } else {
                 animationHelper.hideMessage()
             }
-        })
+        }
 
-        viewModel.loginState.observe(viewLifecycleOwner, {
+        viewModel.loginState.observe(viewLifecycleOwner) {
             closeKeyBoard()
             val result = it.getContentIfNotHandled()
             result?.let {
@@ -76,7 +74,7 @@ class LoginFragment : Fragment() {
                     }
                 }
             }
-        })
+        }
     }
 
     override fun onPause() {

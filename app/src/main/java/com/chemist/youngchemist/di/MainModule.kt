@@ -64,7 +64,7 @@ object MainModule {
 
     @Provides
     @Singleton
-    fun provideSubjectsDao(db: SubjectDatabase) = db.getSubjectdao()
+    fun provideSubjectsDao(db: SubjectDatabase) = db.getSubjectDao()
 
     @Provides
     @Singleton

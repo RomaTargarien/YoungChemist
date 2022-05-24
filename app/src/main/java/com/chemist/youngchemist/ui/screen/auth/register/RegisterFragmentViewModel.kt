@@ -155,6 +155,9 @@ class RegisterFragmentViewModel @Inject constructor(
                 password.value,
                 name.value,
                 surname.value)
+            if (registerResult is ResourceNetwork.Success) {
+                userPreferences.lastEmail = login.value
+            }
             _registerState.postValue(Event(registerResult))
         }
     }

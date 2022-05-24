@@ -17,6 +17,7 @@
         tools:context=".ui.screen.main.subjects.lectures.lectures_list.LecturesListFragment">
 
         <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/container"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@drawable/main_background">
@@ -174,14 +175,13 @@
                     android:id="@+id/iv_reload"
                     android:layout_width="35dp"
                     android:layout_height="35dp"
+                    android:layout_marginEnd="10dp"
+                    android:onClick="@{view -> viewModel.loadRemoteLectures()}"
                     android:src="@drawable/ic_baseline_refresh_24"
+                    android:visibility="visible"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
-                    android:onClick="@{view -> viewModel.loadRemoteLectures()}"
-                    android:layout_marginEnd="10dp"
-                    android:visibility="gone"
-                    app:layout_constraintTop_toTopOf="parent"/>
-
+                    app:layout_constraintTop_toTopOf="parent" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
