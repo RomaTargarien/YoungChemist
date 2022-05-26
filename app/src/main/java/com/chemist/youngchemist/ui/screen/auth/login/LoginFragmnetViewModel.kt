@@ -52,19 +52,21 @@ class LoginFragmnetViewModel @Inject constructor(
 
     init {
         viewModelScope.launch(Dispatchers.Default) {
-            login.drop(if (userPreferences.lastEmail == null) 1 else 0).onEach {
-                errorLoginBehavior.emit(TextInputResource.InputInProcess())
-            }.debounce(300).collect {
-                errorLoginBehavior.emit(loginValidation.validate(it))
-            }
+            login.drop(if (userPreferences.lastEmail == null) 1 else 0)
+                .onEach { errorLoginBehavior.emit(TextInputResource.InputInProcess()) }
+                .debounce(300)
+                .collect {
+                    errorLoginBehavior.emit(loginValidation.validate(it))
+                }
         }
 
         viewModelScope.launch(Dispatchers.Default) {
-            password.drop(1).onEach {
-                errorPasswordBehavior.emit(TextInputResource.InputInProcess())
-            }.debounce(300).collect {
-                errorPasswordBehavior.emit(passwordValidation.validate(it))
-            }
+            password.drop(1)
+                .onEach { errorPasswordBehavior.emit(TextInputResource.InputInProcess()) }
+                .debounce(300)
+                .collect {
+                    errorPasswordBehavior.emit(passwordValidation.validate(it))
+                }
         }
     }
 

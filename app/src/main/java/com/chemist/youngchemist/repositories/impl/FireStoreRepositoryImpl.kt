@@ -1,34 +1,32 @@
 package com.chemist.youngchemist.repositories.impl
 
-import android.util.Log
 import com.chemist.youngchemist.model.*
 import com.chemist.youngchemist.model.user.Model3D
 import com.chemist.youngchemist.model.user.PassedUserTest
 import com.chemist.youngchemist.model.user.UserAchievement
 import com.chemist.youngchemist.model.user.UserProgress
 import com.chemist.youngchemist.repositories.FireStoreRepository
+import com.chemist.youngchemist.ui.util.constants.Constants.EMPTY_SUCCESS
 import com.chemist.youngchemist.ui.util.ResourceNetwork
+import com.chemist.youngchemist.ui.util.constants.Collection
 import com.chemist.youngchemist.ui.util.safeCall
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
-import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
-import java.util.*
 import javax.inject.Inject
-import kotlin.collections.ArrayList
 
 class FireStoreRepositoryImpl @Inject constructor(
-    private val firestore: FirebaseFirestore,
-    private val storage: FirebaseStorage
+    private val firestore: FirebaseFirestore
 ) : FireStoreRepository {
 
-    private val subjects = firestore.collection("subjects")
-    private val testref = firestore.collection("tests")
-    private val achref = firestore.collection("achievements")
+    private val subjects = firestore.collection(Collection.SUBJECTS)
+    private val achievements = firestore.collection(Collection.ACHIEVEMENTS)
+    private val users = firestore.collection(Collection.USERS)
+    private val models3D = firestore.collection(Collection.MODELS3D)
 
     override suspend fun getAllSubjects() = withContext(Dispatchers.IO) {
         safeCall {
@@ -58,19 +56,9 @@ class FireStoreRepositoryImpl @Inject constructor(
 
     override suspend fun get3DModel(modelId: String) = withContext(Dispatchers.IO) {
         safeCall {
-            val result = firestore.collection("3Dmodels").document(modelId).get().await()
+            val result = models3D.document(modelId).get().await()
             val model = result.toObject(Model3D::class.java)
             ResourceNetwork.Success(model)
-        }
-    }
-
-    override suspend fun saveTest(test: Test) {
-        withContext(Dispatchers.IO) {
-            try {
-                testref.add(test).await()
-            } catch (e: Exception) {
-                Log.d("Tag", e.localizedMessage)
-            }
         }
     }
 
@@ -80,53 +68,37 @@ class FireStoreRepositoryImpl @Inject constructor(
     ): ResourceNetwork<String> {
         return withContext(Dispatchers.IO) {
             safeCall {
-                val result = firestore.collection("users").document(userUid).get().await()
+                val result = users.document(userUid).get().await()
                 val user = result.toObject(User::class.java)
-                Log.d("TAG", user.toString())
                 user?.passedUserTests?.add(passedUserTest)
-                firestore.collection("users").document(userUid).set(
+                users.document(userUid).set(
                     user!!,
                     SetOptions.merge()
                 )
-                ResourceNetwork.Success("")
+                ResourceNetwork.Success(EMPTY_SUCCESS)
             }
-        }
-    }
-
-    override suspend fun retriveTest(uid: String) = withContext(Dispatchers.IO) {
-        safeCall {
-            val result = firestore.collection("tests").document(uid).get().await()
-            val test: Test? = result.toObject(Test::class.java)
-            ResourceNetwork.Success(test)
         }
     }
 
     override suspend fun getUser(userUid: String) = CoroutineScope(Dispatchers.IO).async {
         safeCall {
-            val result = firestore.collection("users").document(userUid).get().await()
+            val result = users.document(userUid).get().await()
             val user = result.toObject(User::class.java)
             ResourceNetwork.Success(user)
-        }
-    }
-
-    override suspend fun saveLecture(lecture: Lecture) = withContext(Dispatchers.IO) {
-        safeCall {
-            firestore.collection("titration").document(lecture.lectureId).set(lecture).await()
-            ResourceNetwork.Success("")
         }
     }
 
     override suspend fun save3DModels(userId: String, models3D: List<Model3D>) =
         withContext(Dispatchers.IO) {
             safeCall {
-                val result = firestore.collection("users").document(userId).get().await()
+                val result = users.document(userId).get().await()
                 val user = result.toObject(User::class.java)
                 user?.saved3DModels = ArrayList(models3D)
-                firestore.collection("users").document(userId).set(
+                users.document(userId).set(
                     user!!,
                     SetOptions.merge()
                 )
-                ResourceNetwork.Success("")
+                ResourceNetwork.Success(EMPTY_SUCCESS)
             }
         }
 
@@ -135,14 +107,14 @@ class FireStoreRepositoryImpl @Inject constructor(
         userProgress: List<UserProgress>
     ) = withContext(Dispatchers.IO) {
         safeCall {
-            val result = firestore.collection("users").document(userId).get().await()
+            val result = users.document(userId).get().await()
             val user = result.toObject(User::class.java)
             user?.userProgress = ArrayList(userProgress)
-            firestore.collection("users").document(userId).set(
+            users.document(userId).set(
                 user!!,
                 SetOptions.merge()
             )
-            ResourceNetwork.Success("")
+            ResourceNetwork.Success(EMPTY_SUCCESS)
         }
     }
 
@@ -151,20 +123,20 @@ class FireStoreRepositoryImpl @Inject constructor(
         doneAchievements: List<UserAchievement>
     ) = withContext(Dispatchers.IO) {
         safeCall {
-            val result = firestore.collection("users").document(userId).get().await()
+            val result = users.document(userId).get().await()
             val user = result.toObject(User::class.java)
             user?.doneAchievements = ArrayList(doneAchievements)
-            firestore.collection("users").document(userId).set(
+            users.document(userId).set(
                 user!!,
                 SetOptions.merge()
             )
-            ResourceNetwork.Success("")
+            ResourceNetwork.Success(EMPTY_SUCCESS)
         }
     }
 
     override suspend fun getUserModels3D(userId: String) = withContext(Dispatchers.IO) {
         safeCall {
-            val result = firestore.collection("users").document(userId).get().await()
+            val result = users.document(userId).get().await()
             val user = result.toObject(User::class.java)
             ResourceNetwork.Success(user?.saved3DModels)
         }
@@ -172,21 +144,21 @@ class FireStoreRepositoryImpl @Inject constructor(
 
     override suspend fun updateUserInfo(user: User) = withContext(Dispatchers.IO) {
         safeCall {
-            firestore.collection("users").document(user.uid).set(user, SetOptions.merge())
-            ResourceNetwork.Success("")
+            users.document(user.uid).set(user, SetOptions.merge())
+            ResourceNetwork.Success(EMPTY_SUCCESS)
         }
     }
 
     override suspend fun saveAchivement(achievement: Achievement) = withContext(Dispatchers.IO) {
         safeCall {
-            achref.document(achievement.id).set(achievement)
-            ResourceNetwork.Success("")
+            achievements.document(achievement.id).set(achievement)
+            ResourceNetwork.Success(EMPTY_SUCCESS)
         }
     }
 
     override suspend fun getAllAchivements() = withContext(Dispatchers.IO) {
         safeCall {
-            val result = achref.get().await()
+            val result = achievements.get().await()
             val achievements = mutableListOf<Achievement>()
             result.documents.forEach { snapshot ->
                 snapshot.toObject(Achievement::class.java)?.let {

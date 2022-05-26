@@ -32,12 +32,11 @@ class RegisterFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        requireActivity().onBackPressedDispatcher.addCallback {
-            viewModel.exit()
-        }
         binding.lifecycleOwner = viewLifecycleOwner
         binding.viewModel = viewModel
-        animationHelper = initializeAnimationHepler()
+        initializeAnimationHelper()
+        observeRegistrationState()
+        observeStateAfterRegistration()
         slideUpViews(
             binding.loginContainer,
             binding.nameContainer,
@@ -46,34 +45,43 @@ class RegisterFragment : Fragment() {
             binding.repetaedPasswordContainer,
             binding.bnRegister
         )
+        requireActivity().onBackPressedDispatcher.addCallback {
+            viewModel.exit()
+        }
+    }
 
-        viewModel.isErrorMessageVisible.observe(viewLifecycleOwner, {
+    private fun observeStateAfterRegistration() {
+        viewModel.isErrorMessageVisible.observe(viewLifecycleOwner) {
             if (it.second) {
-                it.first?.let { animationHelper.showMessage(it) }
+                animationHelper.showMessage(it.first ?: "")
             } else {
                 animationHelper.hideMessage()
             }
-        })
+        }
+    }
 
-        viewModel.registerState.observe(viewLifecycleOwner, {
+    private fun observeRegistrationState() {
+        viewModel.registerState.observe(viewLifecycleOwner) {
             val result = it.getContentIfNotHandled()
             result?.let {
-                when {
-                    it is ResourceNetwork.Loading -> {
+                when(result) {
+                    is ResourceNetwork.Loading -> {
                         binding.mainContainer.alpha = 0.5f
                         binding.bnRegister.isEnabled = false
                         binding.progressFlask.isVisible = true
                     }
-                    it is ResourceNetwork.Success -> {
+                    is ResourceNetwork.Success -> {
                         viewModel.enter()
                     }
-                    it is ResourceNetwork.Error -> {
+                    is ResourceNetwork.Error -> {
+                        binding.mainContainer.alpha = 1f
+                        binding.bnRegister.isEnabled = true
                         binding.progressFlask.isVisible = false
-                        viewModel.showError(it.message)
+                        viewModel.showError(result.message)
                     }
                 }
             }
-        })
+        }
     }
 
     override fun onPause() {
@@ -81,12 +89,11 @@ class RegisterFragment : Fragment() {
         closeKeyBoard()
     }
 
-    private fun initializeAnimationHepler() =
-        AnimationHelper(
+    private fun initializeAnimationHelper() {
+        animationHelper = AnimationHelper(
             this.requireContext(),
-            binding.mainContainer,
             binding.cvRegisterResult,
-            binding.errorText,
-            binding.bnRegister
+            binding.errorText
         )
+    }
 }

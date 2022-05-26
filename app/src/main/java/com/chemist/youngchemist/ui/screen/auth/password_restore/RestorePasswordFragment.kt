@@ -36,7 +36,9 @@ class RestorePasswordFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         binding.lifecycleOwner = viewLifecycleOwner
         binding.viewModel = viewModel
-        initializeAnimationHepler()
+        initializeAnimationHelper()
+        observeRestorePasswordState()
+        observeStateAfterRestoringPassword()
         slideUpViews(
             binding.loginContainer,
             binding.bnRestorePassword
@@ -44,21 +46,13 @@ class RestorePasswordFragment : Fragment() {
         requireActivity().onBackPressedDispatcher.addCallback {
             viewModel.exit()
         }
+    }
 
-        viewModel.isResultMessageVisible.observe(viewLifecycleOwner, { result ->
-            if (result.second) {
-                result.first?.let {
-                    animationHelper.showMessage(it,result.third)
-                }
-            } else {
-                animationHelper.hideMessage()
-            }
-        })
-
-        viewModel.restorePasswordState.observe(viewLifecycleOwner, {
+    private fun observeRestorePasswordState() {
+        viewModel.restorePasswordState.observe(viewLifecycleOwner) {
             val result = it.getContentIfNotHandled()
             result?.let {
-                when (it) {
+                when (result) {
                     is ResourceNetwork.Loading -> {
                         binding.mainContainer.alpha = 0.5f
                         binding.bnRestorePassword.isEnabled = false
@@ -66,24 +60,36 @@ class RestorePasswordFragment : Fragment() {
                     }
                     is ResourceNetwork.Success -> {
                         binding.progressFlask.isVisible = false
-                        viewModel.showResultMessage(getString(R.string.go_to_your_email_for_password_changing),false)
+                        binding.bnRestorePassword.isEnabled = true
+                        binding.mainContainer.alpha = 1f
+                        viewModel.showResultMessage(getString(R.string.go_to_your_email_for_password_changing), false)
                     }
                     is ResourceNetwork.Error -> {
+                        binding.mainContainer.alpha = 1f
+                        binding.bnRestorePassword.isEnabled = true
                         binding.progressFlask.isVisible = false
-                        viewModel.showResultMessage(it.message)
+                        viewModel.showResultMessage(result.message)
                     }
                 }
             }
-        })
+        }
     }
 
-    private fun initializeAnimationHepler() {
+    private fun observeStateAfterRestoringPassword() {
+        viewModel.isResultMessageVisible.observe(viewLifecycleOwner) { result ->
+            if (result.second) {
+                animationHelper.showMessage(result.first ?: "", result.third)
+            } else {
+                animationHelper.hideMessage()
+            }
+        }
+    }
+
+    private fun initializeAnimationHelper() {
         animationHelper = AnimationHelper(
             this.requireContext(),
-            binding.mainContainer,
             binding.cvRestorePasswordResult,
             binding.tvResultText,
-            binding.bnRestorePassword,
             binding.ivResultImage,
             binding.tvOoops
         )

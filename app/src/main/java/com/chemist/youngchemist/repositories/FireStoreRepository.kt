@@ -16,17 +16,11 @@ interface FireStoreRepository {
 
     suspend fun get3DModel(modelId: String): ResourceNetwork<Model3D>
 
-    suspend fun saveTest(test: Test)
-
-    suspend fun retriveTest(uid: String): ResourceNetwork<Test>
-
     suspend fun saveTest(userUid: String, passedUserTest: PassedUserTest): ResourceNetwork<String>
 
     suspend fun getUser(userUid: String): Deferred<ResourceNetwork<User>>
 
     suspend fun updateUserInfo(user: User): ResourceNetwork<String>
-
-    suspend fun saveLecture(lecture: Lecture): ResourceNetwork<String>
 
     suspend fun save3DModels(userId: String, models3D: List<Model3D>): ResourceNetwork<String>
 
