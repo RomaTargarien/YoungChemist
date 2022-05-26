@@ -29,8 +29,8 @@ object MainModule {
 
     @Provides
     @Singleton
-    fun provideFirestoreRepository(fireStore: FirebaseFirestore, storage: FirebaseStorage) =
-        FireStoreRepositoryImpl(fireStore, storage) as FireStoreRepository
+    fun provideFirestoreRepository(fireStore: FirebaseFirestore) =
+        FireStoreRepositoryImpl(fireStore) as FireStoreRepository
 
     @Provides
     @Singleton
@@ -102,6 +102,5 @@ object MainModule {
     @Provides
     @Singleton
     fun provideResources(@ApplicationContext context: Context): Resources = context.resources
-
 
 }

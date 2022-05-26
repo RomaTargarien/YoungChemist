@@ -3,7 +3,7 @@ package com.chemist.youngchemist.ui.base.validation
 import android.content.Context
 import android.util.Patterns
 import com.chemist.youngchemist.R
-import com.chemist.youngchemist.ui.util.Constants
+import com.chemist.youngchemist.ui.util.constants.Constants
 import com.chemist.youngchemist.ui.util.TextInputResource
 import javax.inject.Inject
 

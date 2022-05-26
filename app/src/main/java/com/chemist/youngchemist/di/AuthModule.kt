@@ -1,6 +1,7 @@
 package com.chemist.youngchemist.di
 
 import android.content.Context
+import android.content.res.Resources
 import com.chemist.youngchemist.repositories.AuthRepository
 import com.chemist.youngchemist.repositories.impl.AuthRepositoryImpl
 import com.chemist.youngchemist.ui.base.validation.ValidationImpl
@@ -42,8 +43,9 @@ object AuthModule {
     @Singleton
     fun provideAuthRepository(
         firebaseAuth: FirebaseAuth,
-        firestore: FirebaseFirestore
-    ) = AuthRepositoryImpl(firebaseAuth, firestore) as AuthRepository
+        firestore: FirebaseFirestore,
+        resources: Resources
+    ) = AuthRepositoryImpl(firebaseAuth, firestore,resources) as AuthRepository
 
     @Provides
     @Singleton

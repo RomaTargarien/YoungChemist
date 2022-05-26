@@ -34,7 +34,9 @@ class LoginFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         binding.lifecycleOwner = viewLifecycleOwner
         binding.viewModel = viewModel
-        animationHelper = initializeAnimationHepler()
+        initializeAnimationHelper()
+        observeErrorWhileLogin()
+        observeLoginState()
         requireActivity().onBackPressedDispatcher.addCallback {
             viewModel.exit()
         }
@@ -44,37 +46,6 @@ class LoginFragment : Fragment() {
             binding.tvRestorePassword,
             binding.bnLogin
         )
-
-        viewModel.isErrorMessageVisible.observe(viewLifecycleOwner) {
-            if (it.second) {
-                it.first?.let {
-                    animationHelper.showMessage(it)
-                }
-            } else {
-                animationHelper.hideMessage()
-            }
-        }
-
-        viewModel.loginState.observe(viewLifecycleOwner) {
-            closeKeyBoard()
-            val result = it.getContentIfNotHandled()
-            result?.let {
-                when {
-                    it is ResourceNetwork.Loading -> {
-                        binding.mainContainer.alpha = 0.5f
-                        binding.bnLogin.isEnabled = false
-                        binding.progressFlask.isVisible = true
-                    }
-                    it is ResourceNetwork.Success -> {
-                        viewModel.enter()
-                    }
-                    it is ResourceNetwork.Error -> {
-                        binding.progressFlask.isVisible = false
-                        viewModel.showMessage(it.message)
-                    }
-                }
-            }
-        }
     }
 
     override fun onPause() {
@@ -82,12 +53,46 @@ class LoginFragment : Fragment() {
         closeKeyBoard()
     }
 
-    private fun initializeAnimationHepler() =
-        AnimationHelper(
+    private fun observeErrorWhileLogin() {
+        viewModel.isErrorMessageVisible.observe(viewLifecycleOwner) {
+            if (it.second) {
+                animationHelper.showMessage(it.first ?: "")
+            } else {
+                animationHelper.hideMessage()
+            }
+        }
+    }
+
+    private fun observeLoginState() {
+        viewModel.loginState.observe(viewLifecycleOwner) {
+            closeKeyBoard()
+            val result = it.getContentIfNotHandled()
+            result?.let {
+                when (result) {
+                    is ResourceNetwork.Loading -> {
+                        binding.mainContainer.alpha = 0.5f
+                        binding.bnLogin.isEnabled = false
+                        binding.progressFlask.isVisible = true
+                    }
+                    is ResourceNetwork.Success -> {
+                        viewModel.enter()
+                    }
+                    is ResourceNetwork.Error -> {
+                        binding.mainContainer.alpha = 1f
+                        binding.bnLogin.isEnabled = true
+                        binding.progressFlask.isVisible = false
+                        viewModel.showMessage(result.message)
+                    }
+                }
+            }
+        }
+    }
+
+    private fun initializeAnimationHelper() {
+        animationHelper = AnimationHelper(
             this.requireContext(),
-            binding.mainContainer,
             binding.cvLoginResult,
-            binding.tvErrorText,
-            binding.bnLogin
+            binding.tvErrorText
         )
+    }
 }

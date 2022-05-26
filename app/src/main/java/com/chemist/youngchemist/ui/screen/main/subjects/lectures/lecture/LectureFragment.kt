@@ -2,6 +2,7 @@ package com.chemist.youngchemist.ui.screen.main.subjects.lectures.lecture
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -75,6 +76,7 @@ class LectureFragment : Fragment() {
         val size = lecture.data.size
         adapter.setOnEventListener(object : OnUriGetting {
             override fun onUriGetted(uri: String) {
+                Log.d("TAG",uri)
                 startActivity(Intent3DCreator.create3DIntent(uri))
             }
         })
@@ -113,10 +115,10 @@ class LectureFragment : Fragment() {
     private fun initializeBottomSheetPagination() {
         val bottomSheet = binding.bmSheet.bottomSheetContainer
         val bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet)
-        viewModel.isPaginationVisible.observe(viewLifecycleOwner, {
+        viewModel.isPaginationVisible.observe(viewLifecycleOwner) {
             bottomSheetBehavior.state =
                 if (it) BottomSheetBehavior.STATE_EXPANDED else BottomSheetBehavior.STATE_COLLAPSED
-        })
+        }
         bottomSheetBehavior.addBottomSheetCallback(object :
             BottomSheetBehavior.BottomSheetCallback() {
             override fun onStateChanged(bottomSheet: View, newState: Int) {}

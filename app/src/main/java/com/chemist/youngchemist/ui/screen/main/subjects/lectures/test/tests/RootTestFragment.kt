@@ -17,10 +17,13 @@ import com.chemist.youngchemist.ui.base.AnimationHelper
 import com.chemist.youngchemist.ui.screen.main.subjects.lectures.test.tests.dialogs.TestNoSaveDialogFragment
 import com.chemist.youngchemist.ui.screen.main.subjects.lectures.test.tests.dialogs.TestSaveDialogFragment
 import com.chemist.youngchemist.ui.util.FragmentAnimationBehavior
+import com.chemist.youngchemist.ui.util.animateProgress
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.FlowPreview
 
 
+@FlowPreview
 @AndroidEntryPoint
 class RootTestFragment : Fragment() {
 
@@ -49,7 +52,7 @@ class RootTestFragment : Fragment() {
         binding.viewModel = viewModel
         binding.bmSheet.viewModel = viewModel
         viewModel.createUserTest(test)
-        initializeAnimationHepler()
+        initializeAnimationHelper()
         initializeBottomSheet()
         observeTimeLeft()
         observeCurrentPageNumber()
@@ -67,7 +70,7 @@ class RootTestFragment : Fragment() {
     }
 
     private fun observeTimeIsUp() {
-        viewModel.timeIsUp.observe(viewLifecycleOwner, {
+        viewModel.timeIsUp.observe(viewLifecycleOwner) {
             if (it) {
                 binding.testContent.isVisible = false
                 binding.bmSheet.bnDone.isEnabled = false
@@ -77,11 +80,11 @@ class RootTestFragment : Fragment() {
             } else {
                 viewModel.saveTest(true, false)
             }
-        })
+        }
     }
 
     private fun observeCurrentPageNumber() {
-        viewModel.currentPage.observe(viewLifecycleOwner, {
+        viewModel.currentPage.observe(viewLifecycleOwner) {
             val pageNumber = it.first
             val animationBehavior = it.second
             if (pageNumber >= 0) {
@@ -94,13 +97,13 @@ class RootTestFragment : Fragment() {
                     resources.getString(R.string.page_number_from_all_pages, page, allPages)
                 previousPosition = pageNumber
             }
-        })
+        }
     }
 
     private fun observeTimeLeft() {
-        viewModel.timeLeft.observe(viewLifecycleOwner, {
+        viewModel.timeLeft.observe(viewLifecycleOwner) {
             binding.tvTimer.text = it
-        })
+        }
     }
 
     private fun initializeBottomSheet() {
@@ -170,20 +173,18 @@ class RootTestFragment : Fragment() {
         fragmentManager.replace(R.id.test_content, fragment).commit()
     }
 
-    private fun initializeAnimationHepler() {
+    private fun initializeAnimationHelper() {
         animationHelper = AnimationHelper(
             this.requireContext(),
-            binding.testContent,
             binding.cvTestEnd,
-            binding.tvErrorText,
-            binding.bmSheet.bnDone
+            binding.tvErrorText
         )
     }
 
     private fun animateProgressBar(pageNumber: Int) {
         val from = (((previousPosition.toFloat() + 1) / (test.tasks.size)) * 100)
         val to = ((pageNumber.toFloat() + 1) / (test.tasks.size)) * 100
-        animationHelper.animateProgressBar(binding.progressBar, from, to)
+        binding.progressBar.animateProgress(from.toInt(), to.toInt())
     }
 
     private fun toggleArrowsVisibility(pageNumber: Int) {
@@ -199,6 +200,7 @@ class RootTestFragment : Fragment() {
 
     companion object {
         private const val TEST = "test"
+
         @JvmStatic
         fun newInstance(test: Test) =
             RootTestFragment().apply {

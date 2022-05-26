@@ -21,8 +21,7 @@ import kotlin.collections.ArrayList
 @FlowPreview
 @HiltViewModel
 class AuthFragmentViewModel @Inject constructor(
-    private val router: Router,
-    private val userPreferences: UserPreferences
+    private val router: Router
 ) : ViewModel() {
 
     fun navigateToRegisterScreen() {
