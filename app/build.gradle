@@ -8,6 +8,14 @@ plugins {
 }
 
 android {
+    signingConfigs {
+        release {
+            storeFile file('../keys/keystore.jks')
+            storePassword '1111063Roman'
+            keyAlias 'key_release'
+            keyPassword '1111063Roman'
+        }
+    }
     compileSdk 31
 
     defaultConfig {
@@ -18,6 +26,7 @@ android {
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        signingConfig signingConfigs.release
     }
     androidExtensions {
         experimental = true
@@ -26,6 +35,8 @@ android {
     buildTypes {
         release {
             minifyEnabled false
+            debuggable false
+            signingConfig signingConfigs.release
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
